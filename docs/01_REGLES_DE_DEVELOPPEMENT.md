@@ -186,7 +186,8 @@ app/src/main/java/mg/itu/att/
 
 - Dépôt Git **public** (exigence des mini-TP), branche `main` stable, une branche par étape (`etape-05-auth`), commits en français à l'impératif (« Ajoute l'entité Candidat et son DAO »), petits et fréquents.
 - `.gitignore` : `local.properties`, `build/`, `.gradle/`, `.idea/` (sauf `.idea/codeStyles` si partagé), `*.db`.
-- Fin de chaque étape : compte rendu dans `docs/COMPTES_RENDUS.md` (créé / modifié / tests / décisions restantes) + entrée dans `JOURNAL-IA.md` si l'IA a été utilisée.
+- **Suivi de l'avancement (automatique)** : le tableau « Où en est-on ? » en tête de `docs/02_PLAN_DE_TRAVAIL.md` est la source unique de vérité pour les deux devs. Claude le met à jour sans qu'on le lui demande : au début d'une étape (ligne 🟡, « Étape en cours ») et à la fin (ligne 🟢 datée, dernière terminée / prochaine / qui), puis commit et push. Pas de suivi parallèle dans un autre outil : un dev qui arrive lit ce tableau, puis le dernier compte rendu.
+- Fin de chaque étape : compte rendu dans `docs/COMPTES_RENDUS.md` (créé / modifié / tests / décisions restantes) + entrée dans `JOURNAL-IA.md` si l'IA a été utilisée + mise à jour du plan + commit + push.
 - Chaque membre du binôme doit pouvoir expliquer chaque fichier sans IA (restitution individuelle S8) : relecture croisée avant merge.
 - Les fichiers `.docx` de cadrage et leurs versions texte sont dans `docs/references/` ; le `.docx` fait foi.
 

@@ -36,5 +36,14 @@ Application Android (Kotlin, Jetpack Compose, Room) de gestion des examens du pe
 ./gradlew :app:installDebug           # installer sur l'émulateur
 ```
 
-## Fin de chaque étape
-Compte rendu dans `docs/COMPTES_RENDUS.md`, entrée dans `JOURNAL-IA.md` si l'IA a produit ou critiqué du code, build et tests verts, vérification manuelle sur émulateur.
+## Début et fin de chaque étape (automatique, sans qu'on ait à le demander)
+**Au début** : passer la ligne de l'étape à 🟡 dans `docs/02_PLAN_DE_TRAVAIL.md` et remplir « Étape en cours » du tableau « Où en est-on ? ».
+
+**À la fin**, dans cet ordre :
+1. Build et tests verts, vérification manuelle sur émulateur.
+2. Compte rendu dans `docs/COMPTES_RENDUS.md` (créé / modifié / tests / décisions restantes).
+3. Entrée dans `JOURNAL-IA.md` si l'IA a produit ou critiqué du code.
+4. `docs/02_PLAN_DE_TRAVAIL.md` : ligne de l'étape à 🟢 avec la date, tableau « Où en est-on ? » mis à jour (dernière terminée, en cours, prochaine, qui).
+5. Commit en français à l'impératif, puis `git push`. Si le travail est sur une branche d'étape, fusionner dans `main` seulement quand le build est vert.
+
+Le tableau « Où en est-on ? » est la seule source de vérité de l'avancement pour les deux devs. Ne jamais terminer une étape sans l'avoir mis à jour et poussé.

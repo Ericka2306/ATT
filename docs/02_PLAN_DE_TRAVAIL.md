@@ -3,6 +3,17 @@
 > Ordre imposé par les instructions §2 : analyse → acteurs/entités → modèle de données → cas d'utilisation → auth/rôles → auto-écoles/candidats/dossiers → règles configurables → centres/sessions/créneaux → inscriptions/présence → tentatives/épreuves → évaluation théorique → structure conduite → calcul des résultats → consultation/impression → tests et cas particuliers.
 > Règle : **une étape à la fois**, compte rendu à la fin de chaque étape (`docs/COMPTES_RENDUS.md`), build et tests verts avant de passer à la suivante.
 
+## 📍 Où en est-on ? (mis à jour automatiquement par Claude à chaque fin d'étape)
+
+| | |
+|---|---|
+| **Dernière étape terminée** | A3 (modèle de données validé) — 15/09/2026 |
+| **Étape en cours** | aucune |
+| **Prochaine étape** | A4 (cas d'utilisation et écrans) puis B0 (socle Gradle) — dev 1 |
+| **Dev 2 peut démarrer** | après B1 (base de données en place) : C4 puis C5 |
+| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape A1 » |
+| **Dernier commit poussé** | `main` — « Note l'URL du dépôt dans le compte rendu » |
+
 Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une question à valider
 
 ---
