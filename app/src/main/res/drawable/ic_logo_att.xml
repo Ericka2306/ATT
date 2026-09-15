@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Logo de l'application (dessin vectoriel maison, pas le logo officiel de l'ATT) :
+     une route qui file vers l'horizon dans un disque bleu, soleil vert de Madagascar. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Disque de fond -->
+    <path
+        android:fillColor="#0F4C81"
+        android:pathData="M54,54 m-46,0 a46,46 0 1,0 92,0 a46,46 0 1,0 -92,0" />
+
+    <!-- Soleil -->
+    <path
+        android:fillColor="#1E8449"
+        android:pathData="M54,34 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0" />
+
+    <!-- Horizon -->
+    <path
+        android:fillColor="#D6E4F5"
+        android:pathData="M12,46 L96,46 L96,49 L12,49 Z" />
+
+    <!-- Route en perspective -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M48,49 L60,49 L86,92 L22,92 Z" />
+
+    <!-- Bandes centrales -->
+    <path
+        android:fillColor="#0F4C81"
+        android:pathData="M53.2,52 L54.8,52 L55.2,58 L52.8,58 Z" />
+    <path
+        android:fillColor="#0F4C81"
+        android:pathData="M52.5,63 L55.5,63 L56.2,72 L51.8,72 Z" />
+    <path
+        android:fillColor="#0F4C81"
+        android:pathData="M51.4,78 L56.6,78 L57.6,90 L50.4,90 Z" />
+
+    <!-- Bordures ambre de la route -->
+    <path
+        android:fillColor="#C77700"
+        android:pathData="M48,49 L50,49 L26,92 L22,92 Z" />
+    <path
+        android:fillColor="#C77700"
+        android:pathData="M58,49 L60,49 L86,92 L82,92 Z" />
+</vector>

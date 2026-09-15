@@ -1,74 +1,92 @@
 package mg.itu.att
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import mg.itu.att.ui.socle.SocleViewModel
-
-// ---------- LES ROUTES ----------
-// Routes en chaînes de caractères, comme dans listedetail (cours S5).
-// Un écran qui a besoin d'un identifiant le reçoit dans la route : "candidat/{candidatId}".
-// La liste complète est dans docs/05_CAS_UTILISATION.md §4.
-
-/** Écran d'accueil provisoire, remplacé par l'écran de connexion à l'étape C1. */
-const val ROUTE_ACCUEIL = "accueil"
-
-// ---------- LA NAVIGATION ----------
+import mg.itu.att.data.Role
+import mg.itu.att.ui.accueil.EcranAccueil
+import mg.itu.att.ui.accueil.Routes
+import mg.itu.att.ui.accueil.menuPour
+import mg.itu.att.ui.communs.EcranAVenir
+import mg.itu.att.ui.connexion.ConnexionViewModel
+import mg.itu.att.ui.connexion.EcranConnexion
 
 /**
- * Graphe de navigation de l'application.
- *
- * Les écrans ne connaissent pas le navController : ils reçoivent des lambdas.
- * L'écran signale, la navigation décide.
+ * Graphe de navigation de l'application (cours S5) : routes en chaînes,
+ * argument = identifiant ou libellé lu dans la route, écrans qui reçoivent des lambdas.
+ * La liste complète des routes est dans docs/05_CAS_UTILISATION.md §4 et `Routes`.
  */
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = ROUTE_ACCUEIL) {
-        composable(ROUTE_ACCUEIL) {
-            val viewModel: SocleViewModel = viewModel()
-            EcranAccueilProvisoire(viewModel)
+    // UN SEUL ViewModel de session, partagé par tous les écrans : créé au-dessus de la navigation,
+    // il survit aux changements d'écran et à la rotation (cours S6).
+    val connexionViewModel: ConnexionViewModel = viewModel()
+    val session by connexionViewModel.session.collectAsState()
+
+    /**
+     * Déconnexion : retour à la connexion en vidant toute la pile, pour que le bouton « retour »
+     * du téléphone ne ramène jamais dans un écran protégé (`popUpTo` : docs/HORS_COURS.md n° 11).
+     */
+    fun seDeconnecter() {
+        connexionViewModel.seDeconnecter()
+        navController.navigate(Routes.CONNEXION) {
+            popUpTo(navController.graph.id) { inclusive = true }
         }
     }
-}
 
-// ---------- L'ÉCRAN PROVISOIRE ----------
+    NavHost(navController = navController, startDestination = Routes.CONNEXION) {
 
-/** Vérifie que le socle (Compose + Navigation + Room) fonctionne. Supprimé à l'étape C1. */
-@Composable
-fun EcranAccueilProvisoire(viewModel: SocleViewModel) {
-    val etat by viewModel.uiState.collectAsState()
+        composable(Routes.CONNEXION) {
+            EcranConnexion(
+                viewModel = connexionViewModel,
+                onConnecte = {
+                    navController.navigate(Routes.ACCUEIL) {
+                        popUpTo(Routes.CONNEXION) { inclusive = true }
+                    }
+                },
+            )
+        }
 
-    Column(Modifier.padding(24.dp)) {
-        Text("ATT", style = MaterialTheme.typography.headlineLarge)
-        Spacer(Modifier.height(8.dp))
-        Text(
-            "Gestion des examens du permis de conduire",
-            style = MaterialTheme.typography.titleMedium,
-        )
-        Spacer(Modifier.height(16.dp))
-        Text(
-            if (etat.donneesInserees) "Base de données prête (étape B1)." else "Création de la base…",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        Spacer(Modifier.height(8.dp))
-        Text("Régions : ${etat.regions}")
-        Text("Catégories de permis : ${etat.categories}")
-        Text("Règles configurables : ${etat.regles}")
-        Text("Utilisateurs : ${etat.utilisateurs}")
+        composable(Routes.ACCUEIL) {
+            val utilisateur = session
+            if (utilisateur != null) {
+                EcranAccueil(
+                    session = utilisateur,
+                    onNaviguer = { route -> navController.navigate(route) },
+                    onDeconnexion = { seDeconnecter() },
+                )
+            } else {
+                // Pas de session : on n'affiche rien de protégé, on remontre la connexion
+                // (le null se gère jusque dans l'UI, comme le prix non fixé du cours).
+                EcranConnexion(
+                    viewModel = connexionViewModel,
+                    onConnecte = { navController.navigate(Routes.ACCUEIL) { popUpTo(Routes.ACCUEIL) { inclusive = true } } },
+                )
+            }
+        }
+
+        // ---------- FONCTIONNALITÉS À VENIR ----------
+        // Chaque étape du plan remplace l'une de ces lignes par son vrai écran.
+        // Le titre affiché est le libellé de l'entrée de menu correspondante.
+        val libelles = Role.entries.flatMap { menuPour(it) }.associate { it.route to it.libelle }
+        for (route in listOf(
+            Routes.CONFIGURATION, Routes.AUTO_ECOLES, Routes.CANDIDATS, Routes.DOSSIERS, Routes.SESSIONS,
+            Routes.EVALUATION, Routes.RESULTATS, Routes.HISTORIQUE, Routes.PARCOURS,
+        )) {
+            composable(route) {
+                EcranAVenir(libelle = libelles[route] ?: route, onRetour = { navController.popBackStack() })
+            }
+        }
+
+        composable(Routes.A_VENIR) { backStackEntry ->
+            val libelle = backStackEntry.arguments?.getString("libelle") ?: "À venir"
+            EcranAVenir(libelle = libelle, onRetour = { navController.popBackStack() })
+        }
     }
 }
