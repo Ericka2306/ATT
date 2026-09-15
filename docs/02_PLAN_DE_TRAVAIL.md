@@ -7,9 +7,9 @@
 
 | | |
 |---|---|
-| **Dernière étape terminée** | B1 (base de données : 25 entités, 25 DAO, données initiales, hachage) — 15/09/2026, en attente de fusion (PR de `etape-B1-base-de-donnees`) |
+| **Dernière étape terminée** | C1 (base du front-end : session, connexion, accueil par rôle, barre de titre, composants communs) — 15/09/2026, en attente de fusion (PR de `etape-C1-connexion`, à fusionner **après** la PR #3 de B1) |
 | **Étape en cours** | aucune |
-| **Prochaine étape** | B2 (historique et transactions) puis C1 (connexion) — dev 1 |
+| **Prochaine étape** | C2 (auto-écoles et comptes, avec le traçage `Historique` de B2) — dev 1 |
 | **Dev 2 peut démarrer** | **dès la fusion de B1** : C4 (configuration) puis C5 (centres, sessions, créneaux), sur des branches `etape-C4-…` / `etape-C5-…` |
 | **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape B1 » |
 | **Dernier commit poussé** | `main` — « Merge pull request #2 » (étape A4) |
@@ -33,13 +33,13 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 |---|---|---|---|---|
 | B0 Socle Gradle et projet | `git init` + dépôt public ; package `mg.itu.att` ; Compose/Navigation/ViewModel/Room-KSP ; Java 17 ; suppression appcompat/material ; `MainActivity` + `AppNavigation` + écran « Bonjour ATT » ; thème | `build.gradle.kts`, `libs.versions.toml`, `AndroidManifest.xml`, `MainActivity.kt`, `Navigation.kt`, `.gitignore` | `./gradlew :app:assembleDebug` vert, appli lancée sur émulateur, versions définitives notées dans `docs/01` §2.1 et `HORS_COURS.md` | 🟢 15/09/2026 |
 | B1 Base de données | toutes les entités de `docs/03`, DAO minimaux (`tous`, `parId`, `inserer`, `modifier`), `AppDatabase.obtenir()`, données initiales (régions, superadmin, exemples « à confirmer ») | `data/Entites*.kt`, `data/*Dao.kt`, `data/AppDatabase.kt`, `data/DonneesInitiales.kt` | build vert, base créée au premier lancement, inspection avec App Inspection d'Android Studio | 🟢 15/09/2026 |
-| B2 Historique et transactions | DAO `Historique`, fonction utilitaire `tracer(...)`, `@Transaction` sur les écritures sensibles | `data/HistoriqueDao.kt`, `metier/Trace.kt` | une écriture de test produit sa ligne d'historique | ⚪ |
+| B2 Historique et transactions | DAO `Historique` (fait en B1), fonction utilitaire `tracer(...)`, `@Transaction` sur les écritures sensibles | `data/HistoriqueDao.kt`, `metier/Trace.kt` | une écriture de test produit sa ligne d'historique | ⚪ (réalisée avec C2, première écriture sensible) |
 
 ## Phase C — Fonctionnalités MVP (ordre des instructions §2)
 
 | Étape | Contenu | Écrans / ViewModels | Critère de fin (= critère MVP §9) | Statut |
 |---|---|---|---|---|
-| C1 Authentification et rôles | connexion, session utilisateur, hachage, déconnexion, accueil par rôle | `ui/connexion/EcranConnexion`, `ConnexionViewModel`, `ui/accueil/EcranAccueil` | chaque rôle voit uniquement son menu ; mot de passe jamais en clair | ⚪ |
+| C1 Authentification et rôles | connexion, session utilisateur, hachage, déconnexion, accueil par rôle | `ui/connexion/EcranConnexion`, `ConnexionViewModel`, `ui/accueil/EcranAccueil` | chaque rôle voit uniquement son menu ; mot de passe jamais en clair | 🟢 15/09/2026 |
 | C2 Auto-écoles | CRUD auto-écoles + compte utilisateur associé, filtre par région | `ui/autoecoles/` | Admin ATT crée une auto-école dans une région ; l'auto-école se connecte | ⚪ |
 | C3 Candidats et dossiers | CRUD candidat (auto-école : les siens), constitution et soumission du dossier, pièces, validation/refus/incomplet par ATT avec motif + historique | `ui/candidats/` (liste, détail, formulaire, dossier) | **Créer/valider un candidat** ; dossier incomplet/refusé traité ; candidat sans compte géré | ⚪ |
 | C4 Catégories et règles configurables | écrans Super Admin : catégories, types d'épreuve, barèmes versionnés, `RegleConfig`, questions/réponses, critères pratiques (structure) | `ui/configuration/` | aucune valeur en dur dans le code ; changement d'un seuil visible au calcul | 🔒 Q1–Q3 (valeurs par défaut « à confirmer ») |

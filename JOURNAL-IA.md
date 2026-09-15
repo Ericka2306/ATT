@@ -31,7 +31,26 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 3 — <date> — <tâche>
+## Entrée 3 — 15/09/2026 — Étapes B1 et C1, base de données et base du front-end
+
+- Code soumis : `data/Entites*.kt`, `data/*Dao.kt`, `DonneesInitiales.kt`, `securite/MotDePasse.kt`, `ui/connexion/*`, `ui/accueil/*`, `ui/communs/*`, `Navigation.kt` (écrits par l'IA).
+- Remarque principale de l'IA : garantir « jamais écrasé » par la structure plutôt que par la discipline : `ResultatDao` et `HistoriqueDao` n'ont ni `@Update` ni `@Delete`, comme le duo `_uiState`/`uiState` du cours garantit le flux unidirectionnel « par les types ».
+
+⚠️ L'IA a introduit `popUpTo` (vider la pile à la connexion/déconnexion) et `PasswordVisualTransformation`, non vus en cours : ajoutés dans `docs/HORS_COURS.md` n° 11 et 12 avec une explication.
+
+⚠️ Pour prévenir le ViewModel du succès de connexion sans `LaunchedEffect` (hors cours), l'IA a choisi un callback `seConnecter(onSucces)` : l'écran signale, la navigation décide (règle S5). À vérifier : est-ce lisible pour le binôme ?
+
+✅ Les menus par rôle sont une fonction pure `menuPour(role)` testée par JUnit, indépendante d'Android.
+
+⚠️ Design (demande du dev 1) : l'IA a choisi une photo CC0 de Wikimedia Commons (RN44, route non asphaltée) plutôt qu'une image quelconque trouvée sur le web, et un logo dessiné pour le projet plutôt que le logo officiel de l'ATT (droits non vérifiés). Le dev 1 peut remplacer la photo par une route asphaltée s'il préfère une image plus « officielle » ; il suffit de changer le fichier `photo_route_rn44.jpg` et le crédit dans `LISEZMOI.md`.
+
+⚠️ L'IA a d'abord oublié que `material-icons-core` n'est plus fourni avec material3 (erreur `Unresolved reference 'icons'`) : dépendance ajoutée explicitement en 1.7.8.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 1>.
+
+---
+
+## Entrée 4 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :

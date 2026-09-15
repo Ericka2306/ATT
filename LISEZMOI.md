@@ -30,6 +30,11 @@ Android Studio → File → Open → dossier `ATT` → attendre la synchronisati
 ./gradlew :app:testDebugUnitTest    # tests unitaires
 ```
 
+## Crédits
+
+- Photo de l'écran de connexion : « Madagascar RN44 » par Diorit, Wikimedia Commons, licence CC0 (domaine public), réduite à 1080 px.
+- Logo et icône de l'application : dessins vectoriels réalisés pour ce projet. Ce n'est pas le logo officiel de l'ATT.
+
 ## État d'avancement
 
 Voir la colonne « Statut » de [docs/02_PLAN_DE_TRAVAIL.md](docs/02_PLAN_DE_TRAVAIL.md). Phase A (cadrage) terminée ; phase B (socle technique) en cours.
