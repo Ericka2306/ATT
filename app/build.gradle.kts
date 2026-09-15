@@ -33,6 +33,8 @@ android {
 
     buildFeatures {
         compose = true
+        // BuildConfig.DEBUG : pour afficher les comptes de test uniquement en version de développement.
+        buildConfig = true
     }
 
     compileOptions {

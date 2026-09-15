@@ -139,3 +139,35 @@ Format (instructions §10) : ce qui a été créé, les fichiers modifiés, les 
 **Décisions restantes**
 1. Aucun écran de changement de mot de passe : à ajouter quand les comptes seront créés depuis l'application (C2), avec les mots de passe initiaux à changer.
 2. Étape suivante : C2 (auto-écoles et leurs comptes) avec le traçage `Historique` de B2 ; le dev 2 peut démarrer C4 dès la fusion de B1.
+
+---
+
+## Étapes B2 + C2 — Traçabilité et auto-écoles — 15/09/2026
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `data/Tracage.kt` — `ActionsHistorique`, `EntitesHistorique`, `AppDatabase.tracer(...)` (une ligne d'historique, appelée dans `db.withTransaction { }` avec la modification), `AutoEcole.resume()`.
+- `metier/Dates.kt` — `dateDuJour`, `heureCourante`, `maintenantIso`, `formatDate` (déplacées depuis `ui/communs/Formats.kt` : fonctions pures, sans Android).
+- `metier/ValidationAutoEcole.kt` — `validerFiche` (nom, région, adresse, doublon dans la région) et `validerCompte` (identifiant ≥ 4 caractères sans espace, unique ; mot de passe ≥ 8).
+- `ui/communs/Selecteurs.kt` — `SelecteurRegion` (`DropdownMenu`, verrouillable pour un administrateur régional).
+- `ui/autoecoles/AutoEcolesViewModel.kt` — un ViewModel partagé par les quatre écrans (liste filtrée par région avec jointure région, formulaire création/modification, fiche avec comptes et historique via `flatMapLatest`, création de compte). Toute écriture = `withTransaction` + `tracer`. Aucune suppression : désactivation/réactivation.
+- `ui/autoecoles/EcranListeAutoEcoles.kt`, `EcranFormulaireAutoEcole.kt`, `EcranDetailAutoEcole.kt`, `EcranFormulaireCompte.kt`.
+- Tests : `metier/ValidationAutoEcoleTest.kt` (7), `metier/DatesTest.kt` (4).
+- Captures `docs/captures/C2_*.png` (liste vide, formulaire, erreur de validation, formulaire rempli, fiche, fiche avec compte, liste, accueil auto-école).
+
+**Modifié**
+- `data/ActeursDao.kt` — `UtilisateurDao.parAutoEcole`, `tousLesIdentifiants` ; `AutoEcoleDao.parIdEnDirect`, `nomsDansRegion`. `data/ReferentielsDao.kt` — `RegionDao.listeActives`.
+- `Navigation.kt` — sous-graphe `graphAutoEcoles` (routes `autoecoles`, `autoecole/nouvelle`, `autoecole/{id}`, `autoecole/{id}/modifier`, `autoecole/{id}/compte`), ViewModel partagé obtenu sur l'entrée de la liste ; l'entrée « Auto-écoles » quitte la liste des écrans « à venir ».
+- `ui/communs/Formats.kt` — ne garde que `Role.libelle()` et `String?.ouTiret()`.
+- `docs/HORS_COURS.md` — n° 4 précisé (`withTransaction`), n° 17 `DropdownMenu`, n° 18 `flatMapLatest`.
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : 22 tests verts.
+- Émulateur (adb) : connexion `admin` → Auto-écoles (liste vide) → « + » → création sans région refusée (« Choisissez la région. ») → région Analamanga choisie dans la liste déroulante → création → fiche avec ligne d'historique CREATION → « Créer un compte » `soarano` / `Soarano2026` → fiche avec compte et ligne CREATION_COMPTE → liste à 1 → déconnexion → connexion `soarano` → accueil « Auto-école » avec ses 3 entrées.
+- Lecture directe de `att.db` : 3 lignes d'historique (CREATION, CREATION_COMPTE ×2) horodatées et signées par l'utilisateur 2 (`admin`) ; compte `soarano` de rôle AUTO_ECOLE lié à l'auto-école 1 et à la région 1.
+
+**Ajout (demande du dev 1)** : bloc « Comptes de test » sur l'écran de connexion, visible uniquement si `BuildConfig.DEBUG` (`buildFeatures.buildConfig = true`), avec deux boutons qui préremplissent les champs (`ConnexionViewModel.preremplir`). Capture `docs/captures/C2_connexion_comptes_test.png`.
+
+**Décisions restantes**
+1. Les administrateurs régionaux (`Utilisateur.regionId`) sont gérés (filtre verrouillé) mais aucun écran ne permet encore d'en créer : Super Admin, étape C4 (dev 2) ou plus tard.
+2. Le doublon de nom est contrôlé par région uniquement (Q11) ; à ajuster si l'ATT a un agrément national unique.
+3. Étape suivante : C3 (candidats et dossiers), qui réutilise `tracer`, `SelecteurRegion` et le pattern du ViewModel partagé.

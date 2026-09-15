@@ -25,6 +25,14 @@ interface UtilisateurDao {
     @Query("SELECT COUNT(*) FROM utilisateurs")
     fun nombreEnDirect(): Flow<Int>
 
+    /** Les comptes d'une auto-école (UC03). */
+    @Query("SELECT * FROM utilisateurs WHERE autoEcoleId = :autoEcoleId ORDER BY identifiant ASC")
+    fun parAutoEcole(autoEcoleId: Int): Flow<List<Utilisateur>>
+
+    /** Tous les identifiants existants, pour refuser un doublon à la création d'un compte. */
+    @Query("SELECT identifiant FROM utilisateurs")
+    suspend fun tousLesIdentifiants(): List<String>
+
     @Insert
     suspend fun inserer(utilisateur: Utilisateur): Long
 
@@ -42,6 +50,13 @@ interface AutoEcoleDao {
 
     @Query("SELECT * FROM auto_ecoles WHERE id = :id")
     suspend fun parId(id: Int): AutoEcole?
+
+    @Query("SELECT * FROM auto_ecoles WHERE id = :id")
+    fun parIdEnDirect(id: Int): Flow<AutoEcole?>
+
+    /** Noms des autres auto-écoles d'une région (détection de doublon à la saisie). */
+    @Query("SELECT nom FROM auto_ecoles WHERE regionId = :regionId AND id != :saufId")
+    suspend fun nomsDansRegion(regionId: Int, saufId: Int): List<String>
 
     @Insert
     suspend fun inserer(autoEcole: AutoEcole): Long

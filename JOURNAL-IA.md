@@ -50,7 +50,22 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 4 — <date> — <tâche>
+## Entrée 4 — 15/09/2026 — Étapes B2 et C2, traçabilité et auto-écoles
+
+- Code soumis : `data/Tracage.kt`, `metier/ValidationAutoEcole.kt`, `ui/autoecoles/*`, `ui/communs/Selecteurs.kt`, `Navigation.kt` (écrits par l'IA).
+- Remarque principale de l'IA : écrire la modification et sa ligne d'historique dans un même `db.withTransaction { }` pour qu'elles soient enregistrées ensemble ou pas du tout ; et ne jamais supprimer une auto-école, seulement la désactiver.
+
+⚠️ Un seul ViewModel partagé par les quatre écrans du sous-parcours, obtenu avec `viewModel(navController.getBackStackEntry("autoecoles"))` : c'est le « ViewModel au-dessus de la navigation » du cours S6, mais limité à un sous-parcours au lieu de toute l'application. À vérifier : est-ce que le binôme sait l'expliquer ?
+
+⚠️ Les règles de validation (`validerFiche`, `validerCompte`) sont des fonctions pures qui reçoivent les listes de noms/identifiants existants au lieu d'interroger la base : c'est ce qui les rend testables sans Android (11 tests). Le ViewModel fait la requête, la fonction fait le jugement.
+
+⚠️ `flatMapLatest` (fiche qui suit un identifiant qui change) et `DropdownMenu` sont hors cours : ajoutés dans `docs/HORS_COURS.md` n° 17 et 18, à valider.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 1>.
+
+---
+
+## Entrée 5 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :

@@ -20,6 +20,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +35,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import mg.itu.att.BuildConfig
 import mg.itu.att.R
+import mg.itu.att.data.DonneesInitiales
 import mg.itu.att.ui.communs.TexteErreur
 
 /**
@@ -157,6 +160,42 @@ fun EcranConnexion(viewModel: ConnexionViewModel, onConnecte: () -> Unit) {
                         .height(50.dp),
                 ) {
                     Text(if (etat.enCours) "Vérification…" else "Se connecter")
+                }
+            }
+        }
+
+        // ---------- COMPTES DE TEST (version de développement uniquement) ----------
+        // BuildConfig.DEBUG est faux dans une version release : ce bloc disparaît de lui-même.
+        if (BuildConfig.DEBUG) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(
+                        "Comptes de test (version de développement)",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Row {
+                        OutlinedButton(
+                            onClick = { viewModel.preremplir(DonneesInitiales.IDENTIFIANT_SUPER_ADMIN, DonneesInitiales.MOT_DE_PASSE_INITIAL_SUPER_ADMIN) },
+                        ) { Text("superadmin") }
+                        Spacer(Modifier.size(8.dp))
+                        OutlinedButton(
+                            onClick = { viewModel.preremplir(DonneesInitiales.IDENTIFIANT_ADMIN_DEMO, DonneesInitiales.MOT_DE_PASSE_INITIAL_ADMIN_DEMO) },
+                        ) { Text("admin") }
+                    }
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        "superadmin / ${DonneesInitiales.MOT_DE_PASSE_INITIAL_SUPER_ADMIN}   ·   admin / ${DonneesInitiales.MOT_DE_PASSE_INITIAL_ADMIN_DEMO}\n" +
+                            "Les autres comptes (auto-écoles, examinateurs…) se créent dans l'application.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer,
+                    )
                 }
             }
         }
