@@ -44,6 +44,8 @@ Application Android (Kotlin, Jetpack Compose, Room) de gestion des examens du pe
 2. Compte rendu dans `docs/COMPTES_RENDUS.md` (créé / modifié / tests / décisions restantes).
 3. Entrée dans `JOURNAL-IA.md` si l'IA a produit ou critiqué du code.
 4. `docs/02_PLAN_DE_TRAVAIL.md` : ligne de l'étape à 🟢 avec la date, tableau « Où en est-on ? » mis à jour (dernière terminée, en cours, prochaine, qui).
-5. Commit en français à l'impératif, puis `git push`. Si le travail est sur une branche d'étape, fusionner dans `main` seulement quand le build est vert.
+5. **Ne pas commiter, ne pas pousser.** Laisser toutes les modifications non commitées dans l'arbre de travail : le dev les relit dans l'onglet Git d'Android Studio (ou `git diff`) avant toute publication.
+6. Terminer le compte rendu par une section « À relire » : la liste des fichiers modifiés avec, pour chacun, une ligne sur ce qui a changé. Puis attendre.
+7. Quand le dev dit « ok » (ou « commit », « pousse ») : commit en français à l'impératif, fusion dans `main` si on est sur une branche d'étape et que le build est vert, puis `git push`, le tout dans la foulée.
 
-Le tableau « Où en est-on ? » est la seule source de vérité de l'avancement pour les deux devs. Ne jamais terminer une étape sans l'avoir mis à jour et poussé.
+Le tableau « Où en est-on ? » est la seule source de vérité de l'avancement pour les deux devs. Ne jamais terminer une étape sans l'avoir mis à jour.
