@@ -6,6 +6,7 @@
 | `02_PLAN_DE_TRAVAIL.md` | Étapes ordonnées (A cadrage, B socle, C fonctionnalités MVP, D consolidation), livrables, critères de fin |
 | `03_MODELE_DE_DONNEES.md` | Entités, attributs, statuts, invariants, jeu de données initial — **proposition à valider** |
 | `04_QUESTIONS_A_VALIDER.md` | Règles administratives inconnues, ce que la recherche a trouvé, valeurs par défaut « à confirmer » |
+| `05_CAS_UTILISATION.md` | Cas d'utilisation UC01–UC14, contraintes du cadrage, écrans, routes, navigation par rôle, ViewModels |
 | `HORS_COURS.md` | Notions non enseignées en M1, expliquées avant usage |
 | `COMPTES_RENDUS.md` | Compte rendu de chaque étape (créé / modifié / tests / décisions restantes) |
 | `references/01_Cahier_de_cadrage_ATT.md` | Texte du cahier de cadrage (source : `.docx` dans le même dossier) |
@@ -14,4 +15,4 @@
 | `references/SYNTHESE_PROJETS_COURS.md` | Conventions et patterns des projets d'exemple, configuration Gradle, écarts du squelette ATT |
 | `references/RECHERCHE_ATT_ET_ANDROID.md` | Recherche : règles du permis à Madagascar (sources), bonnes pratiques Android 2026 |
 
-Ordre de lecture pour un nouveau membre : `01` → `02` → `03` → `04` → `HORS_COURS`.
+Ordre de lecture pour un nouveau membre : `01` → `02` → `03` → `04` → `05` → `HORS_COURS`.
