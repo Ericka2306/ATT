@@ -27,6 +27,7 @@ Format (instructions §10) : ce qui a été créé, les fichiers modifiés, les 
 4. Notions hors cours n° 1 à 10 acceptées, à expliquer dans le code au moment de l'usage.
 5. Répartition : dev 1 sur le socle et C1–C3, dev 2 sur C4–C5 après B1.
 
+**Dépôt** : https://github.com/Ericka2306/ATT (public, branche `main`), premier commit le 15/09/2026. Les documents de suivi (comptes rendus, questions, journal IA) sont versionnés volontairement : ils font partie du livrable.
+
 **Décisions restantes**
-1. Créer le dépôt Git public et fournir son URL (étape B0).
-2. Obtenir les réponses de l'enseignant aux questions Q1 à Q13.
+1. Obtenir les réponses de l'enseignant aux questions Q1 à Q13.
