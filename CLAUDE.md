@@ -37,7 +37,7 @@ Application Android (Kotlin, Jetpack Compose, Room) de gestion des examens du pe
 ```
 
 ## Début et fin de chaque étape (automatique, sans qu'on ait à le demander)
-**Au début** : passer la ligne de l'étape à 🟡 dans `docs/02_PLAN_DE_TRAVAIL.md` et remplir « Étape en cours » du tableau « Où en est-on ? ».
+**Au début** : créer la branche `etape-XX-nom` depuis `main` à jour, passer la ligne de l'étape à 🟡 dans `docs/02_PLAN_DE_TRAVAIL.md` et remplir « Étape en cours » du tableau « Où en est-on ? ».
 
 **À la fin**, dans cet ordre :
 1. Build et tests verts, vérification manuelle sur émulateur.
@@ -46,6 +46,6 @@ Application Android (Kotlin, Jetpack Compose, Room) de gestion des examens du pe
 4. `docs/02_PLAN_DE_TRAVAIL.md` : ligne de l'étape à 🟢 avec la date, tableau « Où en est-on ? » mis à jour (dernière terminée, en cours, prochaine, qui).
 5. **Ne pas commiter, ne pas pousser.** Laisser toutes les modifications non commitées dans l'arbre de travail : le dev les relit dans l'onglet Git d'Android Studio (ou `git diff`) avant toute publication.
 6. Terminer le compte rendu par une section « À relire » : la liste des fichiers modifiés avec, pour chacun, une ligne sur ce qui a changé. Puis attendre.
-7. Quand le dev dit « ok » (ou « commit », « pousse ») : commit en français à l'impératif, fusion dans `main` si on est sur une branche d'étape et que le build est vert, puis `git push`, le tout dans la foulée.
+7. Quand le dev dit « ok » (ou « commit », « pousse ») : commit en français à l'impératif sur la **branche de l'étape** (`etape-XX-nom`, créée au début de l'étape), puis `git push origin <branche>` et ouverture d'une pull request vers `main` avec `gh pr create`. **Jamais de commit ni de push directement sur `main`** : la fusion se fait dans la pull request, par le dev, après relecture.
 
 Le tableau « Où en est-on ? » est la seule source de vérité de l'avancement pour les deux devs. Ne jamais terminer une étape sans l'avoir mis à jour.
