@@ -1,4 +1,4 @@
-package com.example.att
+package mg.itu.att
 
 import org.junit.Test
 

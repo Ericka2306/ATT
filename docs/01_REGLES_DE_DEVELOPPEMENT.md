@@ -31,7 +31,7 @@
 - **AGP 9.3.2** (déjà présent) : Kotlin est intégré au plugin Android (version embarquée 2.2.10). On ne déclare **pas** `org.jetbrains.kotlin.android`, on n'utilise **pas** `kapt` (incompatible), on n'utilise plus `kotlinOptions`.
 - Plugins : `com.android.application`, `org.jetbrains.kotlin.plugin.compose` (version = Kotlin embarquée), `com.google.devtools.ksp` (version alignée sur Kotlin embarquée).
 - Catalogue de versions `gradle/libs.versions.toml` conservé (généré par Android Studio ; le cours écrit les versions en dur, la différence est de forme).
-- `compileSdk 37`, `targetSdk 37`, `minSdk 24` (proposition : **26** pour PBKDF2WithHmacSHA256, décision T3 de `docs/04`), Java 17, `buildFeatures { compose = true }`.
+- `compileSdk 37`, `targetSdk 37`, `minSdk 26` (Android 8.0, requis pour PBKDF2WithHmacSHA256, décision T3 de `docs/04`), Java 17, `buildFeatures { compose = true }`.
 - Dépendances = celles du cours : Compose BOM + `material3` + `ui` + `activity-compose`, `navigation-compose`, `lifecycle-viewmodel-compose`, `room-runtime` + `room-ktx` + `ksp(room-compiler)`, `core-ktx`. Supprimer `appcompat` et `material` (MDC Views), inutiles avec Compose.
 - Versions proposées (décision T1/T2 de `docs/04`, à confirmer par un premier build à l'étape B0) :
 
@@ -40,15 +40,15 @@
 | AGP | 8.5.2 / 8.13.2 | 9.3.x | **9.3.2** (squelette) | migration officielle documentée, Kotlin intégré |
 | Kotlin | 2.0.20 (plugin) | 2.4.20 | **2.2.10 embarqué par AGP** | zéro configuration, version par défaut d'AGP 9 |
 | Plugin Compose | 2.0.20 | = Kotlin | **2.2.10** | doit égaler la version Kotlin |
-| KSP | 2.0.20-1.0.25 | 2.3.12 | **2.2.10-2.0.2** | version relevée automatiquement par AGP 9 |
+| KSP | 2.0.20-1.0.25 | 2.3.12 | **2.3.12** | KSP 2.2.x utilise l'ancienne DSL `kotlin.sourceSets`, refusée par le Kotlin intégré d'AGP 9 (constaté au premier build) ; depuis 2.3.0 KSP est versionné indépendamment de Kotlin |
 | Compose BOM | 2024.09.03 | 2026.08.00 | **2026.08.00** (repli 2025.x) | exige AGP ≥ 9.1.1 et compileSdk 37 : OK |
 | navigation-compose | 2.8.0 | 2.10.1 | **2.10.1** | Navigation 2 = ce que le cours enseigne ; Navigation 3 exclue |
 | lifecycle-viewmodel-compose | 2.8.4 | 2.11.0 | **2.11.0** | |
 | Room | 2.6.1 | 2.8.5 (Room 3 exclu) | **2.8.5** | 2.6.1 est antérieur à KSP2 ; même API `@Entity/@Dao/@Database` |
-| activity-compose | 1.9.2 | (BOM) | dernière stable | |
+| activity-compose | 1.9.2 | 1.13.0 | **1.13.0** | |
 | Gradle wrapper | 9.3.0 | 9.7.1 | **9.5.0** (squelette) | minimum requis par AGP 9.3 |
 
-  Toute version finalement retenue est notée dans `docs/HORS_COURS.md` ligne 2 après le premier build vert.
+  **Versions confirmées par le premier build vert du 15/09/2026 (étape B0)** : ce tableau est désormais la référence ; `gradle/libs.versions.toml` fait foi en cas d'écart.
 - Aucune autre bibliothèque tierce (pas de Hilt, Koin, Retrofit, Coil, Timber…).
 
 ### 2.2 Identité du projet

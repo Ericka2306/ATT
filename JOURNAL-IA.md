@@ -18,7 +18,20 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 2 — <date> — <tâche>
+## Entrée 2 — 15/09/2026 — Étape B0, configuration Gradle
+
+- Code soumis : `gradle/libs.versions.toml`, `build.gradle.kts`, `app/build.gradle.kts` (écrits par l'IA).
+- Remarque principale de l'IA : avec AGP 9, ne pas déclarer le plugin `org.jetbrains.kotlin.android` ni `kotlinOptions` ; aligner le plugin Compose sur la version Kotlin embarquée (2.2.10) et utiliser KSP plutôt que kapt.
+
+⚠️ L'IA avait d'abord proposé KSP 2.2.10-2.0.2 (version citée par la documentation AGP 9.0). Le build a échoué : « Using kotlin.sourceSets DSL to add Kotlin sources is not allowed with built-in Kotlin ». Correction : KSP 2.3.12, versionné indépendamment de Kotlin.
+
+✅ Les versions des bibliothèques ont été vérifiées sur les dépôts Maven avant d'être écrites (aucune version inventée).
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 1 : vérifier soi-même l'erreur en remettant KSP 2.2.10-2.0.2 et en relançant le build, pour pouvoir l'expliquer sans IA>.
+
+---
+
+## Entrée 3 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :

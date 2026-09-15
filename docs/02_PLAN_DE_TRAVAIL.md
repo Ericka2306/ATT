@@ -7,12 +7,12 @@
 
 | | |
 |---|---|
-| **Dernière étape terminée** | A3 (modèle de données validé) — 15/09/2026 |
+| **Dernière étape terminée** | B0 (socle Gradle, `mg.itu.att`, Compose/Navigation/Room, build vert, appli lancée) — 15/09/2026 |
 | **Étape en cours** | aucune |
-| **Prochaine étape** | A4 (cas d'utilisation et écrans) puis B0 (socle Gradle) — dev 1 |
+| **Prochaine étape** | A4 (cas d'utilisation et liste des écrans) puis B1 (base de données) — dev 1 |
 | **Dev 2 peut démarrer** | après B1 (base de données en place) : C4 puis C5 |
-| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape A1 » |
-| **Dernier commit poussé** | `main` — « Note l'URL du dépôt dans le compte rendu » |
+| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape B0 » |
+| **Dernier commit poussé** | `main` — « Met en place le socle technique (étape B0) » |
 
 Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une question à valider
 
@@ -31,7 +31,7 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 
 | Étape | Contenu | Livrables | Critère de fin | Statut |
 |---|---|---|---|---|
-| B0 Socle Gradle et projet | `git init` + dépôt public ; package `mg.itu.att` ; Compose/Navigation/ViewModel/Room-KSP ; Java 17 ; suppression appcompat/material ; `MainActivity` + `AppNavigation` + écran « Bonjour ATT » ; thème | `build.gradle.kts`, `libs.versions.toml`, `AndroidManifest.xml`, `MainActivity.kt`, `Navigation.kt`, `.gitignore` | `./gradlew :app:assembleDebug` vert, appli lancée sur émulateur, versions définitives notées dans `docs/01` §2.1 et `HORS_COURS.md` | ⚪ |
+| B0 Socle Gradle et projet | `git init` + dépôt public ; package `mg.itu.att` ; Compose/Navigation/ViewModel/Room-KSP ; Java 17 ; suppression appcompat/material ; `MainActivity` + `AppNavigation` + écran « Bonjour ATT » ; thème | `build.gradle.kts`, `libs.versions.toml`, `AndroidManifest.xml`, `MainActivity.kt`, `Navigation.kt`, `.gitignore` | `./gradlew :app:assembleDebug` vert, appli lancée sur émulateur, versions définitives notées dans `docs/01` §2.1 et `HORS_COURS.md` | 🟢 15/09/2026 |
 | B1 Base de données | toutes les entités de `docs/03`, DAO minimaux (`tous`, `parId`, `inserer`, `modifier`), `AppDatabase.obtenir()`, données initiales (régions, superadmin, exemples « à confirmer ») | `data/Entites*.kt`, `data/*Dao.kt`, `data/AppDatabase.kt`, `data/DonneesInitiales.kt` | build vert, base créée au premier lancement, inspection avec App Inspection d'Android Studio | ⚪ |
 | B2 Historique et transactions | DAO `Historique`, fonction utilitaire `tracer(...)`, `@Transaction` sur les écritures sensibles | `data/HistoriqueDao.kt`, `metier/Trace.kt` | une écriture de test produit sa ligne d'historique | ⚪ |
 

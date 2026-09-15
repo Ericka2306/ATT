@@ -5,7 +5,7 @@ Règle R7 : toute notion non enseignée dans le module M1 (voir `docs/references
 | # | Notion | Étape | Pourquoi on en a besoin | Explication simple | Décision |
 |---|---|---|---|---|---|
 | 1 | Catalogue de versions `libs.versions.toml` | 0 | généré par Android Studio, évite de répéter les versions | même chose que les chaînes `"2.8.0"` du cours, rangées dans un fichier unique | accepté |
-| 2 | Kotlin intégré à AGP 9, plugin Compose 2.2.x, KSP 2.x | 0 | le squelette est en AGP 9.3.2 (le cours en 8.x) | AGP 9 embarque le compilateur Kotlin ; on aligne seulement Compose et KSP dessus | accepté (repli : AGP 8.13.2 + Kotlin 2.0.20 comme `carteproduit`) |
+| 2 | Kotlin intégré à AGP 9, plugin Compose 2.2.10, KSP 2.3.12 | B0 | le squelette est en AGP 9.3.2 (le cours en 8.x) | AGP 9 embarque le compilateur Kotlin (2.2.10) ; le plugin Compose suit cette version ; KSP 2.3.x est indépendant de Kotlin et compatible avec le Kotlin intégré | accepté, **confirmé par le build vert du 15/09/2026** (Room 2.8.5, Navigation 2.10.1, Lifecycle 2.11.0, BOM 2026.08.00, activity-compose 1.13.0) |
 | 3 | `@ForeignKey`, `@Index` sur les entités Room | 2 | ~20 tables liées, intégrité des identifiants | le `FOREIGN KEY` / `INDEX` de SQL, posé en annotation comme `@Query` | accepté 15/09/2026 |
 | 4 | `@Transaction` dans un DAO | 2 | écrire une modification et son `Historique` ensemble | `BEGIN … COMMIT` : soit tout, soit rien | accepté 15/09/2026 |
 | 5 | `enum class` persisté par Room | 2 | statuts (dossier, session, présence…) | Room enregistre le nom de l'enum en texte ; on relit `Statut.valueOf` automatiquement | accepté 15/09/2026 |
