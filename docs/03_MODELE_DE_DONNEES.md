@@ -1,7 +1,7 @@
 # Modèle de données ATT — proposition à valider
 
-> Statut : **PROPOSITION** (étape 3 de l'ordre de développement : « Proposer/valider le modèle de données »).
-> Rien n'est implémenté tant que ce document n'est pas validé par le binôme.
+> Statut : **VALIDÉ le 15/09/2026 et implémenté à l'étape B1** (`app/src/main/java/mg/itu/att/data/Entites*.kt`). En cas d'écart, le code fait foi et ce document est mis à jour.
+> Ajouts faits à l'implémentation : `aConfirmer` sur `CategoriePermis`, `TypeEpreuve`, `Bareme`, `Question`, `CriterePratique` (pas seulement `RegleConfig`) ; `categoriePrealableCode` sur `CategoriePermis` (C/D/E exigent B) ; `pointsSaisisDirectement` sur `Evaluation` (procédure papier, Q1) ; règle `CAPACITE_CRENEAU_DEFAUT`.
 > Tout ce qui est marqué « À confirmer » vient d'une règle administrative inconnue : ce n'est jamais codé en dur, c'est une configuration.
 
 Sources : cahier de cadrage §3 à §11, instructions §3 (entités minimales), précisions de l'équipe (application Madagascar uniquement, centres et auto-écoles rattachés à une région).

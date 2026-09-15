@@ -7,12 +7,12 @@
 
 | | |
 |---|---|
-| **Dernière étape terminée** | A4 (cas d'utilisation, écrans, routes) — 15/09/2026, en attente de fusion (PR de `etape-A4-cas-utilisation`) |
+| **Dernière étape terminée** | B1 (base de données : 25 entités, 25 DAO, données initiales, hachage) — 15/09/2026, en attente de fusion (PR de `etape-B1-base-de-donnees`) |
 | **Étape en cours** | aucune |
-| **Prochaine étape** | B1 (base de données : entités, DAO, `AppDatabase`, données initiales) — dev 1 |
-| **Dev 2 peut démarrer** | après B1 (base de données en place) : C4 puis C5 |
-| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape A4 » |
-| **Dernier commit poussé** | `main` — « Merge pull request #1 » (règles Git) |
+| **Prochaine étape** | B2 (historique et transactions) puis C1 (connexion) — dev 1 |
+| **Dev 2 peut démarrer** | **dès la fusion de B1** : C4 (configuration) puis C5 (centres, sessions, créneaux), sur des branches `etape-C4-…` / `etape-C5-…` |
+| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape B1 » |
+| **Dernier commit poussé** | `main` — « Merge pull request #2 » (étape A4) |
 
 Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une question à valider
 
@@ -32,7 +32,7 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 | Étape | Contenu | Livrables | Critère de fin | Statut |
 |---|---|---|---|---|
 | B0 Socle Gradle et projet | `git init` + dépôt public ; package `mg.itu.att` ; Compose/Navigation/ViewModel/Room-KSP ; Java 17 ; suppression appcompat/material ; `MainActivity` + `AppNavigation` + écran « Bonjour ATT » ; thème | `build.gradle.kts`, `libs.versions.toml`, `AndroidManifest.xml`, `MainActivity.kt`, `Navigation.kt`, `.gitignore` | `./gradlew :app:assembleDebug` vert, appli lancée sur émulateur, versions définitives notées dans `docs/01` §2.1 et `HORS_COURS.md` | 🟢 15/09/2026 |
-| B1 Base de données | toutes les entités de `docs/03`, DAO minimaux (`tous`, `parId`, `inserer`, `modifier`), `AppDatabase.obtenir()`, données initiales (régions, superadmin, exemples « à confirmer ») | `data/Entites*.kt`, `data/*Dao.kt`, `data/AppDatabase.kt`, `data/DonneesInitiales.kt` | build vert, base créée au premier lancement, inspection avec App Inspection d'Android Studio | ⚪ |
+| B1 Base de données | toutes les entités de `docs/03`, DAO minimaux (`tous`, `parId`, `inserer`, `modifier`), `AppDatabase.obtenir()`, données initiales (régions, superadmin, exemples « à confirmer ») | `data/Entites*.kt`, `data/*Dao.kt`, `data/AppDatabase.kt`, `data/DonneesInitiales.kt` | build vert, base créée au premier lancement, inspection avec App Inspection d'Android Studio | 🟢 15/09/2026 |
 | B2 Historique et transactions | DAO `Historique`, fonction utilitaire `tracer(...)`, `@Transaction` sur les écritures sensibles | `data/HistoriqueDao.kt`, `metier/Trace.kt` | une écriture de test produit sa ligne d'historique | ⚪ |
 
 ## Phase C — Fonctionnalités MVP (ordre des instructions §2)
