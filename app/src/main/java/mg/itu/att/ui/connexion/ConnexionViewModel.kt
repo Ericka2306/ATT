@@ -58,6 +58,10 @@ class ConnexionViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun changerMotDePasse(valeur: String) = _uiState.update { it.copy(motDePasse = valeur, erreur = null) }
 
+    /** Remplit les deux champs d'un coup (raccourci des comptes de test, version de développement seulement). */
+    fun preremplir(identifiant: String, motDePasse: String) =
+        _uiState.update { it.copy(identifiant = identifiant, motDePasse = motDePasse, erreur = null) }
+
     /**
      * Vérifie les identifiants puis appelle [onSucces] (l'écran signale, la navigation décide).
      * Le message d'erreur est volontairement le même pour « identifiant inconnu » et « mot de passe faux ».

@@ -20,6 +20,10 @@ interface RegionDao {
     @Query("SELECT * FROM regions WHERE actif = 1 ORDER BY nom ASC")
     fun actives(): Flow<List<Region>>
 
+    /** Même liste, en une fois (pour remplir un formulaire). */
+    @Query("SELECT * FROM regions WHERE actif = 1 ORDER BY nom ASC")
+    suspend fun listeActives(): List<Region>
+
     @Query("SELECT * FROM regions WHERE id = :id")
     suspend fun parId(id: Int): Region?
 

@@ -36,8 +36,8 @@ import mg.itu.att.R
 import mg.itu.att.ui.communs.CarteIcone
 import mg.itu.att.ui.communs.EcranAvecBarre
 import mg.itu.att.ui.communs.IconeDeconnexion
-import mg.itu.att.ui.communs.dateDuJour
-import mg.itu.att.ui.communs.formatDate
+import mg.itu.att.metier.dateDuJour
+import mg.itu.att.metier.formatDate
 import mg.itu.att.ui.communs.libelle
 import mg.itu.att.ui.connexion.SessionUtilisateur
 
