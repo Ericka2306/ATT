@@ -1,0 +1,23 @@
+# Gradle
+.gradle/
+/build/
+/app/build/
+/captures/
+.externalNativeBuild
+.cxx
+
+# Configuration locale (chemin du SDK, secrets) : jamais versionnée
+local.properties
+
+# IDE (Android Studio / IntelliJ) : réglages propres à chaque poste
+.idea/
+*.iml
+.kotlin/
+
+# macOS
+.DS_Store
+
+# Fichiers temporaires et bases de test
+*.hprof
+*.db
+*.db-journal

@@ -1,0 +1,45 @@
+# Questions à valider — règles administratives et choix techniques
+
+> Règle R2 : on n'invente pas. Chaque question ci-dessous a une **valeur par défaut « à confirmer »** qui permet de coder sans bloquer ; la valeur est une ligne de `RegleConfig` ou de référentiel, modifiable dans l'application, jamais codée en dur.
+> Sources et niveaux de fiabilité détaillés dans `docs/references/RECHERCHE_ATT_ET_ANDROID.md` (partie A). Recherche du 15/09/2026 ; le site att.mg était inaccessible.
+
+Légende fiabilité : **OFFICIEL** (portail gouvernemental), **PRESSE** (L'Express, Newsmada, Studio Sifaka…), **SECONDAIRE** (sites d'auto-écoles, guides privés), **NON TROUVÉ**.
+
+---
+
+## A. Règles administratives (à poser à l'ATT ou à l'enseignant)
+
+| # | Question | Ce que la recherche indique | Fiabilité | Valeur par défaut retenue (« à confirmer ») | Où dans l'appli |
+|---|---|---|---|---|---|
+| Q1 | Épreuve théorique : nombre de questions, durée, note max, seuil de réussite, support (papier ? écran ?) | 30 questions en 30 minutes, QCM ; seuil « défini par la réglementation », valeur introuvable ; l'ATT teste une application couvrant inscription → résultats | SECONDAIRE / NON TROUVÉ | 30 questions, 30 min, 1 point/question, seuil 20/30 (**exemple**, marqué à confirmer) | `Bareme`, `RegleConfig.DUREE_THEORIE_MIN` |
+| Q2 | Épreuve de conduite : critères, points, fautes éliminatoires, durée, manœuvres | Épreuve en véhicule ; aucune grille trouvée (attention : les grilles trouvées en ligne sont marocaines/françaises) | NON TROUVÉ | Aucun critère préchargé ; écran de saisie générique ; 2 critères d'exemple marqués « exemple » | `CriterePratique` (vide), `EvaluationCritere` |
+| Q3 | Repassage : délai entre tentatives, nombre max de tentatives, durée de validité de la théorie réussie, frais de réinscription | « nouvelle tentative après un délai déterminé » ; ~25 jours (source faible) ; validité de la théorie limitée mais non chiffrée ; nombre max non trouvé | SECONDAIRE / NON TROUVÉ | `DELAI_REPASSAGE_JOURS = 25`, `TENTATIVES_MAX = 0` (0 = illimité), `CONSERVATION_EPREUVE_REUSSIE_JOURS = 365` | `RegleConfig` |
+| Q4 | Appel et présence : tolérance de retard, sort de l'absent (report automatique ? nouvelle inscription ?), l'absence consomme-t-elle une tentative ? | Réunion ATT/BIANCO : appel **par numéro anonyme**, moniteur non admis, examinateur ne connaît pas le nom ; règles de retard/absence non trouvées | PRESSE / NON TROUVÉ | `TOLERANCE_RETARD_MIN = 15`, `REGLE_ABSENCE = NOUVELLE_INSCRIPTION`, absence ne crée pas de tentative ; numéro d'anonymat généré par inscription | `RegleConfig`, `Inscription.numeroAnonymat` |
+| Q5 | Sessions : capacité standard, durée d'un passage, marge, fréquence par centre, créneaux individuels autorisés ? | 60 000 candidats/an, 31 examinateurs, 22 centres ; aucune capacité ni fréquence publiée ; logique de sessions collectives | PRESSE / NON TROUVÉ | `CAPACITE_SESSION_DEFAUT = 30`, `DUREE_CRENEAU_MIN = 15`, `MARGE_CRENEAU_MIN = 5`, créneau individuel possible (capacité 1) mais désactivable | `RegleConfig`, `Creneau.capacite` |
+| Q6 | Examinateur : évalue-t-il théorie et pratique ? saisit-il lui-même ? affectation par tirage ? l'ATT valide-t-elle chaque résultat ? | « examinateurs assermentés au sein de l'ATT », formés par le MTM ; procédure de saisie non documentée | PRESSE | L'examinateur se déclare au moment de la saisie ; tout résultat passe par validation Admin ATT avant publication | `Tentative.examinateurId`, `Resultat.statut` |
+| Q7 | Dossier : pièces exactes, certificat médical pour B ?, données stockables (CIN ? scans ?), durée de conservation | OFFICIEL (Torolalana) : A/A'/B = carte scolaire ou copie CIN, acte de naissance, certificat de résidence, 5 photos ; C/D/E = + CIN, certificat médical BMH, copie permis B. Contradiction sur le certificat médical pour B. Aucune règle de protection des données trouvée | OFFICIEL / À TRANCHER | Liste de pièces = celle de Torolalana, en référentiel modifiable ; on stocke « fournie oui/non », aucun scan ; numéro CIN stocké en texte (à confirmer) | `PieceDossier`, `Candidat.cin` |
+| Q8 | Qui inscrit le candidat à une session : l'ATT seule ou l'auto-école ? | L'auto-école dépose les dossiers et paie les droits pour ses candidats (10 000 Ar A/A'/B ; 15 000 Ar C/D/E) ; le paiement est hors périmètre | OFFICIEL | Admin ATT inscrit ; l'auto-école peut **demander** (statut `DEMANDE`) si la règle `AUTO_ECOLE_PEUT_INSCRIRE = true` | `RegleConfig`, `Inscription.statut` |
+| Q9 | La conduite est-elle conditionnée à la réussite de la théorie ? même jour ou sessions séparées ? | « la réussite de l'épreuve théorique est obligatoire avant de passer à l'autre épreuve » ; « deux examens consécutifs » | PRESSE (concordant) | `CONDUITE_APRES_THEORIE_REUSSIE = true` ; une session = une épreuve | `RegleConfig`, `Session.typeEpreuveId` |
+| Q10 | Catégories exactes et âges minimums (F, AM existent-elles ? décret 2026-974 ?) | A' (< 125 cm³), A (> 125 cm³), B, C, D, E confirmées ; F/AM non trouvées ; âges : 16 (A/A'), 18 (B), 21 (C/D/E) selon presse/secondaire ; nouveau décret d'application 2026-974 non lu | OFFICIEL (liste) / SECONDAIRE (âges) | Référentiel : A', A, B, C, D, E ; âges 16/16/18/21/21/21 marqués à confirmer ; C/D/E exigent B | `CategoriePermis` |
+| Q11 | Découpage régional : régions administratives ou directions ATT ? un candidat passe-t-il dans la région de son auto-école ? les Admin ATT sont-ils régionaux ? examinateurs affectés à un centre ? | **24 régions** (loi 2004-001 + créations 2021 et 2023) ; « visas provinciaux » pour les auto-écoles ; 22 centres d'examen sans liste ; bureaux ATT repérés à Soarano (siège), Toamasina, Mahajanga ; rattachement régional des candidats non trouvé | SECONDAIRE / NON TROUVÉ | Référentiel des 24 régions ; `EXAMEN_DANS_REGION_AUTO_ECOLE = false` (non bloquant) ; `Utilisateur.regionId` facultatif ; `Examinateur.regionId` facultatif | `Region`, `RegleConfig` |
+| Q12 | Formats locaux : CIN (12 chiffres), téléphone (+261), langue de l'interface | Aucune contrainte trouvée | — | Validation souple (chiffres uniquement, longueur non bloquante) ; interface en français ; malgache en perspective | `ui/communs/Formats.kt` |
+| Q13 | Quel document l'ATT remet-elle à la fin (liste des admis ? attestation ?) et qui le signe ? | Le CIM délivre « suivant la liste des admis publiée par l'ATT » ; l'auto-école remet un bordereau | PRESSE / SECONDAIRE | Impression d'un « relevé de résultat » et d'une « liste des admis par session », sans valeur officielle affichée | `ui/impression/` |
+
+## B. Choix techniques — **tranchés le 15/09/2026** (dev 1 + Claude) : propositions acceptées telles quelles
+
+| # | Question | Options | Proposition |
+|---|---|---|---|
+| T1 | Rester sur AGP 9.3.2 (Kotlin 2.2.10 embarqué) ou revenir à AGP 8.13.2 + Kotlin 2.0.20 comme `carteproduit` ? | AGP 9 = squelette actuel, migration documentée par Google ; AGP 8 = identique au cours, tout en cache local | **AGP 9.3.2**, sans plugin `kotlin.android`, plugin Compose 2.2.10, KSP 2.2.10-2.0.2 (repli AGP 8 si le premier build échoue) |
+| T2 | Versions des bibliothèques : celles du cours (2024) ou stables 2026 ? | Room 2.6.1 est antérieur à KSP2 (risque) ; Room 2.8.5 même API ; BOM 2026.08.00 exige AGP ≥ 9.1.1 et compileSdk 37 (OK) | Room 2.8.5, navigation-compose 2.10.1, lifecycle-viewmodel-compose 2.11.0, BOM 2026.08.00 ; repli BOM 2025.x si incompatibilité de métadonnées Kotlin. Navigation 3 et Room 3 exclus (hors cours) |
+| T3 | Hachage des mots de passe | PBKDF2WithHmacSHA256 (API 26+) ou PBKDF2WithHmacSHA1 (API 24) ; SHA-256 simple déconseillé | **minSdk 26** (Android 8.0, 2017) et PBKDF2WithHmacSHA256, ~10 000 itérations pour rester fluide sur mobile ; sinon garder minSdk 24 et SHA1 |
+| T4 | Impression | WebView HTML → `PrintManager` (simple, export PDF inclus) ; `PdfDocument` (plus de code) | **HTML → WebView → PrintManager** |
+| T5 | Tests | JUnit 4 sur `metier/` seulement, ou aussi Room in-memory (`BundledSQLiteDriver`) ? | JUnit 4 sur `metier/` ; Room in-memory en option à l'étape D1 |
+| T6 | Session utilisateur persistante entre deux lancements ? | En mémoire (cours) ou DataStore (hors cours) | En mémoire : reconnexion à chaque lancement |
+
+## C. Ce qui est confirmé et peut être considéré comme acquis
+
+- Parcours officiel (Torolalana) : inscription en auto-école → dossier → examen ATT (théorie puis pratique) → liste des admis ATT → CIM (hors périmètre).
+- L'inscription passe obligatoirement par une auto-école (pas de candidat libre trouvé).
+- Les frais (10 000 / 15 000 Ar ATT, 38 000 Ar CIM) existent mais le paiement est hors périmètre : on ne les modélise pas.
+- Le CIM dépend du Ministère de l'Intérieur, l'ATT du Ministère des Transports : frontière nette du périmètre.
+- L'anonymisation de l'appel (numéro plutôt que nom) est une pratique ATT récente : le modèle prévoit un numéro d'anonymat par inscription.

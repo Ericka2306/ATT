@@ -1,0 +1,35 @@
+# ATT — Digitalisation des examens du permis de conduire (Madagascar)
+
+Application Android (Kotlin, Jetpack Compose, Room) pour la gestion des examens du permis de conduire à l'Agence des Transports Terrestres : dossiers des candidats, sessions et créneaux, présence, tentatives, évaluation et résultats.
+
+Projet universitaire M1 — module « Initiation au développement mobile natif Kotlin, assistée par IA » (ITUniversity, Antananarivo), réalisé en binôme.
+
+## Périmètre
+
+Uniquement l'ATT : de la constitution du dossier par l'auto-école jusqu'au résultat validé. La délivrance du permis (CIM), les notifications et le paiement sont hors périmètre. Aucune règle administrative n'est codée en dur : barèmes, seuils, délais et catégories sont configurables et marqués « à confirmer » tant qu'ils ne sont pas validés par l'ATT.
+
+## Où lire quoi
+
+| Document | Contenu |
+|---|---|
+| [docs/01_REGLES_DE_DEVELOPPEMENT.md](docs/01_REGLES_DE_DEVELOPPEMENT.md) | Règles, pile technique, architecture, conventions |
+| [docs/02_PLAN_DE_TRAVAIL.md](docs/02_PLAN_DE_TRAVAIL.md) | Étapes, livrables, avancement |
+| [docs/03_MODELE_DE_DONNEES.md](docs/03_MODELE_DE_DONNEES.md) | Entités et invariants |
+| [docs/04_QUESTIONS_A_VALIDER.md](docs/04_QUESTIONS_A_VALIDER.md) | Règles administratives inconnues, sources, valeurs par défaut |
+| [docs/HORS_COURS.md](docs/HORS_COURS.md) | Notions non vues en cours, expliquées avant usage |
+| [docs/COMPTES_RENDUS.md](docs/COMPTES_RENDUS.md) | Compte rendu de chaque étape |
+| [JOURNAL-IA.md](JOURNAL-IA.md) | Journal de l'usage de l'IA (protocole du module) |
+| [docs/references/](docs/references/) | Cahier de cadrage, instructions, synthèses des cours, recherche documentaire |
+
+## Ouvrir et lancer
+
+Android Studio → File → Open → dossier `ATT` → attendre la synchronisation Gradle → lancer sur un émulateur ou un appareil (Android 8.0 minimum).
+
+```bash
+./gradlew :app:assembleDebug        # construire
+./gradlew :app:testDebugUnitTest    # tests unitaires
+```
+
+## État d'avancement
+
+Voir la colonne « Statut » de [docs/02_PLAN_DE_TRAVAIL.md](docs/02_PLAN_DE_TRAVAIL.md). Phase A (cadrage) terminée ; phase B (socle technique) en cours.
