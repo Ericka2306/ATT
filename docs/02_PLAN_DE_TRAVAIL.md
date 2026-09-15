@@ -7,12 +7,12 @@
 
 | | |
 |---|---|
-| **Dernière étape terminée** | B0 (socle Gradle, `mg.itu.att`, Compose/Navigation/Room, build vert, appli lancée) — 15/09/2026 |
+| **Dernière étape terminée** | A4 (cas d'utilisation, écrans, routes) — 15/09/2026, en attente de fusion (PR de `etape-A4-cas-utilisation`) |
 | **Étape en cours** | aucune |
-| **Prochaine étape** | A4 (cas d'utilisation et liste des écrans) puis B1 (base de données) — dev 1 |
+| **Prochaine étape** | B1 (base de données : entités, DAO, `AppDatabase`, données initiales) — dev 1 |
 | **Dev 2 peut démarrer** | après B1 (base de données en place) : C4 puis C5 |
-| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape B0 » |
-| **Dernier commit poussé** | `main` — « Met en place le socle technique (étape B0) » |
+| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape A4 » |
+| **Dernier commit poussé** | `main` — « Merge pull request #1 » (règles Git) |
 
 Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une question à valider
 
@@ -25,7 +25,7 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 | A1 Analyse des exigences | Lecture du cadrage, des instructions, des cours ; règles ; plan | `CLAUDE.md`, `docs/01`, `docs/02`, `docs/references/`, `JOURNAL-IA.md` | documents relus par le binôme | 🟢 |
 | A2 Acteurs, permissions, entités | matrice des permissions, liste des entités | `docs/01` §6, `docs/03` | validés par le binôme | 🟢 (validé 15/09/2026, dev 1 + Claude ; dev 2 informé) |
 | A3 Modèle de données | attributs, statuts, relations, invariants, questions | `docs/03_MODELE_DE_DONNEES.md`, `docs/04_QUESTIONS_A_VALIDER.md` | **validation explicite du binôme** ; réponses obtenues ou valeurs par défaut « à confirmer » fixées | 🟢 (validé 15/09/2026 avec les valeurs par défaut ; Q1–Q13 restent à poser à l'enseignant) |
-| A4 Cas d'utilisation et flux | UC01–UC14, parcours écran par écran, liste des écrans et routes | `docs/05_CAS_UTILISATION.md` (schéma des écrans + routes) | chaque UC a un acteur, des préconditions, un flux nominal, les cas d'erreur du cadrage §11 | ⚪ |
+| A4 Cas d'utilisation et flux | UC01–UC14, parcours écran par écran, liste des écrans et routes | `docs/05_CAS_UTILISATION.md` (schéma des écrans + routes) | chaque UC a un acteur, des préconditions, un flux nominal, les cas d'erreur du cadrage §11 | 🟢 15/09/2026 |
 
 ## Phase B — Socle technique
 

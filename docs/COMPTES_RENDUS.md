@@ -57,3 +57,20 @@ Format (instructions §10) : ce qui a été créé, les fichiers modifiés, les 
 **Décisions restantes**
 1. Le contenu passe sous la barre d'état (comportement identique aux projets du cours) : à régler avec `Scaffold` à l'étape C1 (notion hors cours n° 7, déjà acceptée).
 2. Étape suivante : A4 (cas d'utilisation et liste des écrans), puis B1 (base de données).
+
+---
+
+## Étape A4 — Cas d'utilisation, flux et écrans — 15/09/2026
+
+**Créé**
+- `docs/05_CAS_UTILISATION.md` — parcours global, 14 cas d'utilisation (acteur, préconditions, flux nominal, erreurs, étape du plan), tableau des contraintes du cadrage §11, 27 routes et ~22 écrans, menu par rôle, 12 ViewModels prévus.
+
+**Modifié**
+- `docs/README.md`, `CLAUDE.md` — référence au nouveau document.
+- `docs/02_PLAN_DE_TRAVAIL.md` — A4 🟢, tableau « Où en est-on ? ».
+
+**Tests** : sans objet (document).
+
+**Décisions restantes**
+1. Relire les 14 UC, en particulier UC07 (qui inscrit ?), UC08 (qui fait l'appel ?) et UC09 (saisie question par question ou points directs ?) : ce sont les trois points où les réponses de l'enseignant (Q4, Q6, Q8, Q1) changeraient les écrans.
+2. Étape suivante : B1 (base de données : entités, DAO, `AppDatabase`, données initiales).

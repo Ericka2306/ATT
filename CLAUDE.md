@@ -7,6 +7,7 @@ Application Android (Kotlin, Jetpack Compose, Room) de gestion des examens du pe
 - `docs/02_PLAN_DE_TRAVAIL.md` — étapes ordonnées, livrables et critères de fin d'étape. **Ne faire qu'une étape à la fois.**
 - `docs/03_MODELE_DE_DONNEES.md` — entités, statuts, invariants (proposition à valider).
 - `docs/04_QUESTIONS_A_VALIDER.md` — règles administratives inconnues : ne jamais les inventer.
+- `docs/05_CAS_UTILISATION.md` — cas d'utilisation, écrans, routes, navigation par rôle : la référence pour nommer écrans et ViewModels.
 - `docs/HORS_COURS.md` — toute notion non vue en cours doit y être expliquée avant usage.
 - `docs/references/` — cahier de cadrage, instructions, synthèses des cours et des projets d'exemple.
 
