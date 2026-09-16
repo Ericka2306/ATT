@@ -19,6 +19,9 @@ interface TentativeDao {
     @Query("SELECT * FROM tentatives WHERE inscriptionId = :inscriptionId ORDER BY id ASC")
     suspend fun parInscription(inscriptionId: Int): List<Tentative>
 
+    @Query("SELECT * FROM tentatives WHERE candidatId = :candidatId AND typeEpreuveId = :typeEpreuveId ORDER BY numero ASC")
+    suspend fun listePourCandidatEtEpreuve(candidatId: Int, typeEpreuveId: Int): List<Tentative>
+
     @Query("SELECT * FROM tentatives WHERE id = :id")
     suspend fun parId(id: Int): Tentative?
 
@@ -93,6 +96,14 @@ interface ResultatDao {
 
     @Query("SELECT * FROM resultats WHERE id = :id")
     suspend fun parId(id: Int): Resultat?
+
+    /** Le dernier résultat réussi (non annulé) d'un candidat pour une épreuve : sert à « théorie réussie avant conduite ». */
+    @Query(
+        "SELECT resultats.* FROM resultats JOIN tentatives ON tentatives.id = resultats.tentativeId " +
+            "WHERE tentatives.candidatId = :candidatId AND tentatives.typeEpreuveId = :typeEpreuveId " +
+            "AND resultats.reussi = 1 AND resultats.statut != 'ANNULE' ORDER BY resultats.id DESC LIMIT 1",
+    )
+    suspend fun dernierReussi(candidatId: Int, typeEpreuveId: Int): Resultat?
 
     /** Seule écriture autorisée : on ajoute, on ne modifie jamais. */
     @Insert

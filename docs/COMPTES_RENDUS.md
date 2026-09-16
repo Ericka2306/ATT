@@ -276,3 +276,29 @@ Réassignée au dev 1 le 16/09 (le dev 2 n'avait pas commencé) ; le dev 2 repre
 1. Une session = une épreuve. Si l'ATT organise théorie et conduite le même jour, on crée deux sessions (Q9).
 2. Le conflit de centre est un avertissement, pas un blocage : plusieurs sessions le même jour au même centre sont possibles (à confirmer, Q5).
 3. Étape suivante : C6 (inscriptions), qui branchera `session/{id}/inscrire`.
+
+---
+
+## Étape C6 — Inscriptions — 16/09/2026
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `data/Regles.kt` — lecture typée des règles (`regleEntier`, `regleBooleen`, `regleTexte`), catégorie prioritaire sur global.
+- `metier/ReglesInscription.kt` — `ContexteInscription` (tous les faits nécessaires) et `verifier` : session ouverte, dossier validé, pas de double inscription, pas d'autre session le même jour, capacité, région (`EXAMEN_DANS_REGION_AUTO_ECOLE`), tentatives max, délai de repassage, théorie réussie avant conduite (`CONDUITE_APRES_THEORIE_REUSSIE`) ; `choisirCreneau` (premier avec une place), `numeroAnonymat` (rang à trois chiffres jamais réutilisé), `joursEntre`. 7 tests.
+- `ui/inscriptions/InscriptionsViewModel.kt` — rassemble les faits en base, applique `verifier`, enregistre inscription + présence `EN_ATTENTE` + historique en une transaction ; la session passe `COMPLETE` à la dernière place et redevient `OUVERTE` à une annulation ou un report ; l'ATT inscrit, confirme (demande d'auto-école si la règle `AUTO_ECOLE_PEUT_INSCRIRE` l'autorise), reporte et annule avec motif ; l'auto-école ne voit que ses candidats.
+- `ui/inscriptions/EcranInscriptions.kt` — inscrits (n° d'appel, candidat, créneau, statut, actions), places restantes, recherche d'un candidat éligible, choix du créneau ou premier disponible.
+- Captures `docs/captures/C6_*.png`.
+
+**Modifié**
+- `data/ExamensDao.kt` — `TentativeDao.listePourCandidatEtEpreuve`, `ResultatDao.dernierReussi` (jointure tentatives) ; `data/PlanificationDao.kt` — `InscriptionDao.listePourCandidat` ; `data/Tracage.kt` — `Inscription.resume()`.
+- `ui/sessions/EcranDetailSession.kt` — bouton « Inscriptions » dès que la session n'est plus planifiée, visible par tous les rôles autorisés.
+- `Navigation.kt` — route `session/{id}/inscrire` branchée.
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : 51 tests verts.
+- Émulateur (`admin`) : session du 05/10 (12 places) → Inscriptions → RAKOTO Hery proposé (seul candidat à dossier B validé) → inscrit n° 001, créneau 08:00, présence créée → compteur « 1 inscrit(s) / 12 » sur la fiche. Session à 1 place le 12/10 → inscription → « 0 place restante », fiche « Complète » → report avec motif → « Reporté », place libérée, session « Ouverte ». Base : 2 inscriptions, 2 présences, historiques CREATION / REPORT / MODIFICATION de session.
+- Couverts par les tests seulement : double inscription, conflit de jour, région, délai, tentatives max, théorie avant conduite (aucune tentative ni résultat n'existe encore).
+
+**Décisions restantes**
+1. Le numéro d'appel anonyme est un rang (001, 002…) : simple et imprimable ; si l'ATT veut un numéro non prédictible, un tirage aléatoire remplacera `numeroAnonymat` sans toucher aux écrans.
+2. « Reporter » libère la place et laisse l'inscription en `REPORTE` ; la réinscription à une autre session se fait ensuite depuis cette session-là (pas de report « automatique » vers une session choisie, Q4).
+3. Étape suivante : C7 (présence et appel).

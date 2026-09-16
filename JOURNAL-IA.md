@@ -125,7 +125,22 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 9 — <date> — <tâche>
+## Entrée 9 — 16/09/2026 — Étape C6, inscriptions
+
+- Code soumis : `metier/ReglesInscription.kt`, `ui/inscriptions/*`, `data/Regles.kt`.
+- Remarque principale de l'IA : séparer « rassembler les faits » (ViewModel, lectures en base) de « juger » (`ReglesInscription.verifier`, fonction pure sur un `ContexteInscription`) : les neuf contrôles du cadrage (§6, §11) sont testés sans Android, et l'ordre des messages va du plus bloquant au plus fin.
+
+⚠️ Toutes les règles (région, délai, tentatives max, théorie avant conduite) sont lues par `regleEntier` / `regleBooleen` au moment de l'inscription, avec la règle de la catégorie prioritaire sur la règle globale. À vérifier par le binôme : aucune valeur n'est écrite dans le code.
+
+⚠️ `joursEntre` calcule un écart de dates avec la formule des jours juliens plutôt qu'avec `java.time` (hors cours) : à la fois plus « fait main » comme le cours et moins lisible. Le binôme peut préférer `java.time.LocalDate` en l'ajoutant à HORS_COURS.
+
+⚠️ Le passage automatique de la session en COMPLETE / retour en OUVERTE est décidé dans le ViewModel, dans la même transaction que l'inscription : cohérent, mais c'est une règle métier implicite ; elle est documentée dans le compte rendu.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 1>.
+
+---
+
+## Entrée 10 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :
