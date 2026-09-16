@@ -88,6 +88,8 @@ object DonneesInitiales {
             description = "L'auto-école peut demander une inscription à une session — Q8"),
         RegleConfig(cle = ClesRegles.DUREE_THEORIE_MIN, valeur = "30", typeValeur = TypeValeur.ENTIER,
             description = "Durée de l'épreuve théorique, en minutes — Q1"),
+        RegleConfig(cle = ClesRegles.MODE_THEORIE, valeur = "TIRAGE", typeValeur = TypeValeur.TEXTE,
+            description = "Choix des questions : TIRAGE (sujet tiré au sort par l'application) ou DIRECT (l'examinateur choisit pendant l'épreuve) — Q1 bis"),
         // Pièces du dossier : liste du portail officiel Torolalana pour A, A', B (Q7) ; les catégories C, D, E ont leur surcharge.
         RegleConfig(cle = ClesRegles.PIECES_DOSSIER, typeValeur = TypeValeur.TEXTE,
             valeur = listOf(

@@ -7,7 +7,8 @@
 #   saisir "Identifiant" "admin"       → appuie dans le champ « Identifiant » puis tape « admin » (%s = espace)
 #   visible "Mot de passe changé"      → vrai si le texte est à l'écran
 #   capture nom                        → enregistre docs/captures/nom.png
-# Un élément non visible est cherché en faisant défiler l'écran vers le bas (4 essais).
+# Un élément non visible est cherché en faisant défiler l'écran (vers le bas puis vers le haut).
+# Limite connue : le texte saisi ne doit contenir ni apostrophe ni guillemet (adb shell input text).
 
 ADB="${ADB:-$HOME/Library/Android/sdk/platform-tools/adb}"
 DOSSIER_PROJET="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)"
@@ -39,12 +40,20 @@ print("INTROUVABLE", file=sys.stderr); sys.exit(1)
 EOF
 }
 
+# remonte en haut de l'écran
+haut() { $ADB shell input swipe 360 300 360 1100 300; sleep 0.8; $ADB shell input swipe 360 300 360 1100 300; sleep 0.8; }
+
 tap() {
   local c essai
-  for essai in 1 2 3 4; do
+  for essai in 1 2 3 4 5 6; do
     c=$(centre "$1" 2>/dev/null) && break
-    # défilement depuis le haut : la zone basse peut être couverte par le clavier
-    $ADB shell input swipe 360 650 360 250 400; sleep 1.2
+    if [ "$essai" -le 3 ]; then
+      # défilement vers le bas, depuis le haut : la zone basse peut être couverte par le clavier
+      $ADB shell input swipe 360 650 360 250 400; sleep 1.2
+    else
+      # puis vers le haut
+      $ADB shell input swipe 360 300 360 900 400; sleep 1.2
+    fi
   done
   [ -z "$c" ] && { echo "!! introuvable : $1"; return 1; }
   $ADB shell input tap $c; sleep "${2:-1.5}"
@@ -52,6 +61,14 @@ tap() {
 
 saisir() {
   tap "$1" 1.2 || return 1
+  $ADB shell input text "$2"; sleep 0.5
+}
+
+# comme saisir, mais efface d'abord le contenu du champ (sélection totale + suppression)
+remplacer() {
+  tap "$1" 1.2 || return 1
+  $ADB shell input keycombination 113 29 2>/dev/null   # Ctrl + A
+  $ADB shell input keyevent KEYCODE_DEL; sleep 0.3
   $ADB shell input text "$2"; sleep 0.5
 }
 

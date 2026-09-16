@@ -114,7 +114,7 @@ Le projet s'arrête au résultat validé et imprimable. Rien n'est prévu pour l
 |---|---|
 | Acteur | Examinateur (Admin ATT en secours) |
 | Précondition | inscription avec présence `PRESENT` ou `EN_RETARD` accepté ; pas d'affectation préalable examinateur → candidat |
-| Flux nominal | 1. L'examinateur choisit la session puis un candidat présent (identifié par son numéro d'anonymat). 2. Le système crée la `Tentative` n° = max + 1 pour (candidat, épreuve), `examinateurId` = utilisateur courant, présence → `EN_COURS`. 3. **Théorie** : pour chaque `Question` active de l'épreuve, choisir la `Reponse` du candidat (ou « sans réponse ») ; ou saisie directe du nombre de points si la procédure est papier (Q1). 4. **Conduite** : pour chaque `CriterePratique` actif, note, faute éliminatoire, observation. 5. Observations générales, puis « Terminer » : `Evaluation` figée avec `baremeId` courant, tentative `TERMINEE`, présence `TERMINE`. 6. Le calcul (UC10) s'enchaîne. |
+| Flux nominal | 1. L'examinateur choisit la session puis un candidat présent (identifié par son numéro d'anonymat). 2. Le système crée la `Tentative` n° = max + 1 pour (candidat, épreuve), `examinateurId` = utilisateur courant, présence → `EN_COURS`. 3. **Théorie**, selon la règle `MODE_THEORIE` (Q1 bis) : `TIRAGE` = l'application tire au sort des questions actives jusqu'à la note max du barème et fige ce sujet (lignes `ReponseCandidat` créées vides) ; `DIRECT` = l'examinateur choisit les questions au fil de l'eau parmi des propositions groupées par points (proposition aléatoire, bouton « une autre ») jusqu'à atteindre la note max, le total posé restant affiché. Dans les deux cas, il saisit la `Reponse` du candidat (ou « sans réponse »). Variante papier : saisie directe du nombre de points (Q1). 4. **Conduite** : pour chaque `CriterePratique` actif, note, faute éliminatoire, observation. 5. Observations générales, puis « Terminer » : `Evaluation` figée avec `baremeId` courant, tentative `TERMINEE`, présence `TERMINE`. 6. Le calcul (UC10) s'enchaîne. |
 | Erreurs | tentative déjà ouverte pour ce candidat et cette épreuve aujourd'hui → reprise, pas de doublon ; `TENTATIVES_MAX` atteint → refus ; aucune question/critère actif → refus avec renvoi à la configuration ; examinateur indisponible (§11) → tout examinateur connecté peut saisir, aucune affectation n'est requise. |
 | Étape | C8 (tentative), C9 (théorie), C10 (conduite) |
 
@@ -201,11 +201,13 @@ Une seule `MainActivity`, un `NavHost`, routes en chaînes ; l'argument est touj
 ### 4.2 Configuration (dev 2)
 | Route | Écran | UC |
 |---|---|---|
-| `config` | `EcranConfiguration` (liste des référentiels) | UC02 |
-| `config/regions`, `config/categories`, `config/epreuves`, `config/regles`, `config/centres` | `EcranListeReferentiel` générique + `EcranFormulaireReferentiel` | UC02 |
-| `config/baremes/{typeEpreuveId}` | `EcranBaremes` (versions, création d'une version) | UC02 |
-| `config/questions/{typeEpreuveId}` | `EcranQuestions` + `question/{questionId}` (réponses) | UC02 |
-| `config/criteres/{typeEpreuveId}` | `EcranCriteres` | UC02 |
+| `config` | `EcranConfiguration` (menu : catégories et épreuves, règles, centres) | UC02 |
+| `config/categories`, `config/categorie/nouvelle`, `config/categorie/{id}`, `config/categorie/{id}/modifier` | `EcranCategories`, `EcranFormulaireCategorie`, `EcranDetailCategorie` (épreuves de la catégorie) | UC02 |
+| `config/categorie/{id}/epreuve/nouvelle`, `config/epreuve/{id}/modifier/{categorieId}` | `EcranFormulaireEpreuve` | UC02 |
+| `config/epreuve/{id}` | `EcranEpreuve` (versions du barème, questions, critères) | UC02 |
+| `config/epreuve/{id}/bareme`, `…/question`, `…/critere` | `EcranFormulaireBareme` (nouvelle version), `EcranFormulaireQuestion` (4 réponses, une bonne), `EcranFormulaireCritere` | UC02 |
+| `config/regles`, `config/regle/{id}` | `EcranRegles`, `EcranFormulaireRegle` (valeur validée selon le type) | UC02 |
+| `config/centres`, `config/centre/nouveau`, `config/centre/{id}` | `EcranCentres`, `EcranFormulaireCentre` | UC02 |
 
 ### 4.3 Auto-écoles, candidats, dossiers
 | Route | Écran | UC |

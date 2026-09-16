@@ -7,11 +7,11 @@
 
 | | |
 |---|---|
-| **Dernière étape terminée** | C1b (comptes : examinateurs, administrateurs ATT, mot de passe) — 16/09/2026, en attente de fusion (PR de `etape-C1b-comptes`) |
+| **Dernière étape terminée** | C4 (configuration : catégories, épreuves, barèmes, règles, questions, critères, centres) — 16/09/2026, en attente de fusion (PR de `etape-C4-configuration`) |
 | **Étape en cours** | aucune |
-| **Prochaine étape** | C6 (inscriptions) dès que C5 (dev 2) est fusionnée — dev 1. Aucune branche du dev 2 n'existe encore (16/09) : C4 et C5 bloquent C6 à C11. |
-| **Dev 2 peut démarrer** | **maintenant** : C4 (configuration) puis C5 (centres, sessions, créneaux), branches `etape-C4-…` / `etape-C5-…` depuis `main` ; réutiliser `tracer` + `withTransaction`, `SelecteurRegion`, `CarteIcone` et le ViewModel partagé de `graphAutoEcoles` comme modèle |
-| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape C1b » |
+| **Prochaine étape** | C5 (sessions et créneaux) puis C6 (inscriptions) — dev 1 |
+| **Dev 2 peut démarrer** | à son arrivée : C12 (consultation, parcours candidat) sur une branche `etape-C12-…` depuis `main` ; modèle à suivre : `graphCandidats` dans `Navigation.kt` |
+| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape C4 » |
 | **Dernier commit poussé** | `main` — « Merge pull request #4 » (étape C1) |
 
 Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une question à valider
@@ -43,7 +43,7 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 | C2 Auto-écoles | CRUD auto-écoles + compte utilisateur associé, filtre par région | `ui/autoecoles/` | Admin ATT crée une auto-école dans une région ; l'auto-école se connecte | 🟢 15/09/2026 |
 | C1b Comptes | examinateurs et leurs comptes (Admin ATT), comptes Admin ATT nationaux ou régionaux (Super Admin), changement de son mot de passe (tous), désactivation | `ui/comptes/` | un examinateur créé se connecte et voit son menu ; un mot de passe initial peut être changé ; tout est tracé | 🟢 16/09/2026 |
 | C3 Candidats et dossiers | CRUD candidat (auto-école : les siens), constitution et soumission du dossier, pièces, validation/refus/incomplet par ATT avec motif + historique | `ui/candidats/` (liste, détail, formulaire, dossier) | **Créer/valider un candidat** ; dossier incomplet/refusé traité ; candidat sans compte géré | 🟢 15/09/2026 |
-| C4 Catégories et règles configurables | écrans Super Admin : catégories, types d'épreuve, barèmes versionnés, `RegleConfig`, questions/réponses, critères pratiques (structure) | `ui/configuration/` | aucune valeur en dur dans le code ; changement d'un seuil visible au calcul | 🔒 Q1–Q3 (valeurs par défaut « à confirmer ») |
+| C4 Catégories et règles configurables | écrans Super Admin : catégories, types d'épreuve, barèmes versionnés, `RegleConfig`, questions/réponses, critères pratiques (structure) | `ui/configuration/` | aucune valeur en dur dans le code ; changement d'un seuil visible au calcul | 🟢 16/09/2026 (dev 1, réassignée) |
 | C5 Centres, sessions, créneaux | CRUD centres (région), création session (catégorie, épreuve, centre, date, capacité, convocation, durée/marge), génération automatique des créneaux, statuts, annulation | `ui/sessions/` | **Créer une session et ses créneaux** ; capacité respectée | ⚪ |
 | C6 Inscriptions | inscription d'un candidat éligible (dossier VALIDE, catégorie, capacité, doublon, région selon règle), affectation créneau, heure de passage estimée, report/annulation, historique | `ui/sessions/EcranInscriptions` | **Inscrire un candidat** ; session complète et double inscription refusées | ⚪ |
 | C7 Présence | liste d'appel, statuts présent/absent/retard/en cours/terminé, tolérance de retard configurable, réorganisation selon règle, historique | `ui/sessions/EcranAppel` | **Enregistrer présence** | 🔒 Q4 (valeur par défaut) |
@@ -68,9 +68,9 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 
 | Qui | Étapes | Remarque |
 |---|---|---|
-| Dev 1 (Ericka) + Claude | A4, B0, B1, B2, puis C1, C2, C3 | pose le socle ; le dev 2 ne démarre qu'après B1 (base de données en place) |
-| Dev 2 | C4 (règles et barèmes), C5 (centres, sessions, créneaux) | branche par étape, relecture croisée avant merge |
-| Ensemble | C6 à C13, D1 à D3 | ordre du plan ; une étape à la fois |
+| Dev 1 (Ericka) + Claude | A4, B0 à B2, C1, C1b, C2, C3, **puis C4 et C5** (réassignés le 16/09/2026 : le dev 2 n'avait pas commencé), puis C6 à C11 | ne dépend de personne |
+| Dev 2 | à son arrivée : C12 (consultation par rôle, parcours candidat), C13 (impression), D1 (scénarios de test des cas particuliers) | branche par étape, relecture croisée avant merge ; reprend à partir du tableau « Où en est-on ? » |
+| Ensemble | D2, D3 | relecture croisée, démo |
 
 Règle de passage de relais : le dev 2 reprend toujours à partir de `docs/COMPTES_RENDUS.md` (dernière étape terminée) et de `CLAUDE.md`, sans reprendre ce qui est marqué 🟢.
 

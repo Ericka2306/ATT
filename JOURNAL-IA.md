@@ -95,7 +95,22 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 7 — <date> — <tâche>
+## Entrée 7 — 16/09/2026 — Étape C4, configuration
+
+- Code soumis : `ui/configuration/*`, `metier/ValidationConfiguration.kt`.
+- Remarque principale de l'IA : un barème déjà utilisé par un résultat ne doit jamais changer ; « modifier le barème » est donc remplacé par « nouvelle version » (l'ancienne est fermée à la date du jour), et chaque résultat gardera la version qui a servi (règle R6 appliquée aux règles elles-mêmes).
+
+⚠️ Le code ne connaît que la FORME des règles (un seuil ≤ note max, un entier pour un délai), jamais leur valeur : c'est la traduction concrète de « ne pas coder en dur » (R3). À vérifier par le binôme : aucune constante métier dans `ValidationConfiguration` hormis les bornes de saisie (âge 10–99).
+
+⚠️ Les questions et critères se désactivent et ne se modifient pas, pour ne pas altérer d'anciennes évaluations. C'est plus contraignant qu'une édition libre ; le binôme peut décider d'autoriser la modification tant qu'aucune évaluation n'y fait référence.
+
+⚠️ Pilotage : l'apostrophe dans un texte saisi casse `adb shell input text` ; contournement documenté dans le script. Sans lien avec le code livré.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 1>.
+
+---
+
+## Entrée 8 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :
