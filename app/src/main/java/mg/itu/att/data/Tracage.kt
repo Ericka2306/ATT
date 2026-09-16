@@ -60,5 +60,9 @@ suspend fun AppDatabase.tracer(
     )
 }
 
-/** Résumé texte d'une auto-école pour l'historique (jamais l'objet complet). */
+/** Résumés texte pour l'historique (jamais l'objet complet). */
 fun AutoEcole.resume(): String = "$nom (région $regionId, agrément ${numeroAgrement ?: "—"}, ${if (actif) "active" else "inactive"})"
+
+fun Candidat.resume(): String = "$nom $prenom, né(e) le $dateNaissance, auto-école $autoEcoleId${cin?.let { ", CIN $it" } ?: ""}"
+
+fun Dossier.resume(): String = "dossier n° $id, catégorie $categorieId, statut $statut${motif?.let { ", motif : $it" } ?: ""}"

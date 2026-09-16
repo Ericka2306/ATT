@@ -133,6 +133,9 @@ object ClesRegles {
     const val CONDUITE_APRES_THEORIE_REUSSIE = "CONDUITE_APRES_THEORIE_REUSSIE"
     const val AUTO_ECOLE_PEUT_INSCRIRE = "AUTO_ECOLE_PEUT_INSCRIRE"
     const val DUREE_THEORIE_MIN = "DUREE_THEORIE_MIN"
+    /** Pièces attendues dans un dossier, séparées par « ; » ; surcharge possible par catégorie (Q7). */
+    const val PIECES_DOSSIER = "PIECES_DOSSIER"
+    const val SEPARATEUR_PIECES = ";"
 }
 
 // ---------- QUESTIONS ET RÉPONSES (épreuve théorique) ----------
