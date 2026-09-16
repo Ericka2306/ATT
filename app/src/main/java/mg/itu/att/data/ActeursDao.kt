@@ -29,6 +29,10 @@ interface UtilisateurDao {
     @Query("SELECT * FROM utilisateurs WHERE autoEcoleId = :autoEcoleId ORDER BY identifiant ASC")
     fun parAutoEcole(autoEcoleId: Int): Flow<List<Utilisateur>>
 
+    /** Les comptes d'un examinateur (en principe un seul). */
+    @Query("SELECT * FROM utilisateurs WHERE examinateurId = :examinateurId")
+    suspend fun parExaminateur(examinateurId: Int): List<Utilisateur>
+
     /** Tous les identifiants existants, pour refuser un doublon à la création d'un compte. */
     @Query("SELECT identifiant FROM utilisateurs")
     suspend fun tousLesIdentifiants(): List<String>

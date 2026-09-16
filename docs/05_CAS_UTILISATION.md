@@ -191,6 +191,13 @@ Une seule `MainActivity`, un `NavHost`, routes en chaînes ; l'argument est touj
 | `accueil` | `EcranAccueil` (menu selon le rôle, compteurs : dossiers à traiter, sessions du jour, résultats à valider) | tous | UC12 |
 | `historique` / `historique/{entite}/{entiteId}` | `EcranHistorique` | Super Admin, Admin ATT | UC14 |
 
+### 4.1 bis Comptes (étape C1b)
+| Route | Écran | Rôles | UC |
+|---|---|---|---|
+| `examinateurs`, `examinateur/nouveau`, `examinateur/{examinateurId}` | `EcranListeExaminateurs`, `EcranFormulaireExaminateur` (création avec compte, modification, désactivation) | Super Admin, Admin ATT | UC01 |
+| `comptes`, `compte/nouvel-admin` | `EcranComptes`, `EcranFormulaireAdmin` (administrateur national ou régional) | Super Admin | UC01 |
+| `mot-de-passe` | `EcranMotDePasse` | tous | UC01 |
+
 ### 4.2 Configuration (dev 2)
 | Route | Écran | UC |
 |---|---|---|

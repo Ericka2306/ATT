@@ -80,7 +80,22 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 6 — <date> — <tâche>
+## Entrée 6 — 16/09/2026 — Étape C1b, comptes
+
+- Code soumis : `ui/comptes/*`, `metier/ValidationCompte.kt`, `outils/pilote_emulateur.sh`.
+- Remarque principale de l'IA : créer l'examinateur et son compte dans une seule transaction (pas d'examinateur sans compte, pas de compte orphelin), et faire suivre la désactivation de la fiche au compte.
+
+⚠️ L'IA a ajouté l'étape C1b au plan de sa propre initiative (justifiée : C8/C9 ont besoin d'examinateurs connectés, et les mots de passe initiaux devaient pouvoir être changés). Le dev 1 a interrompu puis validé la reprise : à consigner comme décision d'équipe.
+
+⚠️ Le compte courant ne peut pas se désactiver lui-même ; un Super Admin peut en revanche désactiver l'autre Super Admin s'il en existe un : à discuter (garder au moins un Super Admin actif ?).
+
+✅ Le script de pilotage par texte (`uiautomator dump`) rend les vérifications reproductibles : il pourra servir de « démo scriptée » à la soutenance (étape D3).
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 1>.
+
+---
+
+## Entrée 7 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :

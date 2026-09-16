@@ -25,6 +25,12 @@ import mg.itu.att.ui.candidats.EcranDossiersATraiter
 import mg.itu.att.ui.candidats.EcranFormulaireCandidat
 import mg.itu.att.ui.candidats.EcranListeCandidats
 import mg.itu.att.ui.communs.EcranAVenir
+import mg.itu.att.ui.comptes.ComptesViewModel
+import mg.itu.att.ui.comptes.EcranComptes
+import mg.itu.att.ui.comptes.EcranFormulaireAdmin
+import mg.itu.att.ui.comptes.EcranFormulaireExaminateur
+import mg.itu.att.ui.comptes.EcranListeExaminateurs
+import mg.itu.att.ui.comptes.EcranMotDePasse
 import mg.itu.att.ui.communs.idArgument
 import mg.itu.att.ui.communs.viewModelDuSousParcours
 import mg.itu.att.ui.connexion.ConnexionViewModel
@@ -73,10 +79,12 @@ fun AppNavigation() {
 
         graphAutoEcoles(navController) { session }
         graphCandidats(navController) { session }
+        graphComptes(navController) { session }
 
         // ---------- FONCTIONNALITÉS À VENIR ----------
         val libelles = Role.entries.flatMap { menuPour(it) }.associate { it.route to it.libelle }
         for (route in listOf(Routes.CONFIGURATION, Routes.SESSIONS, Routes.EVALUATION, Routes.RESULTATS, Routes.HISTORIQUE, Routes.PARCOURS)) {
+            // (les comptes, examinateurs et le mot de passe sont dans graphComptes)
             composable(route) { EcranAVenir(libelles[route] ?: route, onRetour = { navController.popBackStack() }) }
         }
         composable(Routes.A_VENIR) { entree ->
@@ -123,6 +131,50 @@ private fun NavGraphBuilder.graphAutoEcoles(nav: NavHostController, session: () 
         val vm = viewModelDuSousParcours<AutoEcolesViewModel>(nav, RoutesAutoEcoles.LISTE, session()) ?: return@composable
         val id = entree.idArgument("autoEcoleId") ?: return@composable
         EcranFormulaireCompte(vm, id, onCree = { nav.popBackStack() }, onRetour = retour)
+    }
+}
+
+// ---------- COMPTES : EXAMINATEURS, ADMINISTRATEURS, MOT DE PASSE (étape C1b) ----------
+
+object RoutesComptes {
+    const val EXAMINATEURS = Routes.EXAMINATEURS
+    const val NOUVEL_EXAMINATEUR = "examinateur/nouveau"
+    const val EXAMINATEUR = "examinateur/{examinateurId}"
+    const val COMPTES = Routes.COMPTES
+    const val NOUVEL_ADMIN = "compte/nouvel-admin"
+    const val MOT_DE_PASSE = Routes.MOT_DE_PASSE
+    fun examinateur(id: Int) = "examinateur/$id"
+}
+
+private fun NavGraphBuilder.graphComptes(nav: NavHostController, session: () -> SessionUtilisateur?) {
+    val retour: () -> Unit = { nav.popBackStack() }
+
+    composable(RoutesComptes.EXAMINATEURS) {
+        val vm = viewModelDuSousParcours<ComptesViewModel>(nav, RoutesComptes.EXAMINATEURS, session()) ?: return@composable
+        EcranListeExaminateurs(vm, onNouveau = { nav.navigate(RoutesComptes.NOUVEL_EXAMINATEUR) }, onOuvrir = { nav.navigate(RoutesComptes.examinateur(it)) }, onRetour = retour)
+    }
+    composable(RoutesComptes.NOUVEL_EXAMINATEUR) {
+        val vm = viewModelDuSousParcours<ComptesViewModel>(nav, RoutesComptes.EXAMINATEURS, session()) ?: return@composable
+        EcranFormulaireExaminateur(vm, null, onEnregistre = retour, onRetour = retour)
+    }
+    composable(RoutesComptes.EXAMINATEUR) { entree ->
+        val vm = viewModelDuSousParcours<ComptesViewModel>(nav, RoutesComptes.EXAMINATEURS, session()) ?: return@composable
+        val id = entree.idArgument("examinateurId") ?: return@composable
+        EcranFormulaireExaminateur(vm, id, onEnregistre = retour, onRetour = retour)
+    }
+    composable(RoutesComptes.COMPTES) {
+        val vm = viewModelDuSousParcours<ComptesViewModel>(nav, RoutesComptes.COMPTES, session()) ?: return@composable
+        EcranComptes(vm, onNouvelAdmin = { nav.navigate(RoutesComptes.NOUVEL_ADMIN) }, onRetour = retour)
+    }
+    composable(RoutesComptes.NOUVEL_ADMIN) {
+        val vm = viewModelDuSousParcours<ComptesViewModel>(nav, RoutesComptes.COMPTES, session()) ?: return@composable
+        EcranFormulaireAdmin(vm, onCree = retour, onRetour = retour)
+    }
+    composable(RoutesComptes.MOT_DE_PASSE) {
+        val s = session() ?: return@composable
+        val vm: ComptesViewModel = viewModel()
+        vm.definirSession(s)
+        EcranMotDePasse(vm, onRetour = retour)
     }
 }
 

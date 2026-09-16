@@ -27,6 +27,7 @@ object ActionsHistorique {
 object EntitesHistorique {
     const val AUTO_ECOLE = "AutoEcole"
     const val UTILISATEUR = "Utilisateur"
+    const val EXAMINATEUR = "Examinateur"
     const val CANDIDAT = "Candidat"
     const val DOSSIER = "Dossier"
     const val SESSION = "Session"
@@ -66,3 +67,7 @@ fun AutoEcole.resume(): String = "$nom (région $regionId, agrément ${numeroAgr
 fun Candidat.resume(): String = "$nom $prenom, né(e) le $dateNaissance, auto-école $autoEcoleId${cin?.let { ", CIN $it" } ?: ""}"
 
 fun Dossier.resume(): String = "dossier n° $id, catégorie $categorieId, statut $statut${motif?.let { ", motif : $it" } ?: ""}"
+
+fun Examinateur.resume(): String = "$nom (matricule ${matricule ?: "—"}, région ${regionId ?: "—"}, ${if (actif) "actif" else "inactif"})"
+
+fun Utilisateur.resume(): String = "compte $identifiant ($role, région ${regionId ?: "nationale"}, ${if (actif) "actif" else "désactivé"})"
