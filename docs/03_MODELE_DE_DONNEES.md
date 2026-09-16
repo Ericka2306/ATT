@@ -262,7 +262,7 @@ Aucun document n'est stocké (pas de scan/photo) tant que « données/documents 
 | heurePassageEstimee | String? | |
 | numeroAnonymat | String | numéro d'appel anonyme par session (pratique ATT anti-corruption, Q4) ; l'examinateur ne voit que ce numéro |
 
-Contraintes : `UNIQUE(candidatId, sessionId)` ; nombre d'inscriptions actives ≤ capacité de la session et du créneau.
+Contraintes : une seule inscription **active** (DEMANDE, INSCRIT, CONFIRME) par candidat et par session, garantie par `ReglesInscription.verifier` et non par un index unique (une inscription annulée ou reportée peut être suivie d'une nouvelle sur la même session ; schéma v2, 16/09/2026) ; nombre d'inscriptions actives ≤ capacité de la session et du créneau.
 
 ### Presence
 | Champ | Type | Note |

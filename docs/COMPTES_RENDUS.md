@@ -302,3 +302,28 @@ Réassignée au dev 1 le 16/09 (le dev 2 n'avait pas commencé) ; le dev 2 repre
 1. Le numéro d'appel anonyme est un rang (001, 002…) : simple et imprimable ; si l'ATT veut un numéro non prédictible, un tirage aléatoire remplacera `numeroAnonymat` sans toucher aux écrans.
 2. « Reporter » libère la place et laisse l'inscription en `REPORTE` ; la réinscription à une autre session se fait ensuite depuis cette session-là (pas de report « automatique » vers une session choisie, Q4).
 3. Étape suivante : C7 (présence et appel).
+
+---
+
+## Étape C7 — Présence et appel — 16/09/2026
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `metier/ReglesPresence.kt` — `minutesDeRetard`, `statutArrivee` (PRESENT dans la tolérance `TOLERANCE_RETARD_MIN`, EN_RETARD au-delà), `absentReporteAutomatiquement` (règle `REGLE_ABSENCE` : REPORT_AUTO ou NOUVELLE_INSCRIPTION), `transitionsPossibles`. 4 tests.
+- `ui/appel/AppelViewModel.kt` — liste d'appel par créneau puis numéro (inscriptions actives, hors demandes), compteurs présents / retards / absents / en attente, règles lues en base pour la catégorie de la session ; « Présent » enregistre l'heure d'arrivée et décide PRESENT ou EN_RETARD ; retard accepté (remarque conservée) ou refusé (absent) ; absent → report automatique de l'inscription ou message « à réinscrire » selon la règle ; correction possible tant que la session n'est pas terminée. L'examinateur ne voit que les numéros d'appel. Tout tracé.
+- `ui/appel/EcranAppel.kt` — cartes par candidat avec pastille de statut et actions selon l'état.
+- Captures `docs/captures/C7_appel_attente.png`, `C7_retard_accepte.png`, `C7_absent.png` (trois états distincts, vérifiées une par une).
+
+**Modifié**
+- `data/EntitesPlanification.kt`, `data/AppDatabase.kt` — **schéma v2** : l'index unique (candidatId, sessionId) des inscriptions devient un index simple. Motif : un candidat dont l'inscription a été reportée ou annulée ne pouvait pas être réinscrit à la même session (plantage `SQLiteConstraintException` constaté sur l'émulateur) ; l'unicité d'une inscription *active* est garantie par `ReglesInscription.verifier`. `docs/03` mis à jour.
+- `ui/sessions/EcranDetailSession.kt` — bouton « Appel » dès que la session est ouverte ; « Démarrer » / « Terminer » séparés.
+- `Navigation.kt` — route `session/{id}/appel` branchée. `data/Tracage.kt` — `Presence.resume()`.
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : 55 tests verts.
+- Émulateur, base vide (v2) : toute la chaîne rejouée par le pilote (centre → auto-école + compte → session B 12/10 ouverte → candidat + dossier soumis → validation → inscription n° 001) puis appel : « Présent » à 19:26 pour une convocation à 08:00 → « En retard » (686 min) → accepté → Présent avec remarque → corrigé → Absent avec message « à réinscrire » (règle NOUVELLE_INSCRIPTION). Base : quatre lignes d'historique de présence dans l'ordre.
+- Non exercé sur émulateur : `REGLE_ABSENCE = REPORT_AUTO` (couvert par le test ; le report réutilise le code de C6).
+
+**Décisions restantes**
+1. Qui fait l'appel (Q6) : l'ATT dans cette version ; l'examinateur voit la liste sans les noms et sans boutons.
+2. Une présence marquée avant l'heure de convocation est « Présent » (avance) ; la tolérance ne s'applique qu'au retard.
+3. Étape suivante : C8 (tentatives).

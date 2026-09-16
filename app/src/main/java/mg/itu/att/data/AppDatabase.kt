@@ -29,7 +29,8 @@ import androidx.room.RoomDatabase
         // Traçabilité
         Historique::class,
     ],
-    version = 1,
+    // v2 (16/09/2026, étape C7) : l'index unique (candidatId, sessionId) des inscriptions devient un index simple.
+    version = 2,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {

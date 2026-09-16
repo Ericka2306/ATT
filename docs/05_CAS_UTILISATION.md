@@ -227,7 +227,7 @@ Une seule `MainActivity`, un `NavHost`, routes en chaînes ; l'argument est touj
 | `session/nouvelle` | `EcranFormulaireSession` (valeurs par défaut depuis les règles, aperçu des créneaux, avertissement de conflit) | UC06 |
 | `session/{sessionId}` | `EcranDetailSession` (créneaux et remplissage, statuts, annulation avec motif, historique) | UC06 |
 | `session/{sessionId}/inscrire` | `EcranInscriptions` (inscrits avec actions confirmer / reporter / annuler, places restantes, recherche d'un candidat éligible, choix du créneau) | UC07 |
-| `session/{sessionId}/appel` | `EcranAppel` (présence par créneau) | UC08 |
+| `session/{sessionId}/appel` | `EcranAppel` (liste par créneau et numéro, Présent / Absent, retard à accepter ou refuser, correction, compteurs ; examinateur : numéros seuls) | UC08 |
 
 ### 4.5 Évaluation et résultats
 | Route | Écran | UC |
