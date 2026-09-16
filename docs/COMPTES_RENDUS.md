@@ -171,3 +171,31 @@ Format (instructions §10) : ce qui a été créé, les fichiers modifiés, les 
 1. Les administrateurs régionaux (`Utilisateur.regionId`) sont gérés (filtre verrouillé) mais aucun écran ne permet encore d'en créer : Super Admin, étape C4 (dev 2) ou plus tard.
 2. Le doublon de nom est contrôlé par région uniquement (Q11) ; à ajuster si l'ATT a un agrément national unique.
 3. Étape suivante : C3 (candidats et dossiers), qui réutilise `tracer`, `SelecteurRegion` et le pattern du ViewModel partagé.
+
+---
+
+## Étape C3 — Candidats et dossiers + factorisation — 15/09/2026
+
+**Factorisation (demande du dev 1)** — `ui/communs/` : `Champs.kt` (`ChampTexte` = un champ en une ligne, `BoutonPrincipal`, `CaseACocher` ligne cliquable), `Cadre.kt` (`EcranStandard` remplace le couple `EcranAvecBarre` + `ContenuColonne`, `LigneInfo`, `CarteFiche`, `TitreSection`, `PastilleStatut`, `CarteIcone` avec complément à droite), `Historique.kt` (`LigneHistorique`), `Selecteurs.kt` (`SelecteurChoix` générique, `SelecteurRegion` n'en est qu'un cas), `NavigationCommune.kt` (`viewModelDuSousParcours<VM>()` générique + interface `ViewModelAvecSession`, `idArgument`). Dans les ViewModels, une fonction `modifierFormulaire { it.copy(...) }` remplace les six `changerX`. Les quatre écrans auto-écoles ont été réécrits avec ces briques : le formulaire passe de 95 à 42 lignes, la fiche de 130 à 75.
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `metier/ValidationCandidat.kt` (nom, prénom, date ISO plausible, auto-école) et `metier/ReglesDossier.kt` (`ageA`, `verifierEligibilite` selon l'âge minimum configuré, `peutOuvrirDossier` = un seul dossier en cours ou validé par catégorie, `dossierComplet`, `piecesDepuisRegle`) — 8 tests JUnit.
+- `ui/candidats/CandidatsViewModel.kt` — liste filtrée par rôle (auto-école : les siens ; admin régional : sa région ; ATT : tous) + recherche + filtre auto-école ; formulaire ; fiche (dossiers par catégorie, ouverture d'un dossier avec ses pièces attendues) ; dossier (pièces à cocher, soumission avec contrôle d'éligibilité, décision ATT valider / incomplet / refuser avec motif obligatoire) ; liste « à traiter ». Toute écriture = `withTransaction` + `tracer`.
+- `ui/candidats/Statuts.kt`, `EcranListeCandidats.kt`, `EcranFormulaireCandidat.kt`, `EcranDetailCandidat.kt`, `EcranDossier.kt`, `EcranDossiersATraiter.kt`.
+- Captures `docs/captures/C3_*.png` (liste vide, formulaire, fiche, dossier brouillon, dossier soumis, fiche après soumission, liste, dossiers à traiter, décision, dossier validé).
+
+**Modifié**
+- `data/DonneesInitiales.kt`, `data/EntitesReferentiels.kt` — règle `PIECES_DOSSIER` (liste Torolalana pour A/A'/B, surcharge C/D/E avec certificat médical et copie du permis B), `SEPARATEUR_PIECES`.
+- `data/Tracage.kt` — `Candidat.resume()`, `Dossier.resume()`. DAO : `CandidatDao.parRegion`, `AutoEcoleDao.listeActives`, `DossierDao.tous` / `listePourCandidat`, `CategoriePermisDao.listeActives`.
+- `Navigation.kt` — `graphCandidats` (routes `candidats`, `candidat/nouveau`, `candidat/{id}`, `candidat/{id}/modifier`, `dossier/{id}`, `dossiers`) ; `graphAutoEcoles` réécrit avec l'utilitaire générique ; « Candidats » et « Dossiers à traiter » quittent les écrans « à venir ».
+- `docs/HORS_COURS.md` — n° 20 `Checkbox`, n° 21 fonction générique `inline reified`, n° 22 `modifierFormulaire`.
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : 30 tests verts. Aucun interdit des règles.
+- Émulateur, piloté par le texte des éléments (script `uiautomator`) depuis des données vides : `admin` crée l'auto-école Soarano et le compte `soarano` → `soarano` crée le candidat RAKOTO Hery (né en 2004), ouvre un dossier B (4 pièces attendues chargées depuis la règle), coche les 4 pièces (« complet »), soumet → `admin` voit le dossier dans « Dossiers à traiter », l'ouvre, le valide. Base : dossier `VALIDE` daté et signé, 7 lignes d'historique (création/compte par `admin` ; candidat, dossier, soumission par `soarano` ; validation par `admin`).
+- Non exercés sur l'émulateur (logique couverte par les tests) : décision « incomplet » puis resoumission, refus, refus de soumission pour âge insuffisant, doublon de candidat.
+
+**Décisions restantes**
+1. L'homonymie (même nom, prénom, date de naissance) bloque la création ; le cadrage parle d'« avertissement » : à assouplir si l'ATT le souhaite.
+2. La modification d'un dossier après validation est impossible ; une correction passe par un nouveau dossier (à confirmer).
+3. Étape suivante : C6 (inscriptions) quand C5 (dev 2) sera fusionnée ; en attendant, C12 (parcours candidat, consultation) ou C13 (impression de la fiche candidat).

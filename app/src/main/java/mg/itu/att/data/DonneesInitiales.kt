@@ -88,7 +88,19 @@ object DonneesInitiales {
             description = "L'auto-école peut demander une inscription à une session — Q8"),
         RegleConfig(cle = ClesRegles.DUREE_THEORIE_MIN, valeur = "30", typeValeur = TypeValeur.ENTIER,
             description = "Durée de l'épreuve théorique, en minutes — Q1"),
+        // Pièces du dossier : liste du portail officiel Torolalana pour A, A', B (Q7) ; les catégories C, D, E ont leur surcharge.
+        RegleConfig(cle = ClesRegles.PIECES_DOSSIER, typeValeur = TypeValeur.TEXTE,
+            valeur = listOf(
+                "Copie certifiée de la CIN ou carte scolaire", "Acte de naissance", "Certificat de résidence", "5 photos d'identité",
+            ).joinToString(ClesRegles.SEPARATEUR_PIECES),
+            description = "Pièces attendues dans un dossier (séparées par « ; ») — Q7"),
     )
+
+    /** Pièces supplémentaires pour les catégories qui exigent déjà le permis B (Torolalana). */
+    private val piecesCategoriesLourdes = listOf(
+        "Copie certifiée de la CIN", "Acte de naissance", "Certificat de résidence", "5 photos d'identité",
+        "Certificat médical (BMH)", "Copie certifiée du permis B",
+    ).joinToString(ClesRegles.SEPARATEUR_PIECES)
 
     // ---------- INSERTION ----------
 
@@ -117,6 +129,16 @@ object DonneesInitiales {
             db.baremeDao().inserer(
                 Bareme(typeEpreuveId = conduiteId, version = 1, noteMax = 20.0, seuilReussite = 12.0, dateDebutValidite = DATE_INITIALE),
             )
+            if (categorie.categoriePrealableCode != null) {
+                db.regleConfigDao().insererToutes(
+                    listOf(
+                        RegleConfig(
+                            cle = ClesRegles.PIECES_DOSSIER, valeur = piecesCategoriesLourdes, typeValeur = TypeValeur.TEXTE,
+                            categorieId = categorieId, description = "Pièces attendues pour la catégorie ${categorie.code} — Q7",
+                        ),
+                    ),
+                )
+            }
         }
 
         // Comptes de départ. Les empreintes sont calculées ici, jamais stockées en clair.

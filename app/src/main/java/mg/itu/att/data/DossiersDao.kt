@@ -10,8 +10,14 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DossierDao {
+    @Query("SELECT * FROM dossiers ORDER BY id DESC")
+    fun tous(): Flow<List<Dossier>>
+
     @Query("SELECT * FROM dossiers WHERE candidatId = :candidatId ORDER BY id DESC")
     fun parCandidat(candidatId: Int): Flow<List<Dossier>>
+
+    @Query("SELECT * FROM dossiers WHERE candidatId = :candidatId ORDER BY id DESC")
+    suspend fun listePourCandidat(candidatId: Int): List<Dossier>
 
     /** Les dossiers à traiter par l'ATT (UC05). */
     @Query("SELECT * FROM dossiers WHERE statut = :statut ORDER BY dateSoumission ASC, id ASC")

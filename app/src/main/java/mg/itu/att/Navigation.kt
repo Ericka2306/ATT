@@ -3,8 +3,8 @@ package mg.itu.att
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,7 +18,15 @@ import mg.itu.att.ui.autoecoles.EcranDetailAutoEcole
 import mg.itu.att.ui.autoecoles.EcranFormulaireAutoEcole
 import mg.itu.att.ui.autoecoles.EcranFormulaireCompte
 import mg.itu.att.ui.autoecoles.EcranListeAutoEcoles
+import mg.itu.att.ui.candidats.CandidatsViewModel
+import mg.itu.att.ui.candidats.EcranDetailCandidat
+import mg.itu.att.ui.candidats.EcranDossier
+import mg.itu.att.ui.candidats.EcranDossiersATraiter
+import mg.itu.att.ui.candidats.EcranFormulaireCandidat
+import mg.itu.att.ui.candidats.EcranListeCandidats
 import mg.itu.att.ui.communs.EcranAVenir
+import mg.itu.att.ui.communs.idArgument
+import mg.itu.att.ui.communs.viewModelDuSousParcours
 import mg.itu.att.ui.connexion.ConnexionViewModel
 import mg.itu.att.ui.connexion.EcranConnexion
 import mg.itu.att.ui.connexion.SessionUtilisateur
@@ -26,7 +34,7 @@ import mg.itu.att.ui.connexion.SessionUtilisateur
 /**
  * Graphe de navigation de l'application (cours S5) : routes en chaînes,
  * argument = identifiant lu dans la route, écrans qui reçoivent des lambdas.
- * La liste complète des routes est dans docs/05_CAS_UTILISATION.md §4 et `Routes`.
+ * La liste complète des routes est dans docs/05_CAS_UTILISATION.md §4.
  */
 @Composable
 fun AppNavigation() {
@@ -37,73 +45,48 @@ fun AppNavigation() {
     val connexionViewModel: ConnexionViewModel = viewModel()
     val session by connexionViewModel.session.collectAsState()
 
-    /**
-     * Déconnexion : retour à la connexion en vidant toute la pile, pour que le bouton « retour »
-     * du téléphone ne ramène jamais dans un écran protégé (`popUpTo` : docs/HORS_COURS.md n° 11).
-     */
+    /** Déconnexion : retour à la connexion en vidant toute la pile (`popUpTo`, HORS_COURS n° 11). */
     fun seDeconnecter() {
         connexionViewModel.seDeconnecter()
-        navController.navigate(Routes.CONNEXION) {
-            popUpTo(navController.graph.id) { inclusive = true }
-        }
+        navController.navigate(Routes.CONNEXION) { popUpTo(navController.graph.id) { inclusive = true } }
     }
 
     NavHost(navController = navController, startDestination = Routes.CONNEXION) {
 
         composable(Routes.CONNEXION) {
-            EcranConnexion(
-                viewModel = connexionViewModel,
-                onConnecte = {
-                    navController.navigate(Routes.ACCUEIL) {
-                        popUpTo(Routes.CONNEXION) { inclusive = true }
-                    }
-                },
-            )
+            EcranConnexion(connexionViewModel, onConnecte = {
+                navController.navigate(Routes.ACCUEIL) { popUpTo(Routes.CONNEXION) { inclusive = true } }
+            })
         }
 
         composable(Routes.ACCUEIL) {
             val utilisateur = session
             if (utilisateur != null) {
-                EcranAccueil(
-                    session = utilisateur,
-                    onNaviguer = { route -> navController.navigate(route) },
-                    onDeconnexion = { seDeconnecter() },
-                )
+                EcranAccueil(utilisateur, onNaviguer = { navController.navigate(it) }, onDeconnexion = { seDeconnecter() })
             } else {
-                // Pas de session : on n'affiche rien de protégé, on remontre la connexion
-                // (le null se gère jusque dans l'UI, comme le prix non fixé du cours).
-                EcranConnexion(
-                    viewModel = connexionViewModel,
-                    onConnecte = { navController.navigate(Routes.ACCUEIL) { popUpTo(Routes.ACCUEIL) { inclusive = true } } },
-                )
+                // Pas de session : rien de protégé, on remontre la connexion (le null va jusqu'à l'UI, cours S5).
+                EcranConnexion(connexionViewModel, onConnecte = {
+                    navController.navigate(Routes.ACCUEIL) { popUpTo(Routes.ACCUEIL) { inclusive = true } }
+                })
             }
         }
 
-        // ---------- AUTO-ÉCOLES (UC03, étape C2) ----------
-        // Le ViewModel est partagé par les quatre écrans du sous-parcours : la saisie survit aux allers-retours.
-        graphAutoEcoles(navController, sessionCourante = { session })
+        graphAutoEcoles(navController) { session }
+        graphCandidats(navController) { session }
 
         // ---------- FONCTIONNALITÉS À VENIR ----------
-        // Chaque étape du plan remplace l'une de ces lignes par son vrai écran.
-        // Le titre affiché est le libellé de l'entrée de menu correspondante.
         val libelles = Role.entries.flatMap { menuPour(it) }.associate { it.route to it.libelle }
-        for (route in listOf(
-            Routes.CONFIGURATION, Routes.CANDIDATS, Routes.DOSSIERS, Routes.SESSIONS,
-            Routes.EVALUATION, Routes.RESULTATS, Routes.HISTORIQUE, Routes.PARCOURS,
-        )) {
-            composable(route) {
-                EcranAVenir(libelle = libelles[route] ?: route, onRetour = { navController.popBackStack() })
-            }
+        for (route in listOf(Routes.CONFIGURATION, Routes.SESSIONS, Routes.EVALUATION, Routes.RESULTATS, Routes.HISTORIQUE, Routes.PARCOURS)) {
+            composable(route) { EcranAVenir(libelles[route] ?: route, onRetour = { navController.popBackStack() }) }
         }
-
-        composable(Routes.A_VENIR) { backStackEntry ->
-            val libelle = backStackEntry.arguments?.getString("libelle") ?: "À venir"
-            EcranAVenir(libelle = libelle, onRetour = { navController.popBackStack() })
+        composable(Routes.A_VENIR) { entree ->
+            EcranAVenir(entree.arguments?.getString("libelle") ?: "À venir", onRetour = { navController.popBackStack() })
         }
     }
 }
 
-/** Routes du sous-parcours auto-écoles (docs/05 §4.3). */
+// ---------- AUTO-ÉCOLES (UC03, étape C2) ----------
+
 object RoutesAutoEcoles {
     const val LISTE = Routes.AUTO_ECOLES
     const val NOUVELLE = "autoecole/nouvelle"
@@ -115,75 +98,82 @@ object RoutesAutoEcoles {
     fun compte(id: Int) = "autoecole/$id/compte"
 }
 
-/**
- * Les écrans des auto-écoles. Chaque écran obtient le ViewModel avec `viewModel()` sur l'entrée
- * de la liste (`getBackStackEntry`), donc le même pour tout le sous-parcours.
- */
-private fun androidx.navigation.NavGraphBuilder.graphAutoEcoles(
-    navController: NavHostController,
-    sessionCourante: () -> SessionUtilisateur?,
-) {
-    /** Le ViewModel partagé, initialisé avec la session ; null si personne n'est connecté. */
-    @Composable
-    fun viewModelPartage(): AutoEcolesViewModel? {
-        val session = sessionCourante() ?: return null
-        val entreeListe = remember { navController.getBackStackEntry(RoutesAutoEcoles.LISTE) }
-        val vm: AutoEcolesViewModel = viewModel(entreeListe)
-        vm.definirSession(session)
-        return vm
-    }
+private fun NavGraphBuilder.graphAutoEcoles(nav: NavHostController, session: () -> SessionUtilisateur?) {
+    val retour: () -> Unit = { nav.popBackStack() }
 
     composable(RoutesAutoEcoles.LISTE) {
-        val vm = viewModelPartage() ?: return@composable
-        EcranListeAutoEcoles(
-            viewModel = vm,
-            onNouvelle = { navController.navigate(RoutesAutoEcoles.NOUVELLE) },
-            onOuvrir = { id -> navController.navigate(RoutesAutoEcoles.detail(id)) },
-            onRetour = { navController.popBackStack() },
-        )
+        val vm = viewModelDuSousParcours<AutoEcolesViewModel>(nav, RoutesAutoEcoles.LISTE, session()) ?: return@composable
+        EcranListeAutoEcoles(vm, onNouvelle = { nav.navigate(RoutesAutoEcoles.NOUVELLE) }, onOuvrir = { nav.navigate(RoutesAutoEcoles.detail(it)) }, onRetour = retour)
     }
     composable(RoutesAutoEcoles.NOUVELLE) {
-        val vm = viewModelPartage() ?: return@composable
-        EcranFormulaireAutoEcole(
-            viewModel = vm,
-            autoEcoleId = null,
-            onEnregistre = { id ->
-                navController.navigate(RoutesAutoEcoles.detail(id)) {
-                    popUpTo(RoutesAutoEcoles.LISTE)
-                }
-            },
-            onRetour = { navController.popBackStack() },
-        )
+        val vm = viewModelDuSousParcours<AutoEcolesViewModel>(nav, RoutesAutoEcoles.LISTE, session()) ?: return@composable
+        EcranFormulaireAutoEcole(vm, null, onEnregistre = { nav.navigate(RoutesAutoEcoles.detail(it)) { popUpTo(RoutesAutoEcoles.LISTE) } }, onRetour = retour)
     }
     composable(RoutesAutoEcoles.DETAIL) { entree ->
-        val vm = viewModelPartage() ?: return@composable
-        val id = entree.arguments?.getString("autoEcoleId")?.toIntOrNull() ?: return@composable
-        EcranDetailAutoEcole(
-            viewModel = vm,
-            autoEcoleId = id,
-            onModifier = { navController.navigate(RoutesAutoEcoles.modifier(id)) },
-            onCreerCompte = { navController.navigate(RoutesAutoEcoles.compte(id)) },
-            onRetour = { navController.popBackStack() },
-        )
+        val vm = viewModelDuSousParcours<AutoEcolesViewModel>(nav, RoutesAutoEcoles.LISTE, session()) ?: return@composable
+        val id = entree.idArgument("autoEcoleId") ?: return@composable
+        EcranDetailAutoEcole(vm, id, onModifier = { nav.navigate(RoutesAutoEcoles.modifier(id)) }, onCreerCompte = { nav.navigate(RoutesAutoEcoles.compte(id)) }, onRetour = retour)
     }
     composable(RoutesAutoEcoles.MODIFIER) { entree ->
-        val vm = viewModelPartage() ?: return@composable
-        val id = entree.arguments?.getString("autoEcoleId")?.toIntOrNull() ?: return@composable
-        EcranFormulaireAutoEcole(
-            viewModel = vm,
-            autoEcoleId = id,
-            onEnregistre = { navController.popBackStack() },
-            onRetour = { navController.popBackStack() },
-        )
+        val vm = viewModelDuSousParcours<AutoEcolesViewModel>(nav, RoutesAutoEcoles.LISTE, session()) ?: return@composable
+        val id = entree.idArgument("autoEcoleId") ?: return@composable
+        EcranFormulaireAutoEcole(vm, id, onEnregistre = { nav.popBackStack() }, onRetour = retour)
     }
     composable(RoutesAutoEcoles.COMPTE) { entree ->
-        val vm = viewModelPartage() ?: return@composable
-        val id = entree.arguments?.getString("autoEcoleId")?.toIntOrNull() ?: return@composable
-        EcranFormulaireCompte(
-            viewModel = vm,
-            autoEcoleId = id,
-            onCree = { navController.popBackStack() },
-            onRetour = { navController.popBackStack() },
-        )
+        val vm = viewModelDuSousParcours<AutoEcolesViewModel>(nav, RoutesAutoEcoles.LISTE, session()) ?: return@composable
+        val id = entree.idArgument("autoEcoleId") ?: return@composable
+        EcranFormulaireCompte(vm, id, onCree = { nav.popBackStack() }, onRetour = retour)
+    }
+}
+
+// ---------- CANDIDATS ET DOSSIERS (UC04, UC05, étape C3) ----------
+
+object RoutesCandidats {
+    const val LISTE = Routes.CANDIDATS
+    const val NOUVEAU = "candidat/nouveau"
+    const val DETAIL = "candidat/{candidatId}"
+    const val MODIFIER = "candidat/{candidatId}/modifier"
+    const val DOSSIER = "dossier/{dossierId}"
+    const val A_TRAITER = Routes.DOSSIERS
+    fun detail(id: Int) = "candidat/$id"
+    fun modifier(id: Int) = "candidat/$id/modifier"
+    fun dossier(id: Int) = "dossier/$id"
+}
+
+private fun NavGraphBuilder.graphCandidats(nav: NavHostController, session: () -> SessionUtilisateur?) {
+    val retour: () -> Unit = { nav.popBackStack() }
+
+    composable(RoutesCandidats.LISTE) {
+        val vm = viewModelDuSousParcours<CandidatsViewModel>(nav, RoutesCandidats.LISTE, session()) ?: return@composable
+        EcranListeCandidats(vm, onNouveau = { nav.navigate(RoutesCandidats.NOUVEAU) }, onOuvrir = { nav.navigate(RoutesCandidats.detail(it)) }, onRetour = retour)
+    }
+    composable(RoutesCandidats.NOUVEAU) {
+        val vm = viewModelDuSousParcours<CandidatsViewModel>(nav, RoutesCandidats.LISTE, session()) ?: return@composable
+        EcranFormulaireCandidat(vm, null, onEnregistre = { nav.navigate(RoutesCandidats.detail(it)) { popUpTo(RoutesCandidats.LISTE) } }, onRetour = retour)
+    }
+    composable(RoutesCandidats.DETAIL) { entree ->
+        val vm = viewModelDuSousParcours<CandidatsViewModel>(nav, RoutesCandidats.LISTE, session()) ?: return@composable
+        val id = entree.idArgument("candidatId") ?: return@composable
+        EcranDetailCandidat(vm, id, onModifier = { nav.navigate(RoutesCandidats.modifier(id)) }, onOuvrirDossier = { nav.navigate(RoutesCandidats.dossier(it)) }, onRetour = retour)
+    }
+    composable(RoutesCandidats.MODIFIER) { entree ->
+        val vm = viewModelDuSousParcours<CandidatsViewModel>(nav, RoutesCandidats.LISTE, session()) ?: return@composable
+        val id = entree.idArgument("candidatId") ?: return@composable
+        EcranFormulaireCandidat(vm, id, onEnregistre = { nav.popBackStack() }, onRetour = retour)
+    }
+    // Le dossier et la liste « à traiter » sont accessibles hors du sous-parcours candidats :
+    // ils ont leur propre ViewModel, chargé par identifiant.
+    composable(RoutesCandidats.DOSSIER) { entree ->
+        val s = session() ?: return@composable
+        val vm: CandidatsViewModel = viewModel()
+        vm.definirSession(s)
+        val id = entree.idArgument("dossierId") ?: return@composable
+        EcranDossier(vm, id, onRetour = retour)
+    }
+    composable(RoutesCandidats.A_TRAITER) {
+        val s = session() ?: return@composable
+        val vm: CandidatsViewModel = viewModel()
+        vm.definirSession(s)
+        EcranDossiersATraiter(vm, onOuvrir = { nav.navigate(RoutesCandidats.dossier(it)) }, onRetour = retour)
     }
 }

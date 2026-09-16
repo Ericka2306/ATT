@@ -48,6 +48,9 @@ interface CategoriePermisDao {
     @Query("SELECT * FROM categories_permis WHERE actif = 1 ORDER BY code ASC")
     fun actives(): Flow<List<CategoriePermis>>
 
+    @Query("SELECT * FROM categories_permis WHERE actif = 1 ORDER BY code ASC")
+    suspend fun listeActives(): List<CategoriePermis>
+
     @Query("SELECT * FROM categories_permis WHERE id = :id")
     suspend fun parId(id: Int): CategoriePermis?
 

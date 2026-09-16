@@ -65,7 +65,22 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 5 — <date> — <tâche>
+## Entrée 5 — 15/09/2026 — Étape C3, candidats et dossiers, factorisation
+
+- Code soumis : `ui/communs/*` (factorisation), `ui/candidats/*`, `metier/ReglesDossier.kt`, `metier/ValidationCandidat.kt`.
+- Remarque principale de l'IA : le dev 1 trouvait « beaucoup de code pour peu de fonctionnalités » ; la mesure a montré que 45 % des lignes sont le schéma (entités/DAO), les commentaires et les imports. La factorisation a porté sur les écrans : un champ = une ligne (`ChampTexte`), un cadre unique (`EcranStandard`), un utilitaire générique pour le ViewModel de sous-parcours, une fonction `modifierFormulaire` au lieu de six `changerX`.
+
+⚠️ `modifierFormulaire { it.copy(nom = v) }` expose la forme de l'état à l'écran ; le cours préfère un événement nommé par geste (`ajouterAuPanier`). Compromis assumé pour la taille du code, noté HORS_COURS n° 22 : à trancher par le binôme.
+
+⚠️ La règle « un seul dossier en cours par catégorie » et « âge minimum » sont dans `ReglesDossier`, fonctions pures qui reçoivent la catégorie et la date : l'âge minimum vient de la base (`aConfirmer = true`), jamais du code (règle R3).
+
+⚠️ Le pilotage de l'émulateur par coordonnées a dérivé plusieurs fois ; l'IA est passée à un pilotage par le texte des éléments (`uiautomator dump`), plus fiable. Sans lien avec le code livré, mais utile pour la démo de soutenance.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 1>.
+
+---
+
+## Entrée 6 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :

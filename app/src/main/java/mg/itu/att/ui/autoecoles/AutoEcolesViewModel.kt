@@ -25,6 +25,7 @@ import mg.itu.att.data.resume
 import mg.itu.att.data.tracer
 import mg.itu.att.metier.ValidationAutoEcole
 import mg.itu.att.securite.MotDePasse
+import mg.itu.att.ui.communs.ViewModelAvecSession
 import mg.itu.att.ui.connexion.SessionUtilisateur
 
 // ---------- ÉTATS ----------
@@ -32,7 +33,6 @@ import mg.itu.att.ui.connexion.SessionUtilisateur
 /** Une auto-école accompagnée du nom de sa région (jointure faite dans le ViewModel). */
 data class AutoEcoleAvecRegion(val autoEcole: AutoEcole, val nomRegion: String)
 
-/** État de la liste (UC03). */
 data class EtatListeAutoEcoles(
     val autoEcoles: List<AutoEcoleAvecRegion> = emptyList(),
     val regions: List<Region> = emptyList(),
@@ -41,7 +41,6 @@ data class EtatListeAutoEcoles(
     val regionVerrouillee: Boolean = false,
 )
 
-/** État du formulaire de création / modification. */
 data class EtatFormulaireAutoEcole(
     val id: Int = 0,
     val nom: String = "",
@@ -55,14 +54,12 @@ data class EtatFormulaireAutoEcole(
     val enCours: Boolean = false,
 )
 
-/** État de la fiche détaillée : l'auto-école, ses comptes, son historique. */
 data class EtatDetailAutoEcole(
     val autoEcole: AutoEcoleAvecRegion? = null,
     val comptes: List<Utilisateur> = emptyList(),
     val historique: List<Historique> = emptyList(),
 )
 
-/** État du formulaire de création de compte. */
 data class EtatFormulaireCompte(
     val identifiant: String = "",
     val motDePasse: String = "",
@@ -74,21 +71,17 @@ data class EtatFormulaireCompte(
 
 /**
  * Auto-écoles et leurs comptes (UC03). Toute écriture passe par `withTransaction` avec sa ligne d'historique.
- * Reçoit la session par [definirSession] (pas de Factory de ViewModel : hors cours).
+ * Partagé par les quatre écrans du sous-parcours (voir `viewModelDuSousParcours`).
  */
-class AutoEcolesViewModel(application: Application) : AndroidViewModel(application) {
+class AutoEcolesViewModel(application: Application) : AndroidViewModel(application), ViewModelAvecSession {
 
     private val db = AppDatabase.obtenir(application)
-
     private var session: SessionUtilisateur? = null
 
-    /** À appeler depuis la navigation avant d'afficher un écran : fixe l'utilisateur courant et sa région. */
-    fun definirSession(nouvelle: SessionUtilisateur) {
-        if (session == nouvelle) return
-        session = nouvelle
-        val regionImposee = nouvelle.regionId
-        regionFiltre.value = regionImposee
-        _formulaire.update { it.copy(regionId = regionImposee ?: it.regionId, regionVerrouillee = regionImposee != null) }
+    override fun definirSession(session: SessionUtilisateur) {
+        if (this.session == session) return
+        this.session = session
+        regionFiltre.value = session.regionId
     }
 
     // ----- Liste -----
@@ -116,18 +109,13 @@ class AutoEcolesViewModel(application: Application) : AndroidViewModel(applicati
 
     private val _formulaire = MutableStateFlow(EtatFormulaireAutoEcole())
     val formulaire: StateFlow<EtatFormulaireAutoEcole> = _formulaire
-
     private var idCharge: Int? = null
 
-    /**
-     * Prépare le formulaire : vide pour une création (`autoEcoleId == null`), rempli pour une modification.
-     * Idempotent : rappelé à chaque recomposition sans effacer la saisie en cours.
-     */
+    /** Prépare le formulaire (vide ou rempli). Idempotent : rappelé à chaque recomposition sans effacer la saisie. */
     fun preparerFormulaire(autoEcoleId: Int?) {
         if (idCharge == (autoEcoleId ?: 0)) return
         idCharge = autoEcoleId ?: 0
         viewModelScope.launch {
-            val regions = db.regionDao().listeActives()
             val existante = autoEcoleId?.let { db.autoEcoleDao().parId(it) }
             val regionImposee = session?.regionId
             _formulaire.value = EtatFormulaireAutoEcole(
@@ -137,17 +125,15 @@ class AutoEcolesViewModel(application: Application) : AndroidViewModel(applicati
                 numeroAgrement = existante?.numeroAgrement ?: "",
                 adresse = existante?.adresse ?: "",
                 telephone = existante?.telephone ?: "",
-                regions = regions,
+                regions = db.regionDao().listeActives(),
                 regionVerrouillee = regionImposee != null,
             )
         }
     }
 
-    fun changerNom(v: String) = _formulaire.update { it.copy(nom = v, erreur = null) }
-    fun changerRegion(v: Int?) = _formulaire.update { it.copy(regionId = v, erreur = null) }
-    fun changerAgrement(v: String) = _formulaire.update { it.copy(numeroAgrement = v, erreur = null) }
-    fun changerAdresse(v: String) = _formulaire.update { it.copy(adresse = v, erreur = null) }
-    fun changerTelephone(v: String) = _formulaire.update { it.copy(telephone = v, erreur = null) }
+    /** Un seul point d'entrée pour toute saisie : l'écran signale `it.copy(champ = valeur)` (HORS_COURS n° 22). */
+    fun modifierFormulaire(transformation: (EtatFormulaireAutoEcole) -> EtatFormulaireAutoEcole) =
+        _formulaire.update { transformation(it).copy(erreur = null) }
 
     /** Crée ou modifie l'auto-école, avec sa ligne d'historique, puis appelle [onSucces] avec son id. */
     fun enregistrer(onSucces: (Int) -> Unit) {
@@ -162,6 +148,7 @@ class AutoEcolesViewModel(application: Application) : AndroidViewModel(applicati
                 return@launch
             }
             _formulaire.update { it.copy(enCours = true) }
+            val ancienne = if (f.id == 0) null else db.autoEcoleDao().parId(f.id)
             val nouvelle = AutoEcole(
                 id = f.id,
                 regionId = regionId,
@@ -169,19 +156,18 @@ class AutoEcolesViewModel(application: Application) : AndroidViewModel(applicati
                 numeroAgrement = f.numeroAgrement.trim().ifBlank { null },
                 adresse = f.adresse.trim(),
                 telephone = f.telephone.trim().ifBlank { null },
-                actif = if (f.id == 0) true else db.autoEcoleDao().parId(f.id)?.actif ?: true,
+                actif = ancienne?.actif ?: true,
             )
             val id = db.withTransaction {
-                if (f.id == 0) {
+                if (ancienne == null) {
                     val id = db.autoEcoleDao().inserer(nouvelle).toInt()
                     db.tracer(EntitesHistorique.AUTO_ECOLE, id, ActionsHistorique.CREATION, utilisateur.id, nouvelleValeur = nouvelle.resume())
                     id
                 } else {
-                    val ancienne = db.autoEcoleDao().parId(f.id)
                     db.autoEcoleDao().modifier(nouvelle)
                     db.tracer(
                         EntitesHistorique.AUTO_ECOLE, f.id, ActionsHistorique.MODIFICATION, utilisateur.id,
-                        ancienneValeur = ancienne?.resume(), nouvelleValeur = nouvelle.resume(),
+                        ancienneValeur = ancienne.resume(), nouvelleValeur = nouvelle.resume(),
                     )
                     f.id
                 }
@@ -239,8 +225,8 @@ class AutoEcolesViewModel(application: Application) : AndroidViewModel(applicati
     private val _compte = MutableStateFlow(EtatFormulaireCompte())
     val compte: StateFlow<EtatFormulaireCompte> = _compte
 
-    fun changerIdentifiantCompte(v: String) = _compte.update { it.copy(identifiant = v, erreur = null) }
-    fun changerMotDePasseCompte(v: String) = _compte.update { it.copy(motDePasse = v, erreur = null) }
+    fun modifierCompte(transformation: (EtatFormulaireCompte) -> EtatFormulaireCompte) =
+        _compte.update { transformation(it).copy(erreur = null) }
 
     /** Crée le compte AUTO_ECOLE lié, mot de passe haché, avec historique, puis appelle [onSucces]. */
     fun creerCompte(autoEcoleId: Int, onSucces: () -> Unit) {
@@ -248,38 +234,30 @@ class AutoEcolesViewModel(application: Application) : AndroidViewModel(applicati
         val utilisateur = session ?: return
         viewModelScope.launch {
             val erreur = ValidationAutoEcole.validerCompte(c.identifiant, c.motDePasse, db.utilisateurDao().tousLesIdentifiants())
-            if (erreur != null) {
-                _compte.update { it.copy(erreur = erreur) }
-                return@launch
-            }
             val autoEcole = db.autoEcoleDao().parId(autoEcoleId)
-            if (autoEcole == null) {
-                _compte.update { it.copy(erreur = "Auto-école introuvable.") }
-                return@launch
+            when {
+                erreur != null -> _compte.update { it.copy(erreur = erreur) }
+                autoEcole == null -> _compte.update { it.copy(erreur = "Auto-école introuvable.") }
+                else -> {
+                    _compte.update { it.copy(enCours = true) }
+                    db.withTransaction {
+                        val id = db.utilisateurDao().inserer(
+                            Utilisateur(
+                                identifiant = c.identifiant.trim(),
+                                motDePasseHash = MotDePasse.hacher(c.motDePasse),
+                                nom = autoEcole.nom,
+                                role = Role.AUTO_ECOLE,
+                                regionId = autoEcole.regionId,
+                                autoEcoleId = autoEcoleId,
+                            ),
+                        ).toInt()
+                        db.tracer(EntitesHistorique.UTILISATEUR, id, ActionsHistorique.CREATION_COMPTE, utilisateur.id, nouvelleValeur = "compte ${c.identifiant.trim()} (AUTO_ECOLE) pour ${autoEcole.nom}")
+                        db.tracer(EntitesHistorique.AUTO_ECOLE, autoEcoleId, ActionsHistorique.CREATION_COMPTE, utilisateur.id, nouvelleValeur = "compte ${c.identifiant.trim()}")
+                    }
+                    _compte.value = EtatFormulaireCompte()
+                    onSucces()
+                }
             }
-            _compte.update { it.copy(enCours = true) }
-            db.withTransaction {
-                val id = db.utilisateurDao().inserer(
-                    Utilisateur(
-                        identifiant = c.identifiant.trim(),
-                        motDePasseHash = MotDePasse.hacher(c.motDePasse),
-                        nom = autoEcole.nom,
-                        role = Role.AUTO_ECOLE,
-                        regionId = autoEcole.regionId,
-                        autoEcoleId = autoEcoleId,
-                    ),
-                ).toInt()
-                db.tracer(
-                    EntitesHistorique.UTILISATEUR, id, ActionsHistorique.CREATION_COMPTE, utilisateur.id,
-                    nouvelleValeur = "compte ${c.identifiant.trim()} (AUTO_ECOLE) pour ${autoEcole.nom}",
-                )
-                db.tracer(
-                    EntitesHistorique.AUTO_ECOLE, autoEcoleId, ActionsHistorique.CREATION_COMPTE, utilisateur.id,
-                    nouvelleValeur = "compte ${c.identifiant.trim()}",
-                )
-            }
-            _compte.value = EtatFormulaireCompte()
-            onSucces()
         }
     }
 }

@@ -7,9 +7,9 @@
 
 | | |
 |---|---|
-| **Dernière étape terminée** | B2 + C2 (traçage `Historique`, auto-écoles et leurs comptes) — 15/09/2026, en attente de fusion (PR de `etape-C2-auto-ecoles`) |
+| **Dernière étape terminée** | C3 (candidats et dossiers) + factorisation — 15/09/2026, en attente de fusion (PR de `etape-C3-candidats`, **après** la PR #5 de C2) |
 | **Étape en cours** | aucune |
-| **Prochaine étape** | C3 (candidats et dossiers) — dev 1 |
+| **Prochaine étape** | C6 (inscriptions) dès que C5 (dev 2) est fusionnée ; sinon C12 (consultation, parcours candidat) — dev 1 |
 | **Dev 2 peut démarrer** | **maintenant** : C4 (configuration) puis C5 (centres, sessions, créneaux), branches `etape-C4-…` / `etape-C5-…` depuis `main` ; réutiliser `tracer` + `withTransaction`, `SelecteurRegion`, `CarteIcone` et le ViewModel partagé de `graphAutoEcoles` comme modèle |
 | **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étapes B2 + C2 » |
 | **Dernier commit poussé** | `main` — « Merge pull request #4 » (étape C1) |
@@ -41,7 +41,7 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 |---|---|---|---|---|
 | C1 Authentification et rôles | connexion, session utilisateur, hachage, déconnexion, accueil par rôle | `ui/connexion/EcranConnexion`, `ConnexionViewModel`, `ui/accueil/EcranAccueil` | chaque rôle voit uniquement son menu ; mot de passe jamais en clair | 🟢 15/09/2026 |
 | C2 Auto-écoles | CRUD auto-écoles + compte utilisateur associé, filtre par région | `ui/autoecoles/` | Admin ATT crée une auto-école dans une région ; l'auto-école se connecte | 🟢 15/09/2026 |
-| C3 Candidats et dossiers | CRUD candidat (auto-école : les siens), constitution et soumission du dossier, pièces, validation/refus/incomplet par ATT avec motif + historique | `ui/candidats/` (liste, détail, formulaire, dossier) | **Créer/valider un candidat** ; dossier incomplet/refusé traité ; candidat sans compte géré | ⚪ |
+| C3 Candidats et dossiers | CRUD candidat (auto-école : les siens), constitution et soumission du dossier, pièces, validation/refus/incomplet par ATT avec motif + historique | `ui/candidats/` (liste, détail, formulaire, dossier) | **Créer/valider un candidat** ; dossier incomplet/refusé traité ; candidat sans compte géré | 🟢 15/09/2026 |
 | C4 Catégories et règles configurables | écrans Super Admin : catégories, types d'épreuve, barèmes versionnés, `RegleConfig`, questions/réponses, critères pratiques (structure) | `ui/configuration/` | aucune valeur en dur dans le code ; changement d'un seuil visible au calcul | 🔒 Q1–Q3 (valeurs par défaut « à confirmer ») |
 | C5 Centres, sessions, créneaux | CRUD centres (région), création session (catégorie, épreuve, centre, date, capacité, convocation, durée/marge), génération automatique des créneaux, statuts, annulation | `ui/sessions/` | **Créer une session et ses créneaux** ; capacité respectée | ⚪ |
 | C6 Inscriptions | inscription d'un candidat éligible (dossier VALIDE, catégorie, capacité, doublon, région selon règle), affectation créneau, heure de passage estimée, report/annulation, historique | `ui/sessions/EcranInscriptions` | **Inscrire un candidat** ; session complète et double inscription refusées | ⚪ |

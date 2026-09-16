@@ -48,6 +48,9 @@ interface AutoEcoleDao {
     @Query("SELECT * FROM auto_ecoles WHERE regionId = :regionId ORDER BY nom ASC")
     fun parRegion(regionId: Int): Flow<List<AutoEcole>>
 
+    @Query("SELECT * FROM auto_ecoles WHERE actif = 1 ORDER BY nom ASC")
+    suspend fun listeActives(): List<AutoEcole>
+
     @Query("SELECT * FROM auto_ecoles WHERE id = :id")
     suspend fun parId(id: Int): AutoEcole?
 
@@ -79,6 +82,10 @@ interface CandidatDao {
 
     @Query("SELECT * FROM candidats WHERE id = :id")
     fun parIdEnDirect(id: Int): Flow<Candidat?>
+
+    /** Les candidats des auto-écoles d'une région (administrateur régional). */
+    @Query("SELECT candidats.* FROM candidats JOIN auto_ecoles ON auto_ecoles.id = candidats.autoEcoleId WHERE auto_ecoles.regionId = :regionId ORDER BY candidats.nom ASC, candidats.prenom ASC")
+    fun parRegion(regionId: Int): Flow<List<Candidat>>
 
     /** Détection d'un doublon probable à la création (UC04). */
     @Query("SELECT * FROM candidats WHERE nom = :nom AND prenom = :prenom AND dateNaissance = :dateNaissance")
