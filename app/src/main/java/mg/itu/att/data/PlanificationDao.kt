@@ -59,8 +59,14 @@ interface CreneauDao {
 
 @Dao
 interface InscriptionDao {
+    @Query("SELECT * FROM inscriptions ORDER BY id ASC")
+    fun toutes(): Flow<List<Inscription>>
+
     @Query("SELECT * FROM inscriptions WHERE sessionId = :sessionId ORDER BY creneauId ASC, numeroAnonymat ASC")
     fun parSession(sessionId: Int): Flow<List<Inscription>>
+
+    @Query("SELECT * FROM inscriptions WHERE sessionId = :sessionId ORDER BY id ASC")
+    suspend fun listePourSession(sessionId: Int): List<Inscription>
 
     @Query("SELECT * FROM inscriptions WHERE candidatId = :candidatId ORDER BY dateInscription DESC")
     fun parCandidat(candidatId: Int): Flow<List<Inscription>>

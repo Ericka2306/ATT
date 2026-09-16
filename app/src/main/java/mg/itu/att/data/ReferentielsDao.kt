@@ -75,6 +75,9 @@ interface TypeEpreuveDao {
     @Query("SELECT * FROM types_epreuve WHERE categorieId = :categorieId ORDER BY ordre ASC")
     fun parCategorie(categorieId: Int): Flow<List<TypeEpreuve>>
 
+    @Query("SELECT * FROM types_epreuve WHERE categorieId = :categorieId AND actif = 1 ORDER BY ordre ASC")
+    suspend fun listeActivesPourCategorie(categorieId: Int): List<TypeEpreuve>
+
     @Query("SELECT * FROM types_epreuve WHERE id = :id")
     suspend fun parId(id: Int): TypeEpreuve?
 
@@ -202,6 +205,9 @@ interface CentreDao {
 
     @Query("SELECT * FROM centres WHERE regionId = :regionId AND actif = 1 ORDER BY nom ASC")
     fun actifsParRegion(regionId: Int): Flow<List<Centre>>
+
+    @Query("SELECT * FROM centres WHERE actif = 1 ORDER BY nom ASC")
+    suspend fun listeActifs(): List<Centre>
 
     @Query("SELECT * FROM centres WHERE id = :id")
     suspend fun parId(id: Int): Centre?
