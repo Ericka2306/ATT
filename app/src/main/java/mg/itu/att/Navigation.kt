@@ -25,6 +25,20 @@ import mg.itu.att.ui.candidats.EcranDossiersATraiter
 import mg.itu.att.ui.candidats.EcranFormulaireCandidat
 import mg.itu.att.ui.candidats.EcranListeCandidats
 import mg.itu.att.ui.communs.EcranAVenir
+import mg.itu.att.ui.configuration.ConfigurationViewModel
+import mg.itu.att.ui.configuration.EcranCategories
+import mg.itu.att.ui.configuration.EcranCentres
+import mg.itu.att.ui.configuration.EcranConfiguration
+import mg.itu.att.ui.configuration.EcranDetailCategorie
+import mg.itu.att.ui.configuration.EcranEpreuve
+import mg.itu.att.ui.configuration.EcranFormulaireBareme
+import mg.itu.att.ui.configuration.EcranFormulaireCategorie
+import mg.itu.att.ui.configuration.EcranFormulaireCentre
+import mg.itu.att.ui.configuration.EcranFormulaireCritere
+import mg.itu.att.ui.configuration.EcranFormulaireEpreuve
+import mg.itu.att.ui.configuration.EcranFormulaireQuestion
+import mg.itu.att.ui.configuration.EcranFormulaireRegle
+import mg.itu.att.ui.configuration.EcranRegles
 import mg.itu.att.ui.comptes.ComptesViewModel
 import mg.itu.att.ui.comptes.EcranComptes
 import mg.itu.att.ui.comptes.EcranFormulaireAdmin
@@ -80,11 +94,11 @@ fun AppNavigation() {
         graphAutoEcoles(navController) { session }
         graphCandidats(navController) { session }
         graphComptes(navController) { session }
+        graphConfiguration(navController) { session }
 
         // ---------- FONCTIONNALITÉS À VENIR ----------
         val libelles = Role.entries.flatMap { menuPour(it) }.associate { it.route to it.libelle }
-        for (route in listOf(Routes.CONFIGURATION, Routes.SESSIONS, Routes.EVALUATION, Routes.RESULTATS, Routes.HISTORIQUE, Routes.PARCOURS)) {
-            // (les comptes, examinateurs et le mot de passe sont dans graphComptes)
+        for (route in listOf(Routes.SESSIONS, Routes.EVALUATION, Routes.RESULTATS, Routes.HISTORIQUE, Routes.PARCOURS)) {
             composable(route) { EcranAVenir(libelles[route] ?: route, onRetour = { navController.popBackStack() }) }
         }
         composable(Routes.A_VENIR) { entree ->
@@ -131,6 +145,128 @@ private fun NavGraphBuilder.graphAutoEcoles(nav: NavHostController, session: () 
         val vm = viewModelDuSousParcours<AutoEcolesViewModel>(nav, RoutesAutoEcoles.LISTE, session()) ?: return@composable
         val id = entree.idArgument("autoEcoleId") ?: return@composable
         EcranFormulaireCompte(vm, id, onCree = { nav.popBackStack() }, onRetour = retour)
+    }
+}
+
+// ---------- CONFIGURATION (UC02, étape C4) ----------
+
+object RoutesConfiguration {
+    const val MENU = Routes.CONFIGURATION
+    const val CATEGORIES = "config/categories"
+    const val NOUVELLE_CATEGORIE = "config/categorie/nouvelle"
+    const val CATEGORIE = "config/categorie/{categorieId}"
+    const val MODIFIER_CATEGORIE = "config/categorie/{categorieId}/modifier"
+    const val NOUVELLE_EPREUVE = "config/categorie/{categorieId}/epreuve/nouvelle"
+    const val EPREUVE = "config/epreuve/{epreuveId}"
+    const val MODIFIER_EPREUVE = "config/epreuve/{epreuveId}/modifier/{categorieId}"
+    const val BAREME = "config/epreuve/{epreuveId}/bareme"
+    const val QUESTION = "config/epreuve/{epreuveId}/question"
+    const val CRITERE = "config/epreuve/{epreuveId}/critere"
+    const val REGLES = "config/regles"
+    const val REGLE = "config/regle/{regleId}"
+    const val CENTRES = "config/centres"
+    const val NOUVEAU_CENTRE = "config/centre/nouveau"
+    const val CENTRE = "config/centre/{centreId}"
+    fun categorie(id: Int) = "config/categorie/$id"
+    fun modifierCategorie(id: Int) = "config/categorie/$id/modifier"
+    fun nouvelleEpreuve(categorieId: Int) = "config/categorie/$categorieId/epreuve/nouvelle"
+    fun epreuve(id: Int) = "config/epreuve/$id"
+    fun modifierEpreuve(id: Int, categorieId: Int) = "config/epreuve/$id/modifier/$categorieId"
+    fun bareme(epreuveId: Int) = "config/epreuve/$epreuveId/bareme"
+    fun question(epreuveId: Int) = "config/epreuve/$epreuveId/question"
+    fun critere(epreuveId: Int) = "config/epreuve/$epreuveId/critere"
+    fun regle(id: Int) = "config/regle/$id"
+    fun centre(id: Int) = "config/centre/$id"
+}
+
+private fun NavGraphBuilder.graphConfiguration(nav: NavHostController, session: () -> SessionUtilisateur?) {
+    val retour: () -> Unit = { nav.popBackStack() }
+    /** Le ViewModel partagé de tout le sous-parcours, ancré sur le menu de configuration. */
+    @Composable
+    fun vm(): ConfigurationViewModel? = viewModelDuSousParcours(nav, RoutesConfiguration.MENU, session())
+
+    composable(RoutesConfiguration.MENU) {
+        vm() ?: return@composable
+        EcranConfiguration(onCategories = { nav.navigate(RoutesConfiguration.CATEGORIES) }, onRegles = { nav.navigate(RoutesConfiguration.REGLES) }, onCentres = { nav.navigate(RoutesConfiguration.CENTRES) }, onRetour = retour)
+    }
+    composable(RoutesConfiguration.CATEGORIES) {
+        val v = vm() ?: return@composable
+        EcranCategories(v, onNouvelle = { nav.navigate(RoutesConfiguration.NOUVELLE_CATEGORIE) }, onOuvrir = { nav.navigate(RoutesConfiguration.categorie(it)) }, onRetour = retour)
+    }
+    composable(RoutesConfiguration.NOUVELLE_CATEGORIE) {
+        val v = vm() ?: return@composable
+        EcranFormulaireCategorie(v, null, onEnregistre = { nav.navigate(RoutesConfiguration.categorie(it)) { popUpTo(RoutesConfiguration.CATEGORIES) } }, onRetour = retour)
+    }
+    composable(RoutesConfiguration.CATEGORIE) { entree ->
+        val v = vm() ?: return@composable
+        val id = entree.idArgument("categorieId") ?: return@composable
+        EcranDetailCategorie(v, id, onModifier = { nav.navigate(RoutesConfiguration.modifierCategorie(id)) }, onNouvelleEpreuve = { nav.navigate(RoutesConfiguration.nouvelleEpreuve(id)) }, onOuvrirEpreuve = { nav.navigate(RoutesConfiguration.epreuve(it)) }, onRetour = retour)
+    }
+    composable(RoutesConfiguration.MODIFIER_CATEGORIE) { entree ->
+        val v = vm() ?: return@composable
+        val id = entree.idArgument("categorieId") ?: return@composable
+        EcranFormulaireCategorie(v, id, onEnregistre = { nav.popBackStack() }, onRetour = retour)
+    }
+    composable(RoutesConfiguration.NOUVELLE_EPREUVE) { entree ->
+        val v = vm() ?: return@composable
+        val categorieId = entree.idArgument("categorieId") ?: return@composable
+        EcranFormulaireEpreuve(v, categorieId, null, onEnregistre = retour, onRetour = retour)
+    }
+    composable(RoutesConfiguration.EPREUVE) { entree ->
+        val v = vm() ?: return@composable
+        val id = entree.idArgument("epreuveId") ?: return@composable
+        val categorieId = v.epreuve.value.epreuve?.categorieId ?: 0
+        EcranEpreuve(
+            v, id,
+            onModifier = { nav.navigate(RoutesConfiguration.modifierEpreuve(id, categorieId)) },
+            onNouveauBareme = { nav.navigate(RoutesConfiguration.bareme(id)) },
+            onNouvelleQuestion = { nav.navigate(RoutesConfiguration.question(id)) },
+            onNouveauCritere = { nav.navigate(RoutesConfiguration.critere(id)) },
+            onRetour = retour,
+        )
+    }
+    composable(RoutesConfiguration.MODIFIER_EPREUVE) { entree ->
+        val v = vm() ?: return@composable
+        val id = entree.idArgument("epreuveId") ?: return@composable
+        val categorieId = entree.idArgument("categorieId") ?: return@composable
+        EcranFormulaireEpreuve(v, categorieId, id, onEnregistre = retour, onRetour = retour)
+    }
+    composable(RoutesConfiguration.BAREME) { entree ->
+        val v = vm() ?: return@composable
+        val id = entree.idArgument("epreuveId") ?: return@composable
+        EcranFormulaireBareme(v, id, onCree = retour, onRetour = retour)
+    }
+    composable(RoutesConfiguration.QUESTION) { entree ->
+        val v = vm() ?: return@composable
+        val id = entree.idArgument("epreuveId") ?: return@composable
+        EcranFormulaireQuestion(v, id, onCree = retour, onRetour = retour)
+    }
+    composable(RoutesConfiguration.CRITERE) { entree ->
+        val v = vm() ?: return@composable
+        val id = entree.idArgument("epreuveId") ?: return@composable
+        EcranFormulaireCritere(v, id, onCree = retour, onRetour = retour)
+    }
+    composable(RoutesConfiguration.REGLES) {
+        val v = vm() ?: return@composable
+        EcranRegles(v, onOuvrir = { nav.navigate(RoutesConfiguration.regle(it)) }, onRetour = retour)
+    }
+    composable(RoutesConfiguration.REGLE) { entree ->
+        val v = vm() ?: return@composable
+        val id = entree.idArgument("regleId") ?: return@composable
+        EcranFormulaireRegle(v, id, onEnregistre = retour, onRetour = retour)
+    }
+    composable(RoutesConfiguration.CENTRES) {
+        val v = vm() ?: return@composable
+        EcranCentres(v, onNouveau = { nav.navigate(RoutesConfiguration.NOUVEAU_CENTRE) }, onOuvrir = { nav.navigate(RoutesConfiguration.centre(it)) }, onRetour = retour)
+    }
+    composable(RoutesConfiguration.NOUVEAU_CENTRE) {
+        val v = vm() ?: return@composable
+        EcranFormulaireCentre(v, null, onEnregistre = retour, onRetour = retour)
+    }
+    composable(RoutesConfiguration.CENTRE) { entree ->
+        val v = vm() ?: return@composable
+        val id = entree.idArgument("centreId") ?: return@composable
+        EcranFormulaireCentre(v, id, onEnregistre = retour, onRetour = retour)
     }
 }
 

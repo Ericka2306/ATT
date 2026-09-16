@@ -224,3 +224,31 @@ Format (instructions §10) : ce qui a été créé, les fichiers modifiés, les 
 **Décisions restantes**
 1. Les comptes de test restent affichés sur l'écran de connexion tant que `BuildConfig.DEBUG` ; à la soutenance, changer les mots de passe initiaux depuis « Mon mot de passe ».
 2. Aucune branche du dev 2 (C4, C5) au 16/09 : C6 à C11 sont bloquées. Si le retard persiste, le dev 1 reprend C4/C5.
+
+---
+
+## Étape C4 — Configuration des référentiels et des règles — 16/09/2026
+
+Réassignée au dev 1 le 16/09 (le dev 2 n'avait pas commencé) ; le dev 2 reprendra C12, C13 et D1 à son arrivée.
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `metier/ValidationConfiguration.kt` — validation de forme : catégorie (code unique, âge 10–99), épreuve (code unique par catégorie, ordre ≥ 1), barème (0 ≤ seuil ≤ note max), règle (valeur conforme au type ENTIER / DECIMAL / BOOLEEN / TEXTE), question (énoncé, points > 0, ≥ 2 réponses, une seule bonne), critère, centre. 5 tests.
+- `ui/configuration/ConfigurationViewModel.kt` — un ViewModel partagé pour tout le sous-parcours : catégories (création/modification), épreuves d'une catégorie, épreuve (barèmes, questions, critères), règles, centres. **Un barème utilisé n'est jamais modifié** : « Nouvelle version » ferme la version courante à la date du jour et crée la suivante. Questions et critères se désactivent, ne se suppriment pas. Tout tracé.
+- `ui/configuration/EcranConfiguration.kt` (menu + badge `PastilleAConfirmer`), `EcranCategories.kt` (+ formulaire), `EcranDetailCategorie.kt` (+ formulaire d'épreuve), `EcranEpreuve.kt` (+ formulaires barème, question à 4 réponses, critère), `EcranRegles.kt` (+ formulaire), `EcranCentres.kt` (+ formulaire).
+- Captures `docs/captures/C4_*.png`.
+
+**Modifié**
+- `data/Tracage.kt` — entités et résumés pour catégorie, épreuve, barème, règle, question, critère, centre. `data/ReferentielsDao.kt` — `CategoriePermisDao.parIdEnDirect`, `TypeEpreuveDao.parIdEnDirect` / `toutes`, `ReponseDao.toutes` / `insererToutes`.
+- `Navigation.kt` — `graphConfiguration` (16 routes sous `config/…`) ; « Configuration » quitte les écrans « à venir ».
+- `outils/pilote_emulateur.sh` — `remplacer` (vide un champ prérempli avant saisie), `haut`, défilement vers le haut si l'élément n'est pas trouvé vers le bas.
+- `docs/02_PLAN_DE_TRAVAIL.md` — répartition réassignée, C4 🟢.
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : 38 tests verts.
+- Émulateur (`superadmin`) : Configuration → Catégories → B → Épreuve théorique → nouvelle version du barème (30 / 21 : v1 fermée, v2 courante) → question « Que signifie un feu orange fixe ? » avec 3 réponses, bonne = B → Épreuve de conduite → critère « Démarrage en côte » (2 pt, éliminatoire) → Règles → `TENTATIVES_MAX` = 3 → `DELAI_REPASSAGE_JOURS` = « abc » refusé (« doit être un entier ») → Centres → « Centre ATT Soarano » (Analamanga, capacité 40). Base : toutes les lignes présentes, historique CREATION/MODIFICATION pour chacune.
+- Note : une saisie contenant une apostrophe a fait dériver le premier passage du pilote (limite d'`adb shell input text`) ; un critère parasite « 12 pt » s'est retrouvé sur l'épreuve théorique de l'émulateur. Données de test uniquement, code non concerné ; le pilote documente désormais la limite.
+
+**Décisions restantes**
+1. La modification d'une question existante n'est pas prévue (désactivation puis nouvelle question), pour ne jamais altérer une question déjà utilisée dans une évaluation ; à confirmer.
+2. Les réponses sont limitées à quatre par question (format QCM courant) ; Q1 dira si le format officiel diffère.
+3. Étape suivante : C5 (sessions et créneaux) — dev 1.

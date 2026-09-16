@@ -54,6 +54,9 @@ interface CategoriePermisDao {
     @Query("SELECT * FROM categories_permis WHERE id = :id")
     suspend fun parId(id: Int): CategoriePermis?
 
+    @Query("SELECT * FROM categories_permis WHERE id = :id")
+    fun parIdEnDirect(id: Int): Flow<CategoriePermis?>
+
     @Query("SELECT * FROM categories_permis WHERE code = :code")
     suspend fun parCode(code: String): CategoriePermis?
 
@@ -74,6 +77,12 @@ interface TypeEpreuveDao {
 
     @Query("SELECT * FROM types_epreuve WHERE id = :id")
     suspend fun parId(id: Int): TypeEpreuve?
+
+    @Query("SELECT * FROM types_epreuve WHERE id = :id")
+    fun parIdEnDirect(id: Int): Flow<TypeEpreuve?>
+
+    @Query("SELECT * FROM types_epreuve ORDER BY categorieId ASC, ordre ASC")
+    fun toutes(): Flow<List<TypeEpreuve>>
 
     @Query("SELECT * FROM types_epreuve WHERE categorieId = :categorieId AND code = :code")
     suspend fun parCategorieEtCode(categorieId: Int, code: String): TypeEpreuve?
@@ -154,6 +163,12 @@ interface ReponseDao {
 
     @Query("SELECT * FROM reponses WHERE questionId = :questionId ORDER BY id ASC")
     suspend fun listePourQuestion(questionId: Int): List<Reponse>
+
+    @Query("SELECT * FROM reponses ORDER BY questionId ASC, id ASC")
+    fun toutes(): Flow<List<Reponse>>
+
+    @Insert
+    suspend fun insererToutes(reponses: List<Reponse>)
 
     @Insert
     suspend fun inserer(reponse: Reponse): Long

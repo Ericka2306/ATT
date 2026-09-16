@@ -35,6 +35,12 @@ object EntitesHistorique {
     const val PRESENCE = "Presence"
     const val RESULTAT = "Resultat"
     const val REGLE_CONFIG = "RegleConfig"
+    const val CATEGORIE = "CategoriePermis"
+    const val TYPE_EPREUVE = "TypeEpreuve"
+    const val BAREME = "Bareme"
+    const val QUESTION = "Question"
+    const val CRITERE = "CriterePratique"
+    const val CENTRE = "Centre"
 }
 
 /** Ajoute une ligne d'historique. À appeler à l'intérieur d'un `withTransaction`. */
@@ -71,3 +77,17 @@ fun Dossier.resume(): String = "dossier n° $id, catégorie $categorieId, statut
 fun Examinateur.resume(): String = "$nom (matricule ${matricule ?: "—"}, région ${regionId ?: "—"}, ${if (actif) "actif" else "inactif"})"
 
 fun Utilisateur.resume(): String = "compte $identifiant ($role, région ${regionId ?: "nationale"}, ${if (actif) "actif" else "désactivé"})"
+
+fun CategoriePermis.resume(): String = "$code — $libelle (âge min ${ageMinimum ?: "—"}, préalable ${categoriePrealableCode ?: "—"}, ${if (actif) "active" else "inactive"}${if (aConfirmer) ", à confirmer" else ""})"
+
+fun TypeEpreuve.resume(): String = "$code — $libelle (ordre $ordre, durée ${dureeMinutes ?: "—"} min, ${if (actif) "active" else "inactive"})"
+
+fun Bareme.resume(): String = "version $version : note max $noteMax, seuil $seuilReussite, du $dateDebutValidite${dateFinValidite?.let { " au $it" } ?: ""}"
+
+fun RegleConfig.resume(): String = "$cle = $valeur${categorieId?.let { " (catégorie $it)" } ?: ""}${if (aConfirmer) ", à confirmer" else ""}"
+
+fun Question.resume(): String = "« ${enonce.take(60)} » ($points pt, ${if (actif) "active" else "inactive"})"
+
+fun CriterePratique.resume(): String = "$libelle ($points pt${if (eliminatoire) ", éliminatoire" else ""}, ${if (actif) "actif" else "inactif"})"
+
+fun Centre.resume(): String = "$nom (région $regionId, $adresse, capacité ${capaciteParDefaut ?: "—"}, ${if (actif) "actif" else "inactif"})"

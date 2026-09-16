@@ -133,6 +133,8 @@ object ClesRegles {
     const val CONDUITE_APRES_THEORIE_REUSSIE = "CONDUITE_APRES_THEORIE_REUSSIE"
     const val AUTO_ECOLE_PEUT_INSCRIRE = "AUTO_ECOLE_PEUT_INSCRIRE"
     const val DUREE_THEORIE_MIN = "DUREE_THEORIE_MIN"
+    /** Mode de choix des questions de théorie : TIRAGE (sujet tiré au sort) ou DIRECT (choix de l'examinateur) — Q1 bis, étape C9. */
+    const val MODE_THEORIE = "MODE_THEORIE"
     /** Pièces attendues dans un dossier, séparées par « ; » ; surcharge possible par catégorie (Q7). */
     const val PIECES_DOSSIER = "PIECES_DOSSIER"
     const val SEPARATEUR_PIECES = ";"
