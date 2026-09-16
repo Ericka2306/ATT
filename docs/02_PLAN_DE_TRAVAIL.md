@@ -7,11 +7,11 @@
 
 | | |
 |---|---|
-| **Dernière étape terminée** | C4 (configuration : catégories, épreuves, barèmes, règles, questions, critères, centres) — 16/09/2026, en attente de fusion (PR de `etape-C4-configuration`) |
+| **Dernière étape terminée** | C5 (sessions et créneaux) — 16/09/2026, en attente de fusion (PR de `etape-C5-sessions`, **après** la PR #8 de C4) |
 | **Étape en cours** | aucune |
-| **Prochaine étape** | C5 (sessions et créneaux) puis C6 (inscriptions) — dev 1 |
+| **Prochaine étape** | C6 (inscriptions) — dev 1 |
 | **Dev 2 peut démarrer** | à son arrivée : C12 (consultation, parcours candidat) sur une branche `etape-C12-…` depuis `main` ; modèle à suivre : `graphCandidats` dans `Navigation.kt` |
-| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape C4 » |
+| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape C5 » |
 | **Dernier commit poussé** | `main` — « Merge pull request #4 » (étape C1) |
 
 Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une question à valider
@@ -44,7 +44,7 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 | C1b Comptes | examinateurs et leurs comptes (Admin ATT), comptes Admin ATT nationaux ou régionaux (Super Admin), changement de son mot de passe (tous), désactivation | `ui/comptes/` | un examinateur créé se connecte et voit son menu ; un mot de passe initial peut être changé ; tout est tracé | 🟢 16/09/2026 |
 | C3 Candidats et dossiers | CRUD candidat (auto-école : les siens), constitution et soumission du dossier, pièces, validation/refus/incomplet par ATT avec motif + historique | `ui/candidats/` (liste, détail, formulaire, dossier) | **Créer/valider un candidat** ; dossier incomplet/refusé traité ; candidat sans compte géré | 🟢 15/09/2026 |
 | C4 Catégories et règles configurables | écrans Super Admin : catégories, types d'épreuve, barèmes versionnés, `RegleConfig`, questions/réponses, critères pratiques (structure) | `ui/configuration/` | aucune valeur en dur dans le code ; changement d'un seuil visible au calcul | 🟢 16/09/2026 (dev 1, réassignée) |
-| C5 Centres, sessions, créneaux | CRUD centres (région), création session (catégorie, épreuve, centre, date, capacité, convocation, durée/marge), génération automatique des créneaux, statuts, annulation | `ui/sessions/` | **Créer une session et ses créneaux** ; capacité respectée | ⚪ |
+| C5 Centres, sessions, créneaux | CRUD centres (région), création session (catégorie, épreuve, centre, date, capacité, convocation, durée/marge), génération automatique des créneaux, statuts, annulation | `ui/sessions/` | **Créer une session et ses créneaux** ; capacité respectée | 🟢 16/09/2026 (dev 1 ; centres faits en C4) |
 | C6 Inscriptions | inscription d'un candidat éligible (dossier VALIDE, catégorie, capacité, doublon, région selon règle), affectation créneau, heure de passage estimée, report/annulation, historique | `ui/sessions/EcranInscriptions` | **Inscrire un candidat** ; session complète et double inscription refusées | ⚪ |
 | C7 Présence | liste d'appel, statuts présent/absent/retard/en cours/terminé, tolérance de retard configurable, réorganisation selon règle, historique | `ui/sessions/EcranAppel` | **Enregistrer présence** | 🔒 Q4 (valeur par défaut) |
 | C8 Tentatives | ouverture d'une tentative pour un candidat présent, numérotation, examinateur saisi à ce moment, épreuves à repasser | `ui/evaluation/EcranTentatives`, `metier/ReglesTentatives.kt` | **Créer une tentative** ; tentatives conservées | ⚪ |

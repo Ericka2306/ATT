@@ -252,3 +252,27 @@ Réassignée au dev 1 le 16/09 (le dev 2 n'avait pas commencé) ; le dev 2 repre
 1. La modification d'une question existante n'est pas prévue (désactivation puis nouvelle question), pour ne jamais altérer une question déjà utilisée dans une évaluation ; à confirmer.
 2. Les réponses sont limitées à quatre par question (format QCM courant) ; Q1 dira si le format officiel diffère.
 3. Étape suivante : C5 (sessions et créneaux) — dev 1.
+
+---
+
+## Étape C5 — Sessions et créneaux — 16/09/2026
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `metier/ReglesPlanification.kt` — `genererCreneaux` (découpe la capacité en créneaux successifs à partir de l'heure de convocation, dernier créneau avec le reste, capacité 1 = créneau individuel), `ajouterMinutes`, `heureValide`, `validerSession` (date non passée, formats, capacités ≥ 1), `avertissementConflit`. 6 tests.
+- `ui/sessions/SessionsViewModel.kt` — liste avec libellés (centre, région, catégorie, épreuve, inscrits) filtrée par région pour un admin régional ; formulaire prérempli depuis les règles `CAPACITE_SESSION_DEFAUT`, `CAPACITE_CRENEAU_DEFAUT`, `DUREE_CRENEAU_MIN`, `MARGE_CRENEAU_MIN` (la capacité du centre s'applique si connue), épreuves rechargées selon la catégorie, aperçu des créneaux recalculé à chaque saisie, avertissement si une autre session est prévue au même centre le même jour ; création session + créneaux en une transaction ; détail (créneaux et remplissage, historique) ; changement de statut PLANIFIEE → OUVERTE → EN_COURS → TERMINEE et annulation avec motif obligatoire, qui annule aussi les inscriptions actives (§11).
+- `ui/sessions/Statuts.kt`, `EcranListeSessions.kt` (`FilterChip` à venir / du jour / passées / toutes, comme le TP7), `EcranFormulaireSession.kt`, `EcranDetailSession.kt`.
+- Captures `docs/captures/C5_*.png`.
+
+**Modifié**
+- `data/PlanificationDao.kt` — `InscriptionDao.toutes`, `listePourSession` ; `data/ReferentielsDao.kt` — `CentreDao.listeActifs`, `TypeEpreuveDao.listeActivesPourCategorie` ; `data/Tracage.kt` — `Session.resume()`.
+- `Navigation.kt` — `graphSessions` (`sessions`, `session/nouvelle`, `session/{id}`, et `…/inscrire`, `…/appel` en « à venir » pour C6/C7) ; « Sessions » quitte les écrans « à venir ».
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : 44 tests verts.
+- Émulateur (`admin`) : formulaire prérempli (30 / 5 / 15 / 5 depuis les règles), catégorie B → épreuve théorique proposée, centre Soarano → capacité 40 du centre appliquée, saisie 12 candidats / 5 par créneau → aperçu « 3 créneaux de 08:00 à 08:55 » → création → fiche avec 3 créneaux (5, 5, 2 places) → « Ouvrir aux inscriptions » → statut Ouverte. Date passée refusée (« La date est déjà passée. »). Seconde session le même jour : avertissement « 1 autre session déjà prévue dans ce centre » ; annulation avec motif « Examinateur indisponible » → statut Annulée, ligne ANNULATION avec motif. Base : 2 sessions, 3 + 8 créneaux aux heures attendues.
+- Non exercés : démarrage/terminaison (boutons présents, même code que l'ouverture), annulation avec inscriptions (C6).
+
+**Décisions restantes**
+1. Une session = une épreuve. Si l'ATT organise théorie et conduite le même jour, on crée deux sessions (Q9).
+2. Le conflit de centre est un avertissement, pas un blocage : plusieurs sessions le même jour au même centre sont possibles (à confirmer, Q5).
+3. Étape suivante : C6 (inscriptions), qui branchera `session/{id}/inscrire`.

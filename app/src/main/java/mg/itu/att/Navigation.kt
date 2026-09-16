@@ -39,6 +39,10 @@ import mg.itu.att.ui.configuration.EcranFormulaireEpreuve
 import mg.itu.att.ui.configuration.EcranFormulaireQuestion
 import mg.itu.att.ui.configuration.EcranFormulaireRegle
 import mg.itu.att.ui.configuration.EcranRegles
+import mg.itu.att.ui.sessions.EcranDetailSession
+import mg.itu.att.ui.sessions.EcranFormulaireSession
+import mg.itu.att.ui.sessions.EcranListeSessions
+import mg.itu.att.ui.sessions.SessionsViewModel
 import mg.itu.att.ui.comptes.ComptesViewModel
 import mg.itu.att.ui.comptes.EcranComptes
 import mg.itu.att.ui.comptes.EcranFormulaireAdmin
@@ -95,10 +99,11 @@ fun AppNavigation() {
         graphCandidats(navController) { session }
         graphComptes(navController) { session }
         graphConfiguration(navController) { session }
+        graphSessions(navController) { session }
 
         // ---------- FONCTIONNALITÉS À VENIR ----------
         val libelles = Role.entries.flatMap { menuPour(it) }.associate { it.route to it.libelle }
-        for (route in listOf(Routes.SESSIONS, Routes.EVALUATION, Routes.RESULTATS, Routes.HISTORIQUE, Routes.PARCOURS)) {
+        for (route in listOf(Routes.EVALUATION, Routes.RESULTATS, Routes.HISTORIQUE, Routes.PARCOURS)) {
             composable(route) { EcranAVenir(libelles[route] ?: route, onRetour = { navController.popBackStack() }) }
         }
         composable(Routes.A_VENIR) { entree ->
@@ -146,6 +151,42 @@ private fun NavGraphBuilder.graphAutoEcoles(nav: NavHostController, session: () 
         val id = entree.idArgument("autoEcoleId") ?: return@composable
         EcranFormulaireCompte(vm, id, onCree = { nav.popBackStack() }, onRetour = retour)
     }
+}
+
+// ---------- SESSIONS ET CRÉNEAUX (UC06, étape C5) ----------
+
+object RoutesSessions {
+    const val LISTE = Routes.SESSIONS
+    const val NOUVELLE = "session/nouvelle"
+    const val DETAIL = "session/{sessionId}"
+    const val INSCRIRE = "session/{sessionId}/inscrire"
+    const val APPEL = "session/{sessionId}/appel"
+    fun detail(id: Int) = "session/$id"
+    fun inscrire(id: Int) = "session/$id/inscrire"
+    fun appel(id: Int) = "session/$id/appel"
+}
+
+private fun NavGraphBuilder.graphSessions(nav: NavHostController, session: () -> SessionUtilisateur?) {
+    val retour: () -> Unit = { nav.popBackStack() }
+    @Composable
+    fun vm(): SessionsViewModel? = viewModelDuSousParcours(nav, RoutesSessions.LISTE, session())
+
+    composable(RoutesSessions.LISTE) {
+        val v = vm() ?: return@composable
+        EcranListeSessions(v, onNouvelle = { nav.navigate(RoutesSessions.NOUVELLE) }, onOuvrir = { nav.navigate(RoutesSessions.detail(it)) }, onRetour = retour)
+    }
+    composable(RoutesSessions.NOUVELLE) {
+        val v = vm() ?: return@composable
+        EcranFormulaireSession(v, onCree = { nav.navigate(RoutesSessions.detail(it)) { popUpTo(RoutesSessions.LISTE) } }, onRetour = retour)
+    }
+    composable(RoutesSessions.DETAIL) { entree ->
+        val v = vm() ?: return@composable
+        val id = entree.idArgument("sessionId") ?: return@composable
+        EcranDetailSession(v, id, onInscrire = { nav.navigate(RoutesSessions.inscrire(id)) }, onAppel = { nav.navigate(RoutesSessions.appel(id)) }, onRetour = retour)
+    }
+    // Inscriptions (C6) et appel (C7) : écrans « à venir » pour l'instant.
+    composable(RoutesSessions.INSCRIRE) { EcranAVenir("Inscriptions (étape C6)", onRetour = retour) }
+    composable(RoutesSessions.APPEL) { EcranAVenir("Appel (étape C7)", onRetour = retour) }
 }
 
 // ---------- CONFIGURATION (UC02, étape C4) ----------

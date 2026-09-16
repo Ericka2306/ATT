@@ -110,7 +110,22 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 8 — <date> — <tâche>
+## Entrée 8 — 16/09/2026 — Étape C5, sessions et créneaux
+
+- Code soumis : `metier/ReglesPlanification.kt`, `ui/sessions/*`.
+- Remarque principale de l'IA : la génération des créneaux est une fonction pure (`genererCreneaux`) réutilisée deux fois avec la même entrée : pour l'aperçu à la frappe dans le formulaire et pour l'insertion en base. Ce que l'utilisateur voit est exactement ce qui sera enregistré.
+
+⚠️ Les valeurs par défaut du formulaire (capacité, durée, marge) sont lues dans `RegleConfig` à l'ouverture, jamais écrites dans le code (R3). À vérifier par le binôme : `SessionsViewModel.preparerFormulaire`.
+
+⚠️ Deux textes identiques à l'écran (titre de section et bouton « Annuler la session ») ont trompé le pilote par texte, et auraient pu troubler un utilisateur : bouton renommé « Confirmer l'annulation ». Leçon : un bouton ne doit pas porter le même libellé qu'un titre.
+
+⚠️ Le conflit de centre (§11) est un avertissement non bloquant, faute de règle connue (Q5) ; le binôme peut le rendre bloquant via une règle si l'ATT le demande.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 1>.
+
+---
+
+## Entrée 9 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :
