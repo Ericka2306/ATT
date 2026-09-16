@@ -14,6 +14,8 @@ object Routes {
     const val ACCUEIL = "accueil"
     const val CONFIGURATION = "config"
     const val AUTO_ECOLES = "autoecoles"
+    const val EXAMINATEURS = "examinateurs"
+    const val COMPTES = "comptes"
     const val CANDIDATS = "candidats"
     const val DOSSIERS = "dossiers"
     const val SESSIONS = "sessions"
@@ -21,17 +23,22 @@ object Routes {
     const val RESULTATS = "resultats"
     const val HISTORIQUE = "historique"
     const val PARCOURS = "parcours"
+    const val MOT_DE_PASSE = "mot-de-passe"
 
     /** Écran générique « à venir » : `avenir/{libelle}`. */
     const val A_VENIR = "avenir/{libelle}"
     fun aVenir(libelle: String) = "avenir/$libelle"
 }
 
+private val entreeMotDePasse = EntreeMenu("Mon mot de passe", Routes.MOT_DE_PASSE, "Changer mon mot de passe")
+
 /** Le menu d'un rôle : uniquement ce que ce rôle a le droit de faire (instructions §7). */
 fun menuPour(role: Role): List<EntreeMenu> = when (role) {
     Role.SUPER_ADMIN -> listOf(
         EntreeMenu("Configuration", Routes.CONFIGURATION, "Catégories, épreuves, barèmes, règles, centres"),
+        EntreeMenu("Comptes", Routes.COMPTES, "Tous les comptes, administrateurs ATT"),
         EntreeMenu("Auto-écoles", Routes.AUTO_ECOLES, "Auto-écoles agréées et leurs comptes"),
+        EntreeMenu("Examinateurs", Routes.EXAMINATEURS, "Examinateurs de l'ATT et leurs comptes"),
         EntreeMenu("Candidats", Routes.CANDIDATS, "Tous les candidats"),
         EntreeMenu("Dossiers à traiter", Routes.DOSSIERS, "Dossiers soumis par les auto-écoles"),
         EntreeMenu("Sessions", Routes.SESSIONS, "Sessions, créneaux, inscriptions, appel"),
@@ -40,6 +47,7 @@ fun menuPour(role: Role): List<EntreeMenu> = when (role) {
     )
     Role.ADMIN_ATT -> listOf(
         EntreeMenu("Auto-écoles", Routes.AUTO_ECOLES, "Auto-écoles agréées et leurs comptes"),
+        EntreeMenu("Examinateurs", Routes.EXAMINATEURS, "Examinateurs de l'ATT et leurs comptes"),
         EntreeMenu("Candidats", Routes.CANDIDATS, "Tous les candidats"),
         EntreeMenu("Dossiers à traiter", Routes.DOSSIERS, "Dossiers soumis par les auto-écoles"),
         EntreeMenu("Sessions", Routes.SESSIONS, "Créer, inscrire, faire l'appel, imprimer"),
@@ -58,4 +66,4 @@ fun menuPour(role: Role): List<EntreeMenu> = when (role) {
     Role.CANDIDAT -> listOf(
         EntreeMenu("Mon parcours", Routes.PARCOURS, "Dossier, convocation, résultats"),
     )
-}
+} + entreeMotDePasse

@@ -199,3 +199,28 @@ Format (instructions §10) : ce qui a été créé, les fichiers modifiés, les 
 1. L'homonymie (même nom, prénom, date de naissance) bloque la création ; le cadrage parle d'« avertissement » : à assouplir si l'ATT le souhaite.
 2. La modification d'un dossier après validation est impossible ; une correction passe par un nouveau dossier (à confirmer).
 3. Étape suivante : C6 (inscriptions) quand C5 (dev 2) sera fusionnée ; en attendant, C12 (parcours candidat, consultation) ou C13 (impression de la fiche candidat).
+
+---
+
+## Étape C1b — Comptes : examinateurs, administrateurs ATT, mot de passe — 16/09/2026
+
+Étape ajoutée au plan (sous « Authentification et rôles ») : sans elle, aucun examinateur ne peut se connecter pour C8/C9, et les mots de passe initiaux ne peuvent pas être changés.
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `metier/ValidationCompte.kt` — règles communes à tous les comptes (`validerCreation`, `validerMotDePasse`, `validerChangement`) ; `ValidationAutoEcole.validerCompte` y délègue. 3 tests.
+- `ui/comptes/ComptesViewModel.kt` — examinateurs (liste filtrée par région, création **avec son compte dans une seule transaction**, modification, désactivation qui suit sur le compte), comptes (liste de tous les comptes, création d'un Administrateur ATT national ou régional par le Super Admin, désactivation sauf de son propre compte), changement de son mot de passe (ancien vérifié, nouveau haché). Tout tracé.
+- `ui/comptes/EcranListeExaminateurs.kt`, `EcranFormulaireExaminateur.kt`, `EcranComptes.kt` (+ `EcranFormulaireAdmin`), `EcranMotDePasse.kt`.
+- `outils/pilote_emulateur.sh` — pilotage de l'émulateur par le texte des éléments (`tap`, `saisir`, `visible`, `capture`, `relancer`, `connexion`) : sert aux vérifications de fin d'étape et pourra rejouer la démo de soutenance.
+- Captures `docs/captures/C1b_*.png`.
+
+**Modifié**
+- `ui/accueil/MenuParRole.kt` — routes `examinateurs`, `comptes`, `mot-de-passe` ; « Examinateurs » pour l'ATT, « Comptes » pour le Super Admin, « Mon mot de passe » pour tous. Test mis à jour (5 tests).
+- `Navigation.kt` — `graphComptes`. `data/Tracage.kt` — entité `Examinateur`, résumés `Examinateur`/`Utilisateur`. `data/ActeursDao.kt` — `UtilisateurDao.parExaminateur`.
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : 33 tests verts.
+- Émulateur (pilote par texte) : `admin` crée l'examinateur RABE Jean + compte `rabe` → change son mot de passe → se déconnecte → se reconnecte avec le nouveau → remet l'initial → `rabe` se connecte et voit « Sessions du jour » → `superadmin` ouvre « Comptes » (5 comptes) et crée `admin.toamasina` régional (Atsinanana). Base : compte `rabe` lié à l'examinateur 1 ; historique CREATION, CREATION_COMPTE ×2, CHANGEMENT_MOT_DE_PASSE ×2.
+
+**Décisions restantes**
+1. Les comptes de test restent affichés sur l'écran de connexion tant que `BuildConfig.DEBUG` ; à la soutenance, changer les mots de passe initiaux depuis « Mon mot de passe ».
+2. Aucune branche du dev 2 (C4, C5) au 16/09 : C6 à C11 sont bloquées. Si le retard persiste, le dev 1 reprend C4/C5.

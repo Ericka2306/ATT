@@ -30,6 +30,17 @@ Android Studio → File → Open → dossier `ATT` → attendre la synchronisati
 ./gradlew :app:testDebugUnitTest    # tests unitaires
 ```
 
+## Rejouer un scénario sur l'émulateur
+
+`outils/pilote_emulateur.sh` pilote l'application par le texte des boutons et des champs (`tap "Se connecter"`, `saisir "Identifiant" "admin"`). Les scénarios de vérification de chaque étape sont décrits dans `docs/COMPTES_RENDUS.md`.
+
+```bash
+source outils/pilote_emulateur.sh
+relancer            # redémarre l'application (relancer effacer : repart de zéro)
+connexion admin admin2026
+tap "Auto-écoles"
+```
+
 ## Crédits
 
 - Photo de l'écran de connexion : « Madagascar RN44 » par Diorit, Wikimedia Commons, licence CC0 (domaine public), réduite à 1080 px.
