@@ -209,7 +209,22 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 15 — <date> — <tâche>
+## Entrée 15 — 17/09/2026 — Étape C12, consultation par rôle (dev 2)
+
+- Code soumis : `metier/ReglesConsultation.kt`, `ui/candidats/SectionsParcours.kt`, `EcranParcours.kt`, `EcranFormulaireCompteCandidat.kt`, `ui/inscriptions/MesInscriptionsViewModel.kt`, `EcranMesInscriptions.kt`, et la reprise de `CandidatsViewModel`.
+- Remarque principale de l'IA : le rôle CANDIDAT et son menu « Mon parcours » existaient depuis C1, mais aucun écran ne créait de compte de ce rôle : le parcours n'était pas démontrable. L'IA propose de réutiliser exactement le geste du compte d'auto-école (C2) plutôt que d'inventer une inscription en ligne, qui supposerait un serveur.
+
+⚠️ Une fiche candidat hors périmètre (autre auto-école, autre région) n'affiche pas un message d'erreur mais « Candidat introuvable », comme un identifiant invalide : on ne révèle pas l'existence de la fiche. À valider : le binôme peut préférer un message explicite.
+
+⚠️ Les sections du parcours sont des extensions de `LazyListScope` partagées par deux écrans. C'est plus léger qu'un composant à paramètres, mais moins habituel que les `@Composable` du cours : à regarder en relecture croisée.
+
+⚠️ Le candidat ne peut plus soumettre son dossier : `peutSoumettre` dépend maintenant du rôle. Avant cette étape, seul l'écran limitait l'action.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 2>.
+
+---
+
+## Entrée 16 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :
