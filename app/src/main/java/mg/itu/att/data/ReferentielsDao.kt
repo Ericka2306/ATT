@@ -167,6 +167,9 @@ interface CriterePratiqueDao {
     @Query("SELECT * FROM criteres_pratiques WHERE typeEpreuveId = :typeEpreuveId AND actif = 1 ORDER BY id ASC")
     suspend fun actifsPourEpreuve(typeEpreuveId: Int): List<CriterePratique>
 
+    @Query("SELECT * FROM criteres_pratiques WHERE id = :id")
+    suspend fun parId(id: Int): CriterePratique?
+
     @Insert
     suspend fun inserer(critere: CriterePratique): Long
 

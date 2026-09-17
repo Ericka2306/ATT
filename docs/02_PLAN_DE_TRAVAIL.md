@@ -7,12 +7,12 @@
 
 | | |
 |---|---|
-| **Dernière étape terminée** | C9 (évaluation théorique) — 17/09/2026, en attente de fusion (branche `etape-C9-theorie`, après #10, #11 et #12) |
+| **Dernière étape terminée** | C10 (structure conduite) — 17/09/2026, en attente de fusion (branche `etape-C10-conduite`, après #10 à #13) |
 | **Étape en cours** | aucune |
-| **Prochaine étape** | C10 (structure de l'épreuve de conduite) — dev 1 |
+| **Prochaine étape** | C11 (calcul et validation des résultats) — dev 1 |
 | **Dev 2 peut démarrer** | à son arrivée : C12 (consultation, parcours candidat) sur une branche `etape-C12-…` depuis `main` ; modèle à suivre : `graphCandidats` dans `Navigation.kt` |
-| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape C9 » |
-| **Dernier commit poussé** | `etape-C8-tentatives` — « Ajoute les passages d'épreuve et la vue examinateur (étape C8) », PR #12 |
+| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape C10 » |
+| **Dernier commit poussé** | `etape-C9-theorie` — « Ajoute l'évaluation théorique orale (étape C9) », PR #13 |
 
 Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une question à valider
 
@@ -49,7 +49,7 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 | C7 Présence | liste d'appel, statuts présent/absent/retard/en cours/terminé, tolérance de retard configurable, réorganisation selon règle, historique | `ui/sessions/EcranAppel` | **Enregistrer présence** | 🟢 16/09/2026 (valeurs par défaut Q4 : tolérance 15 min, absent = nouvelle inscription) |
 | C8 Tentatives | ouverture d'une tentative pour un candidat présent, numérotation, examinateur saisi à ce moment, épreuves à repasser | `ui/evaluation/EcranTentatives`, `metier/ReglesTentatives.kt` | **Créer une tentative** ; tentatives conservées | 🟢 16/09/2026 |
 | C9 Évaluation théorique | saisie des réponses du candidat question par question (ou saisie directe du nombre de points si procédure papier), observations | `ui/evaluation/EcranEvaluationTheorie` | **Évaluer** ; réponses stockées | 🟢 17/09/2026 (Q1 : valeurs d'exemple configurables) |
-| C10 Structure conduite | écran de saisie des critères/notes/observations/fautes, sans grille imposée (données de configuration vides) | `ui/evaluation/EcranEvaluationConduite` | écran fonctionnel avec critères de démonstration marqués « à confirmer » | 🔒 Q2 |
+| C10 Structure conduite | écran de saisie des critères/notes/observations/fautes, sans grille imposée (données de configuration vides) | `ui/evaluation/EcranEvaluationConduite` | écran fonctionnel avec critères de démonstration marqués « à confirmer » | 🟢 17/09/2026 (Q2 : grille configurable) |
 | C11 Calcul des résultats | `metier/CalculResultat.kt` (pur), création `Resultat`, validation ATT, correction traçable (nouvelle ligne), échec → nouvelle tentative | `ui/resultats/`, tests JUnit | **Calculer selon le barème configurable** ; **conserver l'historique** ; tests verts | ⚪ |
 | C12 Consultation | parcours candidat (soi), vue auto-école (ses candidats), vues ATT (sessions, résultats, historique), filtres par région | `ui/candidats/EcranParcours`, `ui/resultats/EcranConsultation` | **Respecter les rôles** | ⚪ |
 | C13 Impression | convocation individuelle, liste d'appel de session, relevé de résultat (HTML → `PrintManager` ou PDF) | `ui/impression/` | **Imprimer les informations essentielles** ; fonctionne hors réseau | ⚪ |

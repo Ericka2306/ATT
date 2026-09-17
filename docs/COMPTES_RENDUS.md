@@ -393,3 +393,39 @@ Réassignée au dev 1 le 16/09 (le dev 2 n'avait pas commencé) ; le dev 2 repre
 - `app/src/main/java/mg/itu/att/metier/ValidationConfiguration.kt`, `ui/configuration/ConfigurationViewModel.kt`, `EcranEpreuve.kt` — question orale : énoncé, points, réponse attendue.
 - `app/src/main/java/mg/itu/att/Navigation.kt` — route théorie branchée.
 - `docs/02_PLAN_DE_TRAVAIL.md`, `docs/03_MODELE_DE_DONNEES.md`, `docs/04_QUESTIONS_A_VALIDER.md` (Q1 réécrite), `docs/05_CAS_UTILISATION.md`, `docs/HORS_COURS.md`, `JOURNAL-IA.md`, `LISEZMOI.md`, `docs/captures/C9_*.png`.
+
+---
+
+## Étape C10 — Structure de l'épreuve de conduite — 17/09/2026
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `metier/ReglesConduite.kt` — `NoteCritere` (points max, points saisis, critère éliminatoire, faute cochée ; une faute cochée vaut 0), `pointsGrille`, `verifierOuverture` (barème courant, au moins un critère actif → sinon renvoi à la configuration, Q2), `totalAttribue`, `fauteEliminatoire`, `sansNote`, `verifierFin` (tous les critères notés). 3 tests. `metier/Points.kt` — `pointsValides` partagé avec la théorie.
+- `ui/evaluation/EvaluationConduiteViewModel.kt` — à l'ouverture, crée l'`Evaluation` sur le barème courant et une ligne `EvaluationCritere` par critère actif (grille figée) ; `saisir` (points, faute, observation) exposé directement comme pour la théorie, base mise à jour derrière ; `terminer` : lignes réécrites, observations figées, tentative TERMINEE, présence TERMINE, examinateur enregistré, trois traces dans une transaction.
+- `ui/evaluation/EcranEvaluationConduite.kt` — la grille à l'écran : en-tête (passage, candidat, grille N critères / points, total / note max, bandeau rouge « faute éliminatoire »), une carte par critère (points attribués, case « Faute éliminatoire commise » si le critère l'admet, observation), observations générales, « Terminer l'épreuve ».
+- Captures `C10_conduite.png` (faute cochée sur « Respect des priorités », total 7/20, bandeau rouge), `C10_passages.png` (passage terminé, « Consulter l'épreuve »).
+
+**Modifié**
+- `data/ExamensDao.kt` — `EvaluationCritereDao.pourCritere`, `insererToutes` ; `data/ReferentielsDao.kt` — `CriterePratiqueDao.parId`.
+- `metier/ReglesTheorie.kt`, `ui/evaluation/EvaluationTheorieViewModel.kt`, test — utilisent `pointsValides` partagé.
+- `Navigation.kt` — route `tentative/{tentativeId}/conduite` branchée sur `EcranEvaluationConduite` (plus d'écran « à venir » dans l'évaluation).
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : 70 tests verts (67 + 3).
+- Émulateur (pilote par texte) : `superadmin` passe `CONDUITE_APRES_THEORIE_REUSSIE` à `false` (aucun résultat n'existe avant C11) et crée 3 critères sur l'épreuve de conduite B (5 pt, 3 pt, 10 pt éliminatoire) ; `admin` crée une session de conduite : l'inscription le jour même est **refusée** (« Le candidat a déjà une session le 17/09/2026, conflit de créneaux »), donc session le lendemain, inscription n° 001, appel, passage n° 1 : points 4 et 3, faute cochée sur le 3ᵉ critère → total 7/20 et bandeau rouge ; faute décochée, 8 pt → 15/20, observation, « Terminer » → « Consulter l'épreuve ». Base : évaluation close, 3 lignes `EvaluationCritere`, historique.
+- Captures vérifiées une par une (Read).
+
+**Décisions restantes**
+1. La somme des points de la grille (18) ne vaut pas forcément la note max du barème (20) : C11 doit décider si le total est rapporté à la note max ou comparé tel quel au seuil. À poser (Q2).
+2. Une faute éliminatoire fait perdre l'épreuve quel que soit le total (invariant docs/03 §6) ; l'écran l'annonce, C11 l'applique.
+3. Grille de démonstration seulement : les critères créés dans le test ne sont pas ceux de l'ATT, tous « à confirmer ».
+4. Décision du dev 1 (17/09/2026) : **pour le moment on garde le partage actuel des rôles** : l'examinateur fait passer l'examen ; l'Admin ATT organise (sessions, inscriptions, appel) et peut aussi ouvrir un passage et évaluer « en secours » (Q6). À revoir plus tard : réserver l'évaluation aux examinateurs, et qui fait l'appel.
+5. Étape suivante : C11 (calcul et validation des résultats).
+
+**À relire**
+- `app/src/main/java/mg/itu/att/metier/ReglesConduite.kt`, `Points.kt` — nouveaux ; `ReglesTheorie.kt` — `pointsValides` déplacé.
+- `app/src/test/java/mg/itu/att/metier/ReglesConduiteTest.kt` — nouveau ; `ReglesTheorieTest.kt` — adapté.
+- `app/src/main/java/mg/itu/att/ui/evaluation/EvaluationConduiteViewModel.kt`, `EcranEvaluationConduite.kt` — nouveaux.
+- `app/src/main/java/mg/itu/att/ui/evaluation/EvaluationTheorieViewModel.kt` — import de `pointsValides`.
+- `app/src/main/java/mg/itu/att/data/ExamensDao.kt`, `ReferentielsDao.kt` — requêtes ajoutées.
+- `app/src/main/java/mg/itu/att/Navigation.kt` — route conduite branchée.
+- `docs/02_PLAN_DE_TRAVAIL.md`, `docs/04_QUESTIONS_A_VALIDER.md`, `JOURNAL-IA.md`, `docs/captures/C10_*.png`.

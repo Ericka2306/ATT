@@ -68,11 +68,11 @@ class ReglesTheorieTest {
 
     @Test
     fun `points attribues entre 0 et le maximum de la question`() {
-        assertEquals(2.5, ReglesTheorie.pointsValides("2,5", 3.0))
-        assertEquals(0.0, ReglesTheorie.pointsValides("0", 3.0))
-        assertNull(ReglesTheorie.pointsValides("4", 3.0))
-        assertNull(ReglesTheorie.pointsValides("-1", 3.0))
-        assertNull(ReglesTheorie.pointsValides("", 3.0))
+        assertEquals(2.5, pointsValides("2,5", 3.0))
+        assertEquals(0.0, pointsValides("0", 3.0))
+        assertNull(pointsValides("4", 3.0))
+        assertNull(pointsValides("-1", 3.0))
+        assertNull(pointsValides("", 3.0))
     }
 
     @Test

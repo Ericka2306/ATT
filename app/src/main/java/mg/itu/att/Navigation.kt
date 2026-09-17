@@ -39,7 +39,9 @@ import mg.itu.att.ui.configuration.EcranFormulaireEpreuve
 import mg.itu.att.ui.configuration.EcranFormulaireQuestion
 import mg.itu.att.ui.configuration.EcranFormulaireRegle
 import mg.itu.att.ui.configuration.EcranRegles
+import mg.itu.att.ui.evaluation.EcranEvaluationConduite
 import mg.itu.att.ui.evaluation.EcranEvaluationTheorie
+import mg.itu.att.ui.evaluation.EvaluationConduiteViewModel
 import mg.itu.att.ui.evaluation.EcranSessionsExaminateur
 import mg.itu.att.ui.evaluation.EvaluationTheorieViewModel
 import mg.itu.att.ui.evaluation.EcranTentatives
@@ -238,7 +240,13 @@ private fun NavGraphBuilder.graphSessions(nav: NavHostController, session: () ->
         v.definirSession(s)
         EcranEvaluationTheorie(v, id, onTerminee = retour, onRetour = retour)
     }
-    composable(RoutesEvaluation.CONDUITE) { EcranAVenir("Évaluation de conduite (étape C10)", onRetour = retour) }
+    composable(RoutesEvaluation.CONDUITE) { entree ->
+        val s = session() ?: return@composable
+        val id = entree.idArgument("tentativeId") ?: return@composable
+        val v: EvaluationConduiteViewModel = viewModel()
+        v.definirSession(s)
+        EcranEvaluationConduite(v, id, onTerminee = retour, onRetour = retour)
+    }
 }
 
 // ---------- CONFIGURATION (UC02, étape C4) ----------

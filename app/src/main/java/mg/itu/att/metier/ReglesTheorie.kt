@@ -69,11 +69,7 @@ object ReglesTheorie {
         else -> null
     }
 
-    /** Points saisis pour une question, ou null si le texte est vide ou n'est pas un nombre entre 0 et le maximum. */
-    fun pointsValides(pointsSaisis: String, pointsMax: Double): Double? =
-        pointsSaisis.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it >= 0 && it <= pointsMax }
-
-    /** Total des points attribués sur les lignes correctement notées. */
+    /** Total des points attribués sur les lignes correctement notées (voir [pointsValides]). */
     fun totalAttribue(notes: List<NoteQuestion>): Double = notes.sumOf { pointsValides(it.pointsSaisis, it.pointsMax) ?: 0.0 }
 
     /** Nombre de questions posées dont les points ne sont pas (ou mal) saisis. */
