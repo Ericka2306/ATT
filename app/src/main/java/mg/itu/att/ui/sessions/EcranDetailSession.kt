@@ -28,7 +28,7 @@ import mg.itu.att.ui.communs.TitreSection
 
 /** Fiche d'une session (UC06) : informations, créneaux et leur remplissage, changement de statut, historique. */
 @Composable
-fun EcranDetailSession(viewModel: SessionsViewModel, sessionId: Int, onInscrire: () -> Unit, onAppel: () -> Unit, onRetour: () -> Unit) {
+fun EcranDetailSession(viewModel: SessionsViewModel, sessionId: Int, onInscrire: () -> Unit, onAppel: () -> Unit, onTentatives: () -> Unit, onRetour: () -> Unit) {
     viewModel.afficherDetail(sessionId)
     val etat by viewModel.detail.collectAsState()
     val l = etat.ligne
@@ -53,6 +53,7 @@ fun EcranDetailSession(viewModel: SessionsViewModel, sessionId: Int, onInscrire:
                     if (s.statut != StatutSession.PLANIFIEE) OutlinedButton(onClick = onInscrire) { Text("Inscriptions") }
                     if (s.statut == StatutSession.OUVERTE || s.statut == StatutSession.COMPLETE || s.statut == StatutSession.EN_COURS || s.statut == StatutSession.TERMINEE) {
                         OutlinedButton(onClick = onAppel) { Text("Appel") }
+                        OutlinedButton(onClick = onTentatives) { Text("Passages") }
                     }
                     if (etat.peutGerer) {
                         when (s.statut) {

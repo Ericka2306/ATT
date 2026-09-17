@@ -33,6 +33,7 @@ object EntitesHistorique {
     const val SESSION = "Session"
     const val INSCRIPTION = "Inscription"
     const val PRESENCE = "Presence"
+    const val TENTATIVE = "Tentative"
     const val RESULTAT = "Resultat"
     const val REGLE_CONFIG = "RegleConfig"
     const val CATEGORIE = "CategoriePermis"
@@ -89,6 +90,8 @@ fun RegleConfig.resume(): String = "$cle = $valeur${categorieId?.let { " (catég
 fun Question.resume(): String = "« ${enonce.take(60)} » ($points pt, ${if (actif) "active" else "inactive"})"
 
 fun CriterePratique.resume(): String = "$libelle ($points pt${if (eliminatoire) ", éliminatoire" else ""}, ${if (actif) "actif" else "inactif"})"
+
+fun Tentative.resume(): String = "tentative n° $numero du candidat $candidatId, épreuve $typeEpreuveId, inscription $inscriptionId, examinateur ${examinateurId ?: "—"}, $statut, $dateHeure"
 
 fun Presence.resume(): String = "présence de l'inscription $inscriptionId : $statut${heureArrivee?.let { ", arrivée $it" } ?: ""}${remarque?.let { ", $it" } ?: ""}"
 

@@ -63,9 +63,9 @@ object DonneesInitiales {
 
     private val regles = listOf(
         RegleConfig(cle = ClesRegles.TENTATIVES_MAX, valeur = "0", typeValeur = TypeValeur.ENTIER,
-            description = "Nombre maximal de tentatives par épreuve (0 = illimité) — Q3"),
+            description = "Nombre maximal de passages par épreuve (0 = illimité) — Q3"),
         RegleConfig(cle = ClesRegles.DELAI_REPASSAGE_JOURS, valeur = "25", typeValeur = TypeValeur.ENTIER,
-            description = "Délai minimal en jours entre deux tentatives — Q3"),
+            description = "Délai minimal en jours entre deux passages — Q3"),
         RegleConfig(cle = ClesRegles.CONSERVATION_EPREUVE_REUSSIE_JOURS, valeur = "365", typeValeur = TypeValeur.ENTIER,
             description = "Durée en jours pendant laquelle une épreuve réussie reste acquise — Q3"),
         RegleConfig(cle = ClesRegles.TOLERANCE_RETARD_MIN, valeur = "15", typeValeur = TypeValeur.ENTIER,

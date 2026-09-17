@@ -39,6 +39,9 @@ import mg.itu.att.ui.configuration.EcranFormulaireEpreuve
 import mg.itu.att.ui.configuration.EcranFormulaireQuestion
 import mg.itu.att.ui.configuration.EcranFormulaireRegle
 import mg.itu.att.ui.configuration.EcranRegles
+import mg.itu.att.ui.evaluation.EcranSessionsExaminateur
+import mg.itu.att.ui.evaluation.EcranTentatives
+import mg.itu.att.ui.evaluation.TentativesViewModel
 import mg.itu.att.ui.appel.AppelViewModel
 import mg.itu.att.ui.appel.EcranAppel
 import mg.itu.att.ui.inscriptions.EcranInscriptions
@@ -107,7 +110,7 @@ fun AppNavigation() {
 
         // ---------- FONCTIONNALITÉS À VENIR ----------
         val libelles = Role.entries.flatMap { menuPour(it) }.associate { it.route to it.libelle }
-        for (route in listOf(Routes.EVALUATION, Routes.RESULTATS, Routes.HISTORIQUE, Routes.PARCOURS)) {
+        for (route in listOf(Routes.RESULTATS, Routes.HISTORIQUE, Routes.PARCOURS)) {
             composable(route) { EcranAVenir(libelles[route] ?: route, onRetour = { navController.popBackStack() }) }
         }
         composable(Routes.A_VENIR) { entree ->
@@ -165,9 +168,19 @@ object RoutesSessions {
     const val DETAIL = "session/{sessionId}"
     const val INSCRIRE = "session/{sessionId}/inscrire"
     const val APPEL = "session/{sessionId}/appel"
+    const val TENTATIVES = "session/{sessionId}/tentatives"
     fun detail(id: Int) = "session/$id"
     fun inscrire(id: Int) = "session/$id/inscrire"
     fun appel(id: Int) = "session/$id/appel"
+    fun tentatives(id: Int) = "session/$id/tentatives"
+}
+
+/** Routes de l'évaluation (UC09) : sessions à évaluer, tentatives d'une session, saisie par épreuve (C9, C10). */
+object RoutesEvaluation {
+    const val SESSIONS = Routes.EVALUATION
+    const val THEORIE = "tentative/{tentativeId}/theorie"
+    const val CONDUITE = "tentative/{tentativeId}/conduite"
+    fun saisie(tentativeId: Int, codeEpreuve: String) = if (codeEpreuve == "THEORIE") "tentative/$tentativeId/theorie" else "tentative/$tentativeId/conduite"
 }
 
 private fun NavGraphBuilder.graphSessions(nav: NavHostController, session: () -> SessionUtilisateur?) {
@@ -186,7 +199,7 @@ private fun NavGraphBuilder.graphSessions(nav: NavHostController, session: () ->
     composable(RoutesSessions.DETAIL) { entree ->
         val v = vm() ?: return@composable
         val id = entree.idArgument("sessionId") ?: return@composable
-        EcranDetailSession(v, id, onInscrire = { nav.navigate(RoutesSessions.inscrire(id)) }, onAppel = { nav.navigate(RoutesSessions.appel(id)) }, onRetour = retour)
+        EcranDetailSession(v, id, onInscrire = { nav.navigate(RoutesSessions.inscrire(id)) }, onAppel = { nav.navigate(RoutesSessions.appel(id)) }, onTentatives = { nav.navigate(RoutesSessions.tentatives(id)) }, onRetour = retour)
     }
     composable(RoutesSessions.INSCRIRE) { entree ->
         val s = session() ?: return@composable
@@ -202,6 +215,22 @@ private fun NavGraphBuilder.graphSessions(nav: NavHostController, session: () ->
         v.definirSession(s)
         EcranAppel(v, id, onRetour = retour)
     }
+    composable(RoutesSessions.TENTATIVES) { entree ->
+        val s = session() ?: return@composable
+        val id = entree.idArgument("sessionId") ?: return@composable
+        val v: TentativesViewModel = viewModel()
+        v.definirSession(s)
+        EcranTentatives(v, id, onTentative = { tentativeId, code -> nav.navigate(RoutesEvaluation.saisie(tentativeId, code)) }, onRetour = retour)
+    }
+    // ---------- ÉVALUATION (UC09, étape C8 ; saisie en C9/C10) ----------
+    composable(RoutesEvaluation.SESSIONS) {
+        val s = session() ?: return@composable
+        val v: TentativesViewModel = viewModel()
+        v.definirSession(s)
+        EcranSessionsExaminateur(v, onOuvrir = { nav.navigate(RoutesSessions.tentatives(it)) }, onRetour = retour)
+    }
+    composable(RoutesEvaluation.THEORIE) { EcranAVenir("Évaluation théorique (étape C9)", onRetour = retour) }
+    composable(RoutesEvaluation.CONDUITE) { EcranAVenir("Évaluation de conduite (étape C10)", onRetour = retour) }
 }
 
 // ---------- CONFIGURATION (UC02, étape C4) ----------

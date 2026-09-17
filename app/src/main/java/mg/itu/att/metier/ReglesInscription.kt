@@ -43,9 +43,9 @@ object ReglesInscription {
             ctx.inscriptionsCandidat.any { (i, se) -> se.date == s.date && se.id != s.id && actives(listOf(i)).isNotEmpty() } -> "Le candidat a déjà une session le ${formatDate(s.date)} (conflit de créneaux)."
             actives.size >= s.capacite -> "Session complète (${s.capacite} places)."
             ctx.examenDansRegion && ctx.regionAutoEcole != null && ctx.regionAutoEcole != ctx.regionCentre -> "Le candidat doit passer dans la région de son auto-école (règle EXAMEN_DANS_REGION_AUTO_ECOLE)."
-            ctx.tentativesMax > 0 && ctx.nombreTentatives >= ctx.tentativesMax -> "Nombre maximal de tentatives atteint (${ctx.tentativesMax})."
+            ctx.tentativesMax > 0 && ctx.nombreTentatives >= ctx.tentativesMax -> "Nombre maximal de passages atteint (${ctx.tentativesMax})."
             ctx.derniereTentative != null && ctx.delaiRepassageJours > 0 && joursEntre(ctx.derniereTentative, s.date) < ctx.delaiRepassageJours ->
-                "Délai de repassage non écoulé : ${ctx.delaiRepassageJours} jours après la tentative du ${formatDate(ctx.derniereTentative)}."
+                "Délai de repassage non écoulé : ${ctx.delaiRepassageJours} jours après le passage du ${formatDate(ctx.derniereTentative)}."
             ctx.theorieRequise && !ctx.theorieReussie -> "L'épreuve théorique doit être réussie avant la conduite (règle CONDUITE_APRES_THEORIE_REUSSIE)."
             else -> null
         }

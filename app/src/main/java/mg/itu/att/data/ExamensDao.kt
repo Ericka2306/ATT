@@ -13,11 +13,21 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TentativeDao {
+    @Query("SELECT * FROM tentatives ORDER BY id ASC")
+    fun toutes(): Flow<List<Tentative>>
+
     @Query("SELECT * FROM tentatives WHERE candidatId = :candidatId ORDER BY dateHeure DESC")
     fun parCandidat(candidatId: Int): Flow<List<Tentative>>
 
     @Query("SELECT * FROM tentatives WHERE inscriptionId = :inscriptionId ORDER BY id ASC")
     suspend fun parInscription(inscriptionId: Int): List<Tentative>
+
+    /** Les tentatives ouvertes dans une session (jointure sur les inscriptions). */
+    @Query("SELECT tentatives.* FROM tentatives JOIN inscriptions ON inscriptions.id = tentatives.inscriptionId WHERE inscriptions.sessionId = :sessionId ORDER BY tentatives.id ASC")
+    fun parSession(sessionId: Int): Flow<List<Tentative>>
+
+    @Query("SELECT * FROM tentatives WHERE id = :id")
+    fun parIdEnDirect(id: Int): Flow<Tentative?>
 
     @Query("SELECT * FROM tentatives WHERE candidatId = :candidatId AND typeEpreuveId = :typeEpreuveId ORDER BY numero ASC")
     suspend fun listePourCandidatEtEpreuve(candidatId: Int, typeEpreuveId: Int): List<Tentative>

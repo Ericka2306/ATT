@@ -130,6 +130,7 @@ app/src/main/java/mg/itu/att/
 
 ## 5. Conventions de code
 
+- **Vocabulaire** : le code et les documents gardent les mots du cadrage (`Tentative`, `Inscription`, `Presence`…) ; les écrans peuvent afficher un mot plus simple quand l'équipe le décide (« passage » pour tentative, décision du 17/09/2026). La correspondance est dans le glossaire du `LISEZMOI.md`.
 - **Langue** : identifiants en **français sans accents** (`Candidat`, `EtatSessions`, `enregistrerPresence`, `parCandidat`), mots-clés du framework en anglais tels quels (`uiState`, `onClick`, `viewModel`). Textes d'interface en français en dur (comme le cours) ; `strings.xml` seulement pour `app_name`.
 - **Nommage** : entités au singulier, tables au pluriel (`@Entity(tableName = "candidats")`) ; DAO `CandidatDao` avec méthodes descriptives (`tous()`, `parId(id)`, `parAutoEcole(autoEcoleId)`, `inserer`, `modifier`) ; écrans préfixés `Ecran` ; états `EtatXxx` ; ViewModels `XxxViewModel` ; routes en minuscules ; tags Logcat en majuscules.
 - **Style** : `val` par défaut, `data class` immuables, `copy()`, `when` expression, opérations de collections, `?.let { } ?: "…"`, virgule finale sur les listes multi-lignes, imports explicites, littéraux avec `_` (`250_000`).
