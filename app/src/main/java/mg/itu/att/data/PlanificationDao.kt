@@ -71,6 +71,9 @@ interface InscriptionDao {
     @Query("SELECT * FROM inscriptions WHERE candidatId = :candidatId ORDER BY dateInscription DESC")
     fun parCandidat(candidatId: Int): Flow<List<Inscription>>
 
+    @Query("SELECT * FROM inscriptions WHERE candidatId = :candidatId ORDER BY id ASC")
+    suspend fun listePourCandidat(candidatId: Int): List<Inscription>
+
     @Query("SELECT * FROM inscriptions WHERE id = :id")
     suspend fun parId(id: Int): Inscription?
 

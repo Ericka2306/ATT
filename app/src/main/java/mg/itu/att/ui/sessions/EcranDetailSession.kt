@@ -47,15 +47,14 @@ fun EcranDetailSession(viewModel: SessionsViewModel, sessionId: Int, onInscrire:
                     LigneInfo("Capacité", "${l.inscrits} inscrit(s) / ${s.capacite}")
                     LigneInfo("Créneaux", "${etat.creneaux.size} × ${s.dureeCreneauMin} min, marge ${s.margeMin} min")
                 }
-                if (etat.peutGerer) {
-                    Spacer(Modifier.height(12.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Spacer(Modifier.height(12.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // Les inscriptions sont consultables par tous les rôles autorisés ; les actions de statut restent à l'ATT.
+                    if (s.statut != StatutSession.PLANIFIEE) OutlinedButton(onClick = onInscrire) { Text("Inscriptions") }
+                    if (etat.peutGerer) {
                         when (s.statut) {
                             StatutSession.PLANIFIEE -> Button(onClick = { viewModel.changerStatut(s.id, StatutSession.OUVERTE) }) { Text("Ouvrir aux inscriptions") }
-                            StatutSession.OUVERTE, StatutSession.COMPLETE -> {
-                                OutlinedButton(onClick = onInscrire) { Text("Inscrire") }
-                                Button(onClick = { viewModel.changerStatut(s.id, StatutSession.EN_COURS) }) { Text("Démarrer (appel)") }
-                            }
+                            StatutSession.OUVERTE, StatutSession.COMPLETE -> Button(onClick = { viewModel.changerStatut(s.id, StatutSession.EN_COURS) }) { Text("Démarrer (appel)") }
                             StatutSession.EN_COURS -> {
                                 OutlinedButton(onClick = onAppel) { Text("Appel") }
                                 Button(onClick = { viewModel.changerStatut(s.id, StatutSession.TERMINEE) }) { Text("Terminer") }

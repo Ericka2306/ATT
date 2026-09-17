@@ -39,6 +39,8 @@ import mg.itu.att.ui.configuration.EcranFormulaireEpreuve
 import mg.itu.att.ui.configuration.EcranFormulaireQuestion
 import mg.itu.att.ui.configuration.EcranFormulaireRegle
 import mg.itu.att.ui.configuration.EcranRegles
+import mg.itu.att.ui.inscriptions.EcranInscriptions
+import mg.itu.att.ui.inscriptions.InscriptionsViewModel
 import mg.itu.att.ui.sessions.EcranDetailSession
 import mg.itu.att.ui.sessions.EcranFormulaireSession
 import mg.itu.att.ui.sessions.EcranListeSessions
@@ -184,8 +186,14 @@ private fun NavGraphBuilder.graphSessions(nav: NavHostController, session: () ->
         val id = entree.idArgument("sessionId") ?: return@composable
         EcranDetailSession(v, id, onInscrire = { nav.navigate(RoutesSessions.inscrire(id)) }, onAppel = { nav.navigate(RoutesSessions.appel(id)) }, onRetour = retour)
     }
-    // Inscriptions (C6) et appel (C7) : écrans « à venir » pour l'instant.
-    composable(RoutesSessions.INSCRIRE) { EcranAVenir("Inscriptions (étape C6)", onRetour = retour) }
+    composable(RoutesSessions.INSCRIRE) { entree ->
+        val s = session() ?: return@composable
+        val id = entree.idArgument("sessionId") ?: return@composable
+        val v: InscriptionsViewModel = viewModel()
+        v.definirSession(s)
+        EcranInscriptions(v, id, onRetour = retour)
+    }
+    // Appel (C7) : écran « à venir » pour l'instant.
     composable(RoutesSessions.APPEL) { EcranAVenir("Appel (étape C7)", onRetour = retour) }
 }
 
