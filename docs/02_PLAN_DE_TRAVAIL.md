@@ -7,12 +7,12 @@
 
 | | |
 |---|---|
-| **Dernière étape terminée** | C12a (historique des modifications) — 17/09/2026, en attente de relecture (branche `etape-C12a-historique`, PR #15) ; C10 fusionnée (PR #14) |
-| **Étape en cours** | C12 (consultation par rôle) : C12a 🟢, le reste de C12 en une seule pull request suivante |
-| **Prochaine étape** | C12 (sections inscriptions et passages de la fiche candidat, compte et parcours candidat, inscriptions de l'auto-école) — dev 2 |
+| **Dernière étape terminée** | C12 (consultation par rôle : historique, parcours candidat, compte candidat, inscriptions de l'auto-école) — 17/09/2026, en attente de relecture (branche `etape-C12-consultation`) ; C12a fusionnée (PR #15) |
+| **Étape en cours** | aucune |
+| **Prochaine étape** | C11 (calcul et validation des résultats, avec leur consultation par rôle) — dev 2 |
 | **Qui fait quoi** | depuis le 17/09/2026, le dev 1 a livré jusqu'à C10 ; le dev 2 reprend C11, C12, C13 et D1, une pull request par étape du plan (comme les précédentes) |
-| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape C12a » |
-| **Dernier commit poussé** | `etape-C10-conduite` — « Ajoute l'évaluation de conduite (étape C10) », PR #14 fusionnée |
+| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape C12 » |
+| **Dernier commit poussé** | `etape-C12a-historique` — « Ajoute l'historique des modifications avec filtres (étape C12a) », PR #15 fusionnée |
 
 Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une question à valider
 
@@ -51,7 +51,7 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 | C9 Évaluation théorique | saisie des réponses du candidat question par question (ou saisie directe du nombre de points si procédure papier), observations | `ui/evaluation/EcranEvaluationTheorie` | **Évaluer** ; réponses stockées | 🟢 17/09/2026 (Q1 : valeurs d'exemple configurables) |
 | C10 Structure conduite | écran de saisie des critères/notes/observations/fautes, sans grille imposée (données de configuration vides) | `ui/evaluation/EcranEvaluationConduite` | écran fonctionnel avec critères de démonstration marqués « à confirmer » | 🟢 17/09/2026 (Q2 : grille configurable) |
 | C11 Calcul des résultats | `metier/CalculResultat.kt` (pur), création `Resultat`, validation ATT, correction traçable (nouvelle ligne), échec → nouvelle tentative | `ui/resultats/`, tests JUnit | **Calculer selon le barème configurable** ; **conserver l'historique** ; tests verts | ⚪ |
-| C12 Consultation | parcours candidat (soi), vue auto-école (ses candidats), vues ATT (sessions, résultats, historique), filtres par région | `ui/candidats/EcranParcours`, `ui/resultats/EcranConsultation` | **Respecter les rôles** | 🟡 C12a historique 🟢 17/09/2026 ; reste de C12 en cours (dev 2) ; résultats validés livrés avec C11 |
+| C12 Consultation | parcours candidat (soi), vue auto-école (ses candidats), vues ATT (sessions, résultats, historique), filtres par région | `ui/candidats/EcranParcours`, `ui/resultats/EcranConsultation` | **Respecter les rôles** | 🟢 17/09/2026 (dev 2 ; la consultation des résultats validés est livrée avec C11) |
 | C13 Impression | convocation individuelle, liste d'appel de session, relevé de résultat (HTML → `PrintManager` ou PDF) | `ui/impression/` | **Imprimer les informations essentielles** ; fonctionne hors réseau | ⚪ |
 
 ## Phase D — Consolidation

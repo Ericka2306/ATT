@@ -216,7 +216,10 @@ Une seule `MainActivity`, un `NavHost`, routes en chaînes ; l'argument est touj
 | `autoecole/nouvelle`, `autoecole/{autoEcoleId}` | `EcranFormulaireAutoEcole` (+ compte) | UC03 |
 | `candidats` | `EcranListeCandidats` (auto-école : les siens ; ATT : filtres) | UC04, UC12 |
 | `candidat/nouveau`, `candidat/{candidatId}/modifier` | `EcranFormulaireCandidat` | UC04 |
-| `candidat/{candidatId}` | `EcranDetailCandidat` (identité, dossiers, inscriptions, tentatives, résultats = parcours) | UC12 |
+| `candidat/{candidatId}` | `EcranDetailCandidat` (identité, dossiers, inscriptions et convocations, passages, compte de connexion, historique = parcours) | UC12 |
+| `candidat/{candidatId}/compte` | `EcranFormulaireCompteCandidat` (compte facultatif du candidat, créé par l'ATT ou son auto-école) | UC12 |
+| `parcours` | `EcranParcours` (le candidat connecté : son dossier, ses convocations, ses passages, en lecture seule) | UC12 |
+| `mes-inscriptions` | `EcranMesInscriptions` (auto-école : convocations et présence de ses candidats, à venir / passées) | UC12 |
 | `dossier/nouveau/{candidatId}`, `dossier/{dossierId}` | `EcranDossier` (pièces, soumission ; côté ATT : décision + motif) | UC04, UC05 |
 | `dossiers` | `EcranDossiersATraiter` (ATT : soumis, filtres) | UC05 |
 
@@ -257,7 +260,7 @@ Total : 27 routes, environ 22 fichiers d'écran (les écrans génériques de ré
 |---|---|
 | Super Admin | Configuration · Auto-écoles · Candidats · Dossiers à traiter · Sessions · Résultats à valider · Historique |
 | Admin ATT | Auto-écoles · Candidats · Dossiers à traiter · Sessions (créer, inscrire, appel, imprimer) · Résultats à valider · Historique |
-| Auto-école | Mes candidats (créer, dossiers) · Mes inscriptions et convocations · Résultats de mes candidats |
+| Auto-école | Mes candidats (créer, dossiers, compte du candidat) · Mes inscriptions (convocations, présence) · Résultats de mes candidats |
 | Examinateur | Sessions du jour · Mes évaluations |
 | Candidat | Mon parcours (dossier, convocation, résultats) |
 

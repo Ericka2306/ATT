@@ -44,6 +44,13 @@ class MenuParRoleTest {
     }
 
     @Test
+    fun `l auto-ecole voit ses inscriptions, pas la gestion des sessions`() {
+        val routes = menuPour(Role.AUTO_ECOLE).map { it.route }
+        assertTrue(routes.contains(Routes.MES_INSCRIPTIONS))
+        assertFalse(routes.contains(Routes.SESSIONS))
+    }
+
+    @Test
     fun `le candidat ne voit que son parcours et son mot de passe`() {
         assertEquals(listOf(Routes.PARCOURS, Routes.MOT_DE_PASSE), menuPour(Role.CANDIDAT).map { it.route })
     }

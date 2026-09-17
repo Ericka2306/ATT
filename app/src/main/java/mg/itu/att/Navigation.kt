@@ -23,6 +23,8 @@ import mg.itu.att.ui.candidats.CandidatsViewModel
 import mg.itu.att.ui.candidats.EcranDetailCandidat
 import mg.itu.att.ui.candidats.EcranDossier
 import mg.itu.att.ui.candidats.EcranDossiersATraiter
+import mg.itu.att.ui.candidats.EcranFormulaireCompteCandidat
+import mg.itu.att.ui.candidats.EcranParcours
 import mg.itu.att.ui.candidats.EcranFormulaireCandidat
 import mg.itu.att.ui.candidats.EcranListeCandidats
 import mg.itu.att.ui.communs.EcranAVenir
@@ -52,6 +54,8 @@ import mg.itu.att.ui.historique.HistoriqueViewModel
 import mg.itu.att.ui.appel.AppelViewModel
 import mg.itu.att.ui.appel.EcranAppel
 import mg.itu.att.ui.inscriptions.EcranInscriptions
+import mg.itu.att.ui.inscriptions.EcranMesInscriptions
+import mg.itu.att.ui.inscriptions.MesInscriptionsViewModel
 import mg.itu.att.ui.inscriptions.InscriptionsViewModel
 import mg.itu.att.ui.sessions.EcranDetailSession
 import mg.itu.att.ui.sessions.EcranFormulaireSession
@@ -118,7 +122,7 @@ fun AppNavigation() {
 
         // ---------- FONCTIONNALITÉS À VENIR ----------
         val libelles = Role.entries.flatMap { menuPour(it) }.associate { it.route to it.libelle }
-        for (route in listOf(Routes.RESULTATS, Routes.PARCOURS)) {
+        for (route in listOf(Routes.RESULTATS)) {
             composable(route) { EcranAVenir(libelles[route] ?: route, onRetour = { navController.popBackStack() }) }
         }
         composable(Routes.A_VENIR) { entree ->
@@ -458,9 +462,13 @@ object RoutesCandidats {
     const val MODIFIER = "candidat/{candidatId}/modifier"
     const val DOSSIER = "dossier/{dossierId}"
     const val A_TRAITER = Routes.DOSSIERS
+    const val COMPTE = "candidat/{candidatId}/compte"
+    const val PARCOURS = Routes.PARCOURS
+    const val MES_INSCRIPTIONS = Routes.MES_INSCRIPTIONS
     fun detail(id: Int) = "candidat/$id"
     fun modifier(id: Int) = "candidat/$id/modifier"
     fun dossier(id: Int) = "dossier/$id"
+    fun compte(id: Int) = "candidat/$id/compte"
 }
 
 private fun NavGraphBuilder.graphCandidats(nav: NavHostController, session: () -> SessionUtilisateur?) {
@@ -477,7 +485,26 @@ private fun NavGraphBuilder.graphCandidats(nav: NavHostController, session: () -
     composable(RoutesCandidats.DETAIL) { entree ->
         val vm = viewModelDuSousParcours<CandidatsViewModel>(nav, RoutesCandidats.LISTE, session()) ?: return@composable
         val id = entree.idArgument("candidatId") ?: return@composable
-        EcranDetailCandidat(vm, id, onModifier = { nav.navigate(RoutesCandidats.modifier(id)) }, onOuvrirDossier = { nav.navigate(RoutesCandidats.dossier(it)) }, onRetour = retour)
+        EcranDetailCandidat(vm, id, onModifier = { nav.navigate(RoutesCandidats.modifier(id)) }, onOuvrirDossier = { nav.navigate(RoutesCandidats.dossier(it)) }, onCreerCompte = { nav.navigate(RoutesCandidats.compte(id)) }, onRetour = retour)
+    }
+    composable(RoutesCandidats.COMPTE) { entree ->
+        val vm = viewModelDuSousParcours<CandidatsViewModel>(nav, RoutesCandidats.LISTE, session()) ?: return@composable
+        val id = entree.idArgument("candidatId") ?: return@composable
+        EcranFormulaireCompteCandidat(vm, id, onCree = { nav.popBackStack() }, onRetour = retour)
+    }
+    // Le parcours du candidat connecté et les inscriptions de l'auto-école (UC12, étape C12) :
+    // hors du sous-parcours candidats, avec leur propre ViewModel.
+    composable(RoutesCandidats.PARCOURS) {
+        val s = session() ?: return@composable
+        val vm: CandidatsViewModel = viewModel()
+        vm.definirSession(s)
+        EcranParcours(vm, s.candidatId, onOuvrirDossier = { nav.navigate(RoutesCandidats.dossier(it)) }, onRetour = retour)
+    }
+    composable(RoutesCandidats.MES_INSCRIPTIONS) {
+        val s = session() ?: return@composable
+        val vm: MesInscriptionsViewModel = viewModel()
+        vm.definirSession(s)
+        EcranMesInscriptions(vm, onOuvrirCandidat = { nav.navigate(RoutesCandidats.LISTE); nav.navigate(RoutesCandidats.detail(it)) }, onRetour = retour)
     }
     composable(RoutesCandidats.MODIFIER) { entree ->
         val vm = viewModelDuSousParcours<CandidatsViewModel>(nav, RoutesCandidats.LISTE, session()) ?: return@composable

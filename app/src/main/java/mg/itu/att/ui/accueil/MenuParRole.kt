@@ -23,6 +23,7 @@ object Routes {
     const val RESULTATS = "resultats"
     const val HISTORIQUE = "historique"
     const val PARCOURS = "parcours"
+    const val MES_INSCRIPTIONS = "mes-inscriptions"
     const val MOT_DE_PASSE = "mot-de-passe"
 
     /** Écran générique « à venir » : `avenir/{libelle}`. */
@@ -56,7 +57,7 @@ fun menuPour(role: Role): List<EntreeMenu> = when (role) {
     )
     Role.AUTO_ECOLE -> listOf(
         EntreeMenu("Mes candidats", Routes.CANDIDATS, "Créer un candidat, constituer et soumettre un dossier"),
-        EntreeMenu("Mes inscriptions", Routes.SESSIONS, "Sessions et convocations de mes candidats"),
+        EntreeMenu("Mes inscriptions", Routes.MES_INSCRIPTIONS, "Convocations et présence de mes candidats"),
         EntreeMenu("Résultats", Routes.RESULTATS, "Résultats validés de mes candidats"),
     )
     Role.EXAMINATEUR -> listOf(

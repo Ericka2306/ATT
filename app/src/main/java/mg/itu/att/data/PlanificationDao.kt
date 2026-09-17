@@ -41,6 +41,9 @@ interface SessionDao {
 
 @Dao
 interface CreneauDao {
+    @Query("SELECT * FROM creneaux ORDER BY sessionId ASC, ordre ASC")
+    fun tous(): Flow<List<Creneau>>
+
     @Query("SELECT * FROM creneaux WHERE sessionId = :sessionId ORDER BY ordre ASC")
     fun parSession(sessionId: Int): Flow<List<Creneau>>
 

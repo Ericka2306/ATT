@@ -23,14 +23,22 @@ import mg.itu.att.data.ClesRegles
 import mg.itu.att.data.Dossier
 import mg.itu.att.data.EntitesHistorique
 import mg.itu.att.data.Historique
+import mg.itu.att.data.Inscription
 import mg.itu.att.data.PieceDossier
+import mg.itu.att.data.Presence
 import mg.itu.att.data.Role
+import mg.itu.att.data.Session
 import mg.itu.att.data.StatutDossier
+import mg.itu.att.data.Tentative
+import mg.itu.att.data.Utilisateur
 import mg.itu.att.data.resume
 import mg.itu.att.data.tracer
+import mg.itu.att.metier.ReglesConsultation
 import mg.itu.att.metier.ReglesDossier
 import mg.itu.att.metier.ValidationCandidat
+import mg.itu.att.metier.ValidationCompte
 import mg.itu.att.metier.dateDuJour
+import mg.itu.att.securite.MotDePasse
 import mg.itu.att.ui.communs.ViewModelAvecSession
 import mg.itu.att.ui.connexion.SessionUtilisateur
 
@@ -64,14 +72,41 @@ data class EtatFormulaireCandidat(
 
 data class DossierLigne(val dossier: Dossier, val codeCategorie: String, val libelleCategorie: String)
 
+/** Une inscription du candidat avec sa session, son créneau et sa présence (le parcours, UC12). */
+data class InscriptionParcours(
+    val inscription: Inscription,
+    val session: Session?,
+    val libelleSession: String,
+    val nomCentre: String,
+    val heureCreneau: String?,
+    val presence: Presence?,
+    val aVenir: Boolean,
+)
+
+/** Un passage d'épreuve du candidat (« tentative » dans le cadrage), jamais effacé. */
+data class PassageParcours(val tentative: Tentative, val libelleEpreuve: String, val libelleSession: String)
+
 data class EtatDetailCandidat(
     val candidat: Candidat? = null,
     val nomAutoEcole: String = "",
     val dossiers: List<DossierLigne> = emptyList(),
     val categories: List<CategoriePermis> = emptyList(),
     val categorieChoisieId: Int? = null,
+    val inscriptions: List<InscriptionParcours> = emptyList(),
+    val passages: List<PassageParcours> = emptyList(),
+    val comptes: List<Utilisateur> = emptyList(),
     val historique: List<Historique> = emptyList(),
+    /** L'ATT et l'auto-école modifient la fiche et ouvrent des dossiers ; le candidat lit seulement. */
+    val peutGerer: Boolean = false,
+    val peutCreerCompte: Boolean = false,
     val erreur: String? = null,
+)
+
+data class EtatFormulaireCompteCandidat(
+    val identifiant: String = "",
+    val motDePasse: String = "",
+    val erreur: String? = null,
+    val enCours: Boolean = false,
 )
 
 data class EtatDossier(
@@ -242,6 +277,33 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
         erreurDetail.value = null
     }
 
+    /** Inscriptions et passages du candidat, avec les libellés de session (jointures faites ici). */
+    private fun parcours(id: Int) = combine(
+        combine(db.inscriptionDao().parCandidat(id), db.tentativeDao().parCandidat(id), db.presenceDao().toutes()) { i, t, p -> Triple(i, t, p) },
+        combine(db.sessionDao().toutes(), db.creneauDao().tous(), db.centreDao().tous()) { s, c, ce -> Triple(s, c, ce) },
+        combine(db.categoriePermisDao().toutes(), db.typeEpreuveDao().toutes()) { c, e -> c to e },
+    ) { (inscriptions, tentatives, presences), (sessions, creneaux, centres), (categories, epreuves) ->
+        val aujourdHui = dateDuJour()
+        fun libelle(se: Session?) = se?.let {
+            ReglesConsultation.libelleSession(it.date, it.heureConvocation, categories.find { c -> c.id == it.categorieId }?.code ?: "?", epreuves.find { e -> e.id == it.typeEpreuveId }?.libelle ?: "?")
+        } ?: "Session inconnue"
+        val lignes = inscriptions.map { i ->
+            val se = sessions.find { it.id == i.sessionId }
+            InscriptionParcours(
+                inscription = i, session = se, libelleSession = libelle(se),
+                nomCentre = centres.find { it.id == se?.centreId }?.nom ?: "?",
+                heureCreneau = creneaux.find { it.id == i.creneauId }?.heureDebut,
+                presence = presences.find { it.inscriptionId == i.id },
+                aVenir = se != null && ReglesConsultation.estAVenir(se.date, aujourdHui),
+            )
+        }
+        val passages = tentatives.map { t ->
+            val se = sessions.find { it.id == inscriptions.find { i -> i.id == t.inscriptionId }?.sessionId }
+            PassageParcours(t, epreuves.find { it.id == t.typeEpreuveId }?.libelle ?: "?", libelle(se))
+        }
+        lignes to passages
+    }
+
     val detail: StateFlow<EtatDetailCandidat> =
         idDetail.flatMapLatest { id ->
             combine(
@@ -260,11 +322,65 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
                     },
                     categories = categories,
                     historique = historique,
+                ) to autoEcoles.find { it.id == candidat?.autoEcoleId }?.regionId
+            }.combine(combine(parcours(id), db.utilisateurDao().parCandidat(id), session) { p, c, s -> Triple(p, c, s) }) { (etat, regionAutoEcole), (parcours, comptes, s) ->
+                val (inscriptions, passages) = parcours
+                val c = etat.candidat
+                // Un candidat hors du périmètre de l'utilisateur n'est pas affiché : « introuvable », comme un id invalide.
+                val visible = c != null && s != null &&
+                    ReglesConsultation.peutVoirCandidat(s.role, s.regionId, s.autoEcoleId, s.candidatId, c.id, c.autoEcoleId, regionAutoEcole)
+                if (!visible) EtatDetailCandidat() else etat.copy(
+                    inscriptions = inscriptions, passages = passages, comptes = comptes,
+                    peutGerer = ReglesConsultation.peutGererCandidat(s.role),
+                    peutCreerCompte = ReglesConsultation.peutCreerCompteCandidat(s.role) && comptes.isEmpty(),
                 )
             }
         }.combine(combine(categorieChoisie, erreurDetail) { c, e -> c to e }) { etat, (choix, erreur) ->
             etat.copy(categorieChoisieId = choix, erreur = erreur)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EtatDetailCandidat())
+
+    // ----- Compte de connexion du candidat (facultatif, cadrage §10) -----
+
+    private val _compte = MutableStateFlow(EtatFormulaireCompteCandidat())
+    val compte: StateFlow<EtatFormulaireCompteCandidat> = _compte
+
+    fun modifierCompte(transformation: (EtatFormulaireCompteCandidat) -> EtatFormulaireCompteCandidat) =
+        _compte.update { transformation(it).copy(erreur = null) }
+
+    /** Crée le compte CANDIDAT lié, mot de passe haché, avec historique, puis appelle [onSucces]. */
+    fun creerCompte(candidatId: Int, onSucces: () -> Unit) {
+        val c = _compte.value
+        val utilisateur = session.value ?: return
+        if (!ReglesConsultation.peutCreerCompteCandidat(utilisateur.role)) return
+        viewModelScope.launch {
+            val erreur = ValidationCompte.validerCreation(c.identifiant, c.motDePasse, db.utilisateurDao().tousLesIdentifiants())
+            val candidat = db.candidatDao().parId(candidatId)
+            when {
+                erreur != null -> _compte.update { it.copy(erreur = erreur) }
+                candidat == null -> _compte.update { it.copy(erreur = "Candidat introuvable.") }
+                else -> {
+                    _compte.update { it.copy(enCours = true) }
+                    val autoEcole = db.autoEcoleDao().parId(candidat.autoEcoleId)
+                    db.withTransaction {
+                        val id = db.utilisateurDao().inserer(
+                            Utilisateur(
+                                identifiant = c.identifiant.trim(),
+                                motDePasseHash = MotDePasse.hacher(c.motDePasse),
+                                nom = "${candidat.nom} ${candidat.prenom}",
+                                role = Role.CANDIDAT,
+                                regionId = autoEcole?.regionId,
+                                candidatId = candidatId,
+                            ),
+                        ).toInt()
+                        db.tracer(EntitesHistorique.UTILISATEUR, id, ActionsHistorique.CREATION_COMPTE, utilisateur.id, nouvelleValeur = "compte ${c.identifiant.trim()} (CANDIDAT) pour ${candidat.nom} ${candidat.prenom}")
+                        db.tracer(EntitesHistorique.CANDIDAT, candidatId, ActionsHistorique.CREATION_COMPTE, utilisateur.id, nouvelleValeur = "compte ${c.identifiant.trim()}")
+                    }
+                    _compte.value = EtatFormulaireCompteCandidat()
+                    onSucces()
+                }
+            }
+        }
+    }
 
     /** Ouvre un dossier BROUILLON pour la catégorie choisie, avec ses pièces attendues, puis appelle [onSucces] avec son id. */
     fun ouvrirDossier(candidatId: Int, onSucces: (Int) -> Unit) {
@@ -328,7 +444,7 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
                     historique = historique,
                     motif = m,
                     erreur = e,
-                    peutSoumettre = dossier != null && (dossier.statut == StatutDossier.BROUILLON || dossier.statut == StatutDossier.INCOMPLET),
+                    peutSoumettre = dossier != null && (dossier.statut == StatutDossier.BROUILLON || dossier.statut == StatutDossier.INCOMPLET) && s != null && ReglesConsultation.peutGererCandidat(s.role),
                     peutDecider = dossier?.statut == StatutDossier.SOUMIS && estAtt(s),
                 )
             }.map { etat ->

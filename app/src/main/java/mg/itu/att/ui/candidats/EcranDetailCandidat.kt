@@ -2,12 +2,14 @@ package mg.itu.att.ui.candidats
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +36,7 @@ fun EcranDetailCandidat(
     candidatId: Int,
     onModifier: () -> Unit,
     onOuvrirDossier: (Int) -> Unit,
+    onCreerCompte: () -> Unit,
     onRetour: () -> Unit,
 ) {
     viewModel.afficherDetail(candidatId)
@@ -43,9 +46,9 @@ fun EcranDetailCandidat(
     EcranStandard(
         titre = c?.let { "${it.nom} ${it.prenom}" } ?: "Candidat",
         onRetour = onRetour,
-        iconeAction = Icons.Filled.Edit,
+        iconeAction = if (etat.peutGerer) Icons.Filled.Edit else null,
         descriptionAction = "Modifier",
-        onAction = onModifier,
+        onAction = if (etat.peutGerer) onModifier else null,
     ) {
         if (c == null) {
             Text("Candidat introuvable.")
@@ -74,13 +77,35 @@ fun EcranDetailCandidat(
                     complement = { PastilleDossier(ligne.dossier.statut) },
                 )
             }
-            item {
-                Spacer(Modifier.height(12.dp))
-                SelecteurChoix("Catégorie", etat.categories.map { Option(it.id, "${it.code} — ${it.libelle}") }, etat.categorieChoisieId, viewModel::choisirCategorie, libelleVide = "à choisir")
-                TexteErreur(etat.erreur)
-                Button(onClick = { viewModel.ouvrirDossier(c.id, onSucces = onOuvrirDossier) }) { Text("Ouvrir un dossier") }
-                TitreSection("Historique")
+            if (etat.peutGerer) {
+                item {
+                    Spacer(Modifier.height(12.dp))
+                    SelecteurChoix("Catégorie", etat.categories.map { Option(it.id, "${it.code} — ${it.libelle}") }, etat.categorieChoisieId, viewModel::choisirCategorie, libelleVide = "à choisir")
+                    TexteErreur(etat.erreur)
+                    Button(onClick = { viewModel.ouvrirDossier(c.id, onSucces = onOuvrirDossier) }) { Text("Ouvrir un dossier") }
+                }
             }
+            // Le parcours (UC12) : mêmes sections que « Mon parcours » du candidat.
+            sectionInscriptions(etat.inscriptions)
+            sectionPassages(etat.passages)
+            if (etat.peutGerer) {
+                item {
+                    TitreSection("Compte de connexion")
+                    if (etat.comptes.isEmpty()) {
+                        Text("Aucun compte : le candidat suit son parcours par son auto-école (compte facultatif).", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+                items(etat.comptes) { compte ->
+                    Text("• ${compte.identifiant}" + if (compte.actif) "" else " (désactivé)", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 2.dp))
+                }
+                if (etat.peutCreerCompte) {
+                    item {
+                        Spacer(Modifier.height(8.dp))
+                        OutlinedButton(onClick = onCreerCompte) { Text("Créer un compte") }
+                    }
+                }
+            }
+            item { TitreSection("Historique") }
             items(etat.historique) { LigneHistorique(it) }
         }
     }

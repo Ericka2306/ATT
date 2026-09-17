@@ -463,3 +463,46 @@ Réassignée au dev 1 le 16/09 (le dev 2 n'avait pas commencé) ; le dev 2 repre
 - `app/src/main/java/mg/itu/att/Navigation.kt` — `graphHistorique` ajouté, `HISTORIQUE` retiré des routes « à venir ».
 - `docs/02_PLAN_DE_TRAVAIL.md` — avancement et répartition.
 - `docs/captures/C12a_*.png` — 4 captures de l'émulateur.
+
+---
+
+## Étape C12 — Consultation par rôle (UC12) — 17/09/2026
+
+> Suite de C12a (historique, PR #15). Cette étape complète la consultation : le parcours d'un candidat (inscriptions, passages), son compte de connexion facultatif, « Mon parcours » côté candidat et « Mes inscriptions » côté auto-école. La consultation des résultats validés arrive avec C11, qui les crée.
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `metier/ReglesConsultation.kt` — `peutVoirCandidat` (Super Admin tout ; Admin ATT sa région ; auto-école ses candidats ; candidat lui-même ; examinateur aucune fiche, il travaille sur des numéros d'appel), `peutGererCandidat` / `peutCreerCompteCandidat` (ATT et auto-école), `estAVenir`, `libelleSession`. Fonctions pures, date du jour en paramètre. 6 tests.
+- `ui/candidats/SectionsParcours.kt` — sections « Inscriptions et convocations » et « Passages d'épreuve » (`LazyListScope`), partagées par la fiche candidat et « Mon parcours » ; `PastilleTentative` et le libellé des statuts de passage.
+- `ui/candidats/EcranParcours.kt` — « Mon parcours » du candidat connecté : identité, dossiers, inscriptions, passages, en lecture seule ; message explicite si le compte n'est rattaché à aucun candidat.
+- `ui/candidats/EcranFormulaireCompteCandidat.kt` — création du compte de connexion d'un candidat (compte facultatif, cadrage §10), même formulaire que celui d'une auto-école, mot de passe haché.
+- `ui/inscriptions/MesInscriptionsViewModel.kt` + `EcranMesInscriptions.kt` — « Mes inscriptions » de l'auto-école : convocations de ses candidats (à venir / passées / toutes), centre, créneau, passage estimé, numéro d'appel, présence ; lecture seule, les actions restent sur l'écran d'inscriptions d'une session.
+- Captures `C12_fiche_candidat.png`, `C12_fiche_candidat_parcours.png`, `C12_compte_candidat_cree.png`, `C12_mes_inscriptions_auto_ecole.png`, `C12_accueil_candidat.png`, `C12_mon_parcours.png`, `C12_dossier_lecture_seule.png` (prises sur l'émulateur).
+
+**Modifié**
+- `ui/candidats/CandidatsViewModel.kt` — `EtatDetailCandidat` porte désormais les inscriptions (avec session, centre, créneau, présence), les passages, les comptes et les droits (`peutGerer`, `peutCreerCompte`) ; un candidat hors périmètre n'est pas affiché (« introuvable », comme un identifiant invalide) ; `creerCompte` (rôle CANDIDAT, tracé deux fois : compte et candidat) ; le candidat ne peut plus soumettre un dossier (`peutSoumettre` restreint aux gestionnaires).
+- `ui/candidats/EcranDetailCandidat.kt` — sections du parcours, bloc « Compte de connexion », actions de gestion masquées pour un lecteur.
+- `data/ActeursDao.kt` — `UtilisateurDao.parCandidat` ; `data/PlanificationDao.kt` — `CreneauDao.tous`.
+- `ui/accueil/MenuParRole.kt` — l'auto-école a « Mes inscriptions » (route `mes-inscriptions`) au lieu de la liste des sessions de l'ATT ; `Navigation.kt` — routes `candidat/{id}/compte`, `parcours`, `mes-inscriptions` (plus d'écran « à venir » pour le parcours).
+- `docs/05_CAS_UTILISATION.md` (nouvelles routes, menu auto-école), `docs/02_PLAN_DE_TRAVAIL.md` (C12 🟢, prochaine étape C11).
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : 83 tests verts (76 + 6 de `ReglesConsultation` + 1 sur le menu de l'auto-école).
+- Émulateur (pilote par texte) : `superadmin` crée le centre ATT Soarano ; `admin` ouvre le dossier B de RAKOTO Jean, le soumet et le valide, crée la session du jour, inscrit le candidat (n° 001, créneau 08:00), fait l'appel, puis ouvre sa fiche : sections « Inscriptions et convocations » (centre, n° d'appel, créneau, passage estimé, présence) et « Passages d'épreuve » visibles, compte `rakoto` créé et tracé ; `lalana` (auto-école) : « Mes inscriptions » affiche 1 inscription à venir de son candidat et ouvre sa fiche ; `rakoto` (candidat) : accueil réduit à « Mon parcours », parcours en lecture seule, dossier consultable **sans** bouton « Soumettre à l'ATT ».
+- Captures vérifiées une par une (Read).
+
+**Décisions restantes**
+1. Le compte candidat est créé par l'ATT ou par l'auto-école depuis la fiche (le candidat ne s'inscrit pas lui-même) : cohérent avec le cadrage §4 et l'absence de serveur. À confirmer avec le binôme.
+2. L'examinateur ne consulte aucune fiche candidat (il travaille par numéro d'appel, Q4) : sa vue « Mes évaluations » viendra avec C11.
+3. Un administrateur régional filtre par la région de l'auto-école du candidat (le candidat n'a pas de région propre). À confirmer (Q11).
+4. Étape suivante : C11 (calcul et validation des résultats, avec leur consultation par rôle).
+
+**À relire**
+- `app/src/main/java/mg/itu/att/metier/ReglesConsultation.kt` — nouveau : permissions de consultation, période, libellé de session.
+- `app/src/test/java/mg/itu/att/metier/ReglesConsultationTest.kt` — nouveau : 6 tests ; `ui/accueil/MenuParRoleTest.kt` — test du menu auto-école.
+- `app/src/main/java/mg/itu/att/ui/candidats/SectionsParcours.kt`, `EcranParcours.kt`, `EcranFormulaireCompteCandidat.kt` — nouveaux.
+- `app/src/main/java/mg/itu/att/ui/candidats/CandidatsViewModel.kt` — parcours, comptes, droits, création du compte candidat.
+- `app/src/main/java/mg/itu/att/ui/candidats/EcranDetailCandidat.kt` — sections du parcours et compte, actions selon le rôle.
+- `app/src/main/java/mg/itu/att/ui/inscriptions/MesInscriptionsViewModel.kt`, `EcranMesInscriptions.kt` — nouveaux.
+- `app/src/main/java/mg/itu/att/data/ActeursDao.kt`, `PlanificationDao.kt` — deux requêtes ajoutées.
+- `app/src/main/java/mg/itu/att/ui/accueil/MenuParRole.kt`, `Navigation.kt` — menu et routes.
+- `docs/02_PLAN_DE_TRAVAIL.md`, `docs/05_CAS_UTILISATION.md`, `docs/captures/C12_*.png` — 7 captures de l'émulateur.
