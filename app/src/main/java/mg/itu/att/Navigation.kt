@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import mg.itu.att.data.EntitesHistorique
 import mg.itu.att.data.Role
 import mg.itu.att.ui.accueil.EcranAccueil
 import mg.itu.att.ui.accueil.Routes
@@ -46,6 +47,8 @@ import mg.itu.att.ui.evaluation.EcranSessionsExaminateur
 import mg.itu.att.ui.evaluation.EvaluationTheorieViewModel
 import mg.itu.att.ui.evaluation.EcranTentatives
 import mg.itu.att.ui.evaluation.TentativesViewModel
+import mg.itu.att.ui.historique.EcranHistorique
+import mg.itu.att.ui.historique.HistoriqueViewModel
 import mg.itu.att.ui.appel.AppelViewModel
 import mg.itu.att.ui.appel.EcranAppel
 import mg.itu.att.ui.inscriptions.EcranInscriptions
@@ -111,15 +114,46 @@ fun AppNavigation() {
         graphComptes(navController) { session }
         graphConfiguration(navController) { session }
         graphSessions(navController) { session }
+        graphHistorique(navController) { session }
 
         // ---------- FONCTIONNALITÉS À VENIR ----------
         val libelles = Role.entries.flatMap { menuPour(it) }.associate { it.route to it.libelle }
-        for (route in listOf(Routes.RESULTATS, Routes.HISTORIQUE, Routes.PARCOURS)) {
+        for (route in listOf(Routes.RESULTATS, Routes.PARCOURS)) {
             composable(route) { EcranAVenir(libelles[route] ?: route, onRetour = { navController.popBackStack() }) }
         }
         composable(Routes.A_VENIR) { entree ->
             EcranAVenir(entree.arguments?.getString("libelle") ?: "À venir", onRetour = { navController.popBackStack() })
         }
+    }
+}
+
+// ---------- HISTORIQUE (UC14, étape C12) ----------
+
+/**
+ * Historique global (menu Super Admin et Admin ATT). Un clic sur une ligne ouvre la fiche de l'objet.
+ * Les fiches candidat, session et auto-école vivent dans un sous-parcours dont la liste est la racine
+ * (`viewModelDuSousParcours`) : on ouvre d'abord la liste, puis la fiche, pour que la racine soit dans la pile.
+ */
+private fun NavGraphBuilder.graphHistorique(nav: NavHostController, session: () -> SessionUtilisateur?) {
+    val retour: () -> Unit = { nav.popBackStack() }
+
+    fun peutOuvrir(entite: String) = entite in listOf(
+        EntitesHistorique.CANDIDAT, EntitesHistorique.DOSSIER, EntitesHistorique.SESSION, EntitesHistorique.AUTO_ECOLE,
+    )
+
+    fun ouvrir(entite: String, id: Int) = when (entite) {
+        EntitesHistorique.CANDIDAT -> { nav.navigate(RoutesCandidats.LISTE); nav.navigate(RoutesCandidats.detail(id)) }
+        EntitesHistorique.DOSSIER -> nav.navigate(RoutesCandidats.dossier(id))
+        EntitesHistorique.SESSION -> { nav.navigate(RoutesSessions.LISTE); nav.navigate(RoutesSessions.detail(id)) }
+        EntitesHistorique.AUTO_ECOLE -> { nav.navigate(RoutesAutoEcoles.LISTE); nav.navigate(RoutesAutoEcoles.detail(id)) }
+        else -> Unit
+    }
+
+    composable(Routes.HISTORIQUE) {
+        val s = session() ?: return@composable
+        val vm: HistoriqueViewModel = viewModel()
+        vm.definirSession(s)
+        EcranHistorique(vm, peutOuvrir = ::peutOuvrir, onOuvrir = ::ouvrir, onRetour = retour)
     }
 }
 

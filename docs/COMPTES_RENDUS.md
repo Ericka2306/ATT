@@ -429,3 +429,37 @@ Réassignée au dev 1 le 16/09 (le dev 2 n'avait pas commencé) ; le dev 2 repre
 - `app/src/main/java/mg/itu/att/data/ExamensDao.kt`, `ReferentielsDao.kt` — requêtes ajoutées.
 - `app/src/main/java/mg/itu/att/Navigation.kt` — route conduite branchée.
 - `docs/02_PLAN_DE_TRAVAIL.md`, `docs/04_QUESTIONS_A_VALIDER.md`, `JOURNAL-IA.md`, `docs/captures/C10_*.png`.
+
+---
+
+## Étape C12a — Historique des modifications (UC14) — 17/09/2026
+
+> Première sous-étape de C12 (consultation par rôle), reprise par le dev 2. Cette partie (historique) est livrée seule ; le reste de C12 suit dans une pull request unique, comme les étapes précédentes.
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `metier/FiltresHistorique.kt` — `peutConsulter(role)` (Super Admin et Admin ATT seulement, docs/01 §6), `joursAvant`, `dateDebut(periode, aujourdHui)`, `filtrer(lignes, entite, utilisateurId, periode, aujourdHui)` (filtres combinables, ordre du DAO conservé), `entitesPresentes`, `libelleEntite` (« Passage » pour `Tentative`, comme à l'écran). Fonctions pures, la date du jour est un paramètre. 6 tests.
+- `ui/historique/HistoriqueViewModel.kt` — `EtatHistorique` (lignes avec libellé d'objet et nom d'utilisateur, filtres choisis, objets et utilisateurs présents, `autorise`, total) construit par `combine(historiqueDao.tout(), utilisateurDao.tous(), filtres, session).stateIn`. Aucune écriture. Un rôle non autorisé reçoit un état vide.
+- `ui/historique/EcranHistorique.kt` — périodes en `FilterChip` (Tout / Aujourd'hui / 7 jours / 30 jours), sélecteurs « Objet » et « Utilisateur » (`SelecteurChoix` avec « Tous »), compteur « n modification(s) sur total », une `CarteIcone` par ligne (date, action, objet n°, auteur, résumé, motif). Un clic ouvre la fiche de l'objet quand elle existe.
+- Captures `C12a_historique.png`, `C12a_historique_filtre_candidat.png`, `C12a_ouverture_fiche.png`, `C12a_menu_auto_ecole_sans_historique.png` (prises sur l'émulateur).
+
+**Modifié**
+- `Navigation.kt` — `graphHistorique` : route `historique` branchée sur `EcranHistorique` (retirée de la boucle « à venir ») ; ouverture d'une fiche candidat, dossier, session ou auto-école depuis une ligne (la liste racine du sous-parcours est empilée avant la fiche, pour que `viewModelDuSousParcours` trouve son entrée de pile).
+- `docs/02_PLAN_DE_TRAVAIL.md` — tableau « Où en est-on ? » (C10 fusionnée, C12a terminée, prochaine : reste de C12), répartition : le dev 2 reprend C11 à C13 et D1.
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : 73 tests verts (67 + 6).
+- Émulateur (pilote par texte, base vide) : `admin` crée l'auto-école « Auto-ecole Lalana » (Analamanga), le candidat RAKOTO Jean et le compte `lalana` → Historique : « 2 modification(s) sur 2 » puis 3, ordre du plus récent au plus ancien, objet et auteur affichés ; filtre Objet = Candidat → 1 ligne ; Aujourd'hui → toutes ; Utilisateur = Administrateur ATT → toutes ; clic sur la ligne auto-école → fiche « Auto-ecole Lalana » ; retour → Historique. Connexion `lalana` (auto-école) : le menu n'a pas d'entrée Historique.
+
+**Décisions restantes**
+1. La route `historique/{entite}/{entiteId}` prévue dans docs/05 §4.1 n'est pas ajoutée : chaque fiche (candidat, dossier, session, auto-école) affiche déjà son propre historique (`LigneHistorique`), et l'écran global ouvre la fiche. À retirer de docs/05 si le binôme confirme.
+2. Le filtre « Objet » ne propose que les objets présents dans l'historique (pas la liste complète des entités), pour éviter les choix vides.
+3. Étape suivante : reste de C12 (sections inscriptions et passages sur la fiche candidat, compte et parcours candidat, inscriptions de l'auto-école).
+
+**À relire**
+- `app/src/main/java/mg/itu/att/metier/FiltresHistorique.kt` — nouveau : permission, périodes, filtrage, libellés.
+- `app/src/test/java/mg/itu/att/metier/FiltresHistoriqueTest.kt` — nouveau : 6 tests (rôles, jours avant, début de période, filtres combinés, libellés).
+- `app/src/main/java/mg/itu/att/ui/historique/HistoriqueViewModel.kt` — nouveau : état de l'écran, lecture seule.
+- `app/src/main/java/mg/itu/att/ui/historique/EcranHistorique.kt` — nouveau : l'écran et ses filtres.
+- `app/src/main/java/mg/itu/att/Navigation.kt` — `graphHistorique` ajouté, `HISTORIQUE` retiré des routes « à venir ».
+- `docs/02_PLAN_DE_TRAVAIL.md` — avancement et répartition.
+- `docs/captures/C12a_*.png` — 4 captures de l'émulateur.
