@@ -7,11 +7,11 @@
 
 | | |
 |---|---|
-| **Dernière étape terminée** | C6 (inscriptions) — 16/09/2026, en attente de fusion (PR de `etape-C6-inscriptions`, après les PR #8 et #9) |
+| **Dernière étape terminée** | C7 (présence et appel) — 16/09/2026, en attente de fusion (PR de `etape-C7-appel`, après #8, #9, #10) |
 | **Étape en cours** | aucune |
-| **Prochaine étape** | C7 (présence et appel) — dev 1 |
+| **Prochaine étape** | C8 (tentatives) — dev 1 |
 | **Dev 2 peut démarrer** | à son arrivée : C12 (consultation, parcours candidat) sur une branche `etape-C12-…` depuis `main` ; modèle à suivre : `graphCandidats` dans `Navigation.kt` |
-| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape C6 » |
+| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape C7 » |
 | **Dernier commit poussé** | `main` — « Merge pull request #4 » (étape C1) |
 
 Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une question à valider
@@ -46,7 +46,7 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 | C4 Catégories et règles configurables | écrans Super Admin : catégories, types d'épreuve, barèmes versionnés, `RegleConfig`, questions/réponses, critères pratiques (structure) | `ui/configuration/` | aucune valeur en dur dans le code ; changement d'un seuil visible au calcul | 🟢 16/09/2026 (dev 1, réassignée) |
 | C5 Centres, sessions, créneaux | CRUD centres (région), création session (catégorie, épreuve, centre, date, capacité, convocation, durée/marge), génération automatique des créneaux, statuts, annulation | `ui/sessions/` | **Créer une session et ses créneaux** ; capacité respectée | 🟢 16/09/2026 (dev 1 ; centres faits en C4) |
 | C6 Inscriptions | inscription d'un candidat éligible (dossier VALIDE, catégorie, capacité, doublon, région selon règle), affectation créneau, heure de passage estimée, report/annulation, historique | `ui/sessions/EcranInscriptions` | **Inscrire un candidat** ; session complète et double inscription refusées | 🟢 16/09/2026 |
-| C7 Présence | liste d'appel, statuts présent/absent/retard/en cours/terminé, tolérance de retard configurable, réorganisation selon règle, historique | `ui/sessions/EcranAppel` | **Enregistrer présence** | 🔒 Q4 (valeur par défaut) |
+| C7 Présence | liste d'appel, statuts présent/absent/retard/en cours/terminé, tolérance de retard configurable, réorganisation selon règle, historique | `ui/sessions/EcranAppel` | **Enregistrer présence** | 🟢 16/09/2026 (valeurs par défaut Q4 : tolérance 15 min, absent = nouvelle inscription) |
 | C8 Tentatives | ouverture d'une tentative pour un candidat présent, numérotation, examinateur saisi à ce moment, épreuves à repasser | `ui/evaluation/EcranTentatives`, `metier/ReglesTentatives.kt` | **Créer une tentative** ; tentatives conservées | ⚪ |
 | C9 Évaluation théorique | saisie des réponses du candidat question par question (ou saisie directe du nombre de points si procédure papier), observations | `ui/evaluation/EcranEvaluationTheorie` | **Évaluer** ; réponses stockées | 🔒 Q1 (format exact) |
 | C10 Structure conduite | écran de saisie des critères/notes/observations/fautes, sans grille imposée (données de configuration vides) | `ui/evaluation/EcranEvaluationConduite` | écran fonctionnel avec critères de démonstration marqués « à confirmer » | 🔒 Q2 |

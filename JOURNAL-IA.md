@@ -140,7 +140,22 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 10 — <date> — <tâche>
+## Entrée 10 — 16/09/2026 — Étape C7, présence et appel
+
+- Code soumis : `metier/ReglesPresence.kt`, `ui/appel/*`, schéma v2 des inscriptions.
+- Remarque principale de l'IA : la vérification sur émulateur a révélé un vrai défaut de conception, pas un bug de frappe : l'index unique (candidat, session) en base contredisait la règle métier « une inscription reportée ou annulée peut être suivie d'une nouvelle ». Le test unitaire de la règle passait ; seule la base réelle a montré la contradiction. Leçon pour le binôme : les invariants qui dépendent d'un statut ne se mettent pas dans un index SQL, mais dans une fonction pure.
+
+⚠️ La correction change le schéma (v2) avec `fallbackToDestructiveMigration` : les données de test de l'émulateur sont perdues, ce qui est accepté en développement (docs/01 §7) ; le pilote a rejoué toute la chaîne depuis une base vide en une passe.
+
+⚠️ L'horloge de l'émulateur (19 h) fait classer tout « Présent » en retard pour une convocation à 08:00 : ce n'est pas une anomalie, c'est la règle. Le scénario a donc exercé le chemin « retard accepté » plutôt que « présent direct ».
+
+⚠️ Deux perturbations sans lien avec le code : des projets du cours lancés sur le même émulateur passaient devant ATT ; puis l'émulateur a été fermé et relancé par l'IA. Le pilote vérifie désormais qu'ATT est au premier plan avant chaque action.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 1>.
+
+---
+
+## Entrée 11 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :

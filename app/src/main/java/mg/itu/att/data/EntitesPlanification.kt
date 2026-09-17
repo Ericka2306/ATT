@@ -62,7 +62,11 @@ data class Creneau(
 /** DEMANDE = demandée par l'auto-école, à confirmer par l'ATT (si la règle l'autorise, Q8). */
 enum class StatutInscription { DEMANDE, INSCRIT, CONFIRME, REPORTE, ANNULE }
 
-/** L'inscription d'un candidat (dossier validé) à une session. Un candidat par session au plus. */
+/**
+ * L'inscription d'un candidat (dossier validé) à une session.
+ * Une seule inscription ACTIVE par candidat et par session : c'est `ReglesInscription.verifier` qui le garantit
+ * (une inscription annulée ou reportée peut être suivie d'une nouvelle sur la même session), pas un index unique.
+ */
 @Entity(
     tableName = "inscriptions",
     foreignKeys = [
@@ -71,10 +75,7 @@ enum class StatutInscription { DEMANDE, INSCRIT, CONFIRME, REPORTE, ANNULE }
         ForeignKey(entity = Session::class, parentColumns = ["id"], childColumns = ["sessionId"]),
         ForeignKey(entity = Creneau::class, parentColumns = ["id"], childColumns = ["creneauId"]),
     ],
-    indices = [
-        Index(value = ["candidatId", "sessionId"], unique = true),
-        Index("dossierId"), Index("sessionId"), Index("creneauId"),
-    ],
+    indices = [Index("candidatId"), Index("dossierId"), Index("sessionId"), Index("creneauId")],
 )
 data class Inscription(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,

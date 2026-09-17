@@ -90,6 +90,8 @@ fun Question.resume(): String = "« ${enonce.take(60)} » ($points pt, ${if (act
 
 fun CriterePratique.resume(): String = "$libelle ($points pt${if (eliminatoire) ", éliminatoire" else ""}, ${if (actif) "actif" else "inactif"})"
 
+fun Presence.resume(): String = "présence de l'inscription $inscriptionId : $statut${heureArrivee?.let { ", arrivée $it" } ?: ""}${remarque?.let { ", $it" } ?: ""}"
+
 fun Inscription.resume(): String = "inscription n° $id, candidat $candidatId, session $sessionId, créneau ${creneauId ?: "—"}, n° d'appel $numeroAnonymat, statut $statut${motif?.let { ", motif : $it" } ?: ""}"
 
 fun Session.resume(): String = "session n° $id du $date à $heureConvocation, centre $centreId, catégorie $categorieId, épreuve $typeEpreuveId, capacité $capacite, statut $statut"
