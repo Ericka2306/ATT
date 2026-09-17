@@ -34,6 +34,7 @@ import mg.itu.att.metier.ModesTheorie
 import mg.itu.att.metier.NoteQuestion
 import mg.itu.att.metier.ReglesTheorie
 import mg.itu.att.metier.maintenantIso
+import mg.itu.att.metier.pointsValides
 import mg.itu.att.ui.communs.ViewModelAvecSession
 import mg.itu.att.ui.connexion.SessionUtilisateur
 import kotlin.random.Random
@@ -247,7 +248,7 @@ class EvaluationTheorieViewModel(application: Application) : AndroidViewModel(ap
         val ligne = db.reponseCandidatDao().pourQuestion(evaluation.id, questionId) ?: return
         val question = db.questionDao().parId(questionId) ?: return
         db.reponseCandidatDao().modifier(
-            ligne.copy(reponseDonnee = saisie.reponse.trim().ifBlank { null }, pointsAttribues = ReglesTheorie.pointsValides(saisie.points, question.points)),
+            ligne.copy(reponseDonnee = saisie.reponse.trim().ifBlank { null }, pointsAttribues = pointsValides(saisie.points, question.points)),
         )
     }
 

@@ -97,8 +97,14 @@ interface EvaluationCritereDao {
     @Query("SELECT * FROM evaluations_critere WHERE evaluationId = :evaluationId ORDER BY critereId ASC")
     suspend fun listePourEvaluation(evaluationId: Int): List<EvaluationCritere>
 
+    @Query("SELECT * FROM evaluations_critere WHERE evaluationId = :evaluationId AND critereId = :critereId LIMIT 1")
+    suspend fun pourCritere(evaluationId: Int, critereId: Int): EvaluationCritere?
+
     @Insert
     suspend fun inserer(evaluationCritere: EvaluationCritere): Long
+
+    @Insert
+    suspend fun insererToutes(lignes: List<EvaluationCritere>)
 
     @Update
     suspend fun modifier(evaluationCritere: EvaluationCritere)

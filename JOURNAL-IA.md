@@ -183,7 +183,20 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 13 — <date> — <tâche>
+## Entrée 13 — 17/09/2026 — Étape C10, structure de l'épreuve de conduite
+
+- Code soumis : `metier/ReglesConduite.kt`, `metier/Points.kt`, `ui/evaluation/EvaluationConduiteViewModel.kt`, `EcranEvaluationConduite.kt`.
+- Remarque principale de l'IA : l'écran de conduite est bâti sur le même patron que la théorie (feuille = lignes créées à l'ouverture, saisie exposée directement, clôture tracée), sans copier la logique : ce qui était commun (`pointsValides`) a été sorti dans `metier/Points.kt`. Une faute éliminatoire vaut 0 point sur son critère et perd l'épreuve, mais l'application ne fixe aucune grille : tout vient de la configuration.
+
+⚠️ Après la correction de C9 (QCM → oral), l'IA n'a pas de témoignage sur le déroulement réel de l'épreuve de conduite : la structure « critères, points, faute éliminatoire, observation » est une hypothèse de travail. Le dev 1, qui vient de passer l'examen, est la meilleure source : à décrire avant C11.
+
+⚠️ Pendant la vérification, l'inscription à une seconde session le même jour a été refusée par la règle de conflit de créneaux (C6) : comportement voulu, mais il oblige à planifier théorie et conduite à des dates ou heures différentes.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 1>.
+
+---
+
+## Entrée 14 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :
