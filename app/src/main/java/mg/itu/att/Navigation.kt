@@ -56,6 +56,9 @@ import mg.itu.att.ui.appel.EcranAppel
 import mg.itu.att.ui.inscriptions.EcranInscriptions
 import mg.itu.att.ui.inscriptions.EcranMesInscriptions
 import mg.itu.att.ui.inscriptions.MesInscriptionsViewModel
+import mg.itu.att.ui.resultats.EcranDetailResultat
+import mg.itu.att.ui.resultats.EcranResultats
+import mg.itu.att.ui.resultats.ResultatsViewModel
 import mg.itu.att.ui.inscriptions.InscriptionsViewModel
 import mg.itu.att.ui.sessions.EcranDetailSession
 import mg.itu.att.ui.sessions.EcranFormulaireSession
@@ -120,14 +123,43 @@ fun AppNavigation() {
         graphSessions(navController) { session }
         graphHistorique(navController) { session }
 
+        graphResultats(navController) { session }
+
         // ---------- FONCTIONNALITÉS À VENIR ----------
-        val libelles = Role.entries.flatMap { menuPour(it) }.associate { it.route to it.libelle }
-        for (route in listOf(Routes.RESULTATS)) {
-            composable(route) { EcranAVenir(libelles[route] ?: route, onRetour = { navController.popBackStack() }) }
-        }
         composable(Routes.A_VENIR) { entree ->
             EcranAVenir(entree.arguments?.getString("libelle") ?: "À venir", onRetour = { navController.popBackStack() })
         }
+    }
+}
+
+// ---------- RÉSULTATS (UC10, UC11, UC12, étape C11) ----------
+
+object RoutesResultats {
+    const val LISTE = Routes.RESULTATS
+    const val DETAIL = "resultat/{resultatId}"
+    fun detail(id: Int) = "resultat/$id"
+}
+
+/**
+ * Résultats : la file « à valider » de l'ATT, les résultats validés de l'auto-école et du candidat,
+ * les évaluations saisies par l'examinateur. Un seul écran, filtré par le ViewModel selon le rôle.
+ */
+private fun NavGraphBuilder.graphResultats(nav: NavHostController, session: () -> SessionUtilisateur?) {
+    val retour: () -> Unit = { nav.popBackStack() }
+
+    composable(RoutesResultats.LISTE) {
+        val vm = viewModelDuSousParcours<ResultatsViewModel>(nav, RoutesResultats.LISTE, session()) ?: return@composable
+        EcranResultats(vm, onOuvrir = { nav.navigate(RoutesResultats.detail(it)) }, onRetour = retour)
+    }
+    composable(RoutesResultats.DETAIL) { entree ->
+        val vm = viewModelDuSousParcours<ResultatsViewModel>(nav, RoutesResultats.LISTE, session()) ?: return@composable
+        val id = entree.idArgument("resultatId") ?: return@composable
+        EcranDetailResultat(
+            vm, id,
+            // Une correction crée un nouveau résultat : on l'ouvre à la place de l'ancien.
+            onCorrige = { nouveau -> nav.navigate(RoutesResultats.detail(nouveau)) { popUpTo(RoutesResultats.LISTE) } },
+            onRetour = retour,
+        )
     }
 }
 

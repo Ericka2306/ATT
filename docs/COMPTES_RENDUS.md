@@ -506,3 +506,46 @@ Réassignée au dev 1 le 16/09 (le dev 2 n'avait pas commencé) ; le dev 2 repre
 - `app/src/main/java/mg/itu/att/data/ActeursDao.kt`, `PlanificationDao.kt` — deux requêtes ajoutées.
 - `app/src/main/java/mg/itu/att/ui/accueil/MenuParRole.kt`, `Navigation.kt` — menu et routes.
 - `docs/02_PLAN_DE_TRAVAIL.md`, `docs/05_CAS_UTILISATION.md`, `docs/captures/C12_*.png` — 7 captures de l'émulateur.
+
+---
+
+## Étape C11 — Calcul, validation et correction des résultats — 17/09/2026
+
+> Étape reprise par le dev 2 (le dev 1 a livré jusqu'à C10). Le calcul s'enchaîne à la clôture d'une épreuve (UC10) ; l'ATT valide, corrige si besoin, et le résultat validé devient visible par l'auto-école et le candidat (UC12). Rien n'est jamais réécrit : une correction crée une nouvelle ligne (R6).
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `metier/CalculResultat.kt` — `totalTheorie` / `totalPoseTheorie`, `totalConduite` / `totalGrilleConduite` (faute cochée = 0 point), `fauteEliminatoire`, `rapporterAuBareme` (règle de trois quand le sujet ou la grille ne totalise pas la note maximale — décision Q2 bis), `calculer` (réussi = seuil atteint **et** aucune faute éliminatoire), `calculerTheorie`, `calculerConduite`, `verifierCalcul`, `verifierCorrection`, `arrondir`. Fonctions pures. 9 tests.
+- `metier/ReglesRepassage.kt` — `reussiteEncoreValable` (conservation configurable, 0 = sans limite), `inscriptibleLe` (délai de repassage), `epreuvesARepasser` (jamais réussies, échouées, ou réussite expirée) avec la raison et la date de réinscription. 4 tests.
+- `data/CalculEnBase.kt` — `calculerPourTentative` (rassemble la feuille de théorie ou la grille de conduite et le barème figé, la décision revient à la fonction pure) et `enregistrerResultat` (insère la ligne `Resultat` et la trace ; en correction, référence le résultat remplacé).
+- `ui/resultats/ResultatsViewModel.kt` — liste filtrée par rôle (ATT : tout, file « à valider » ; auto-école et candidat : résultats **validés** de leurs candidats ; examinateur : les passages qu'il a saisis), détail (calcul relu, versions, historique, épreuves à repasser), `valider`, `corriger`.
+- `ui/resultats/EcranResultats.kt`, `EcranDetailResultat.kt`, `Statuts.kt` — un seul écran de liste, titré selon le rôle ; le détail explique la note (points attribués, rapport au barème, seuil, faute éliminatoire), propose la validation et la correction avec motif, et liste les versions successives.
+- Captures `C11_resultats_a_valider.png`, `C11_detail_resultat.png`, `C11_resultat_valide.png`, `C11_correction.png`, `C11_resultats_auto_ecole.png` (prises sur l'émulateur).
+
+**Modifié**
+- `ui/evaluation/EvaluationTheorieViewModel.kt` et `EvaluationConduiteViewModel.kt` — le calcul est enchaîné dans la transaction de clôture (`enregistrerResultat`), conformément à UC10.
+- `data/ExamensDao.kt` — `ResultatDao.tous`, `parIdEnDirect`, `listePourTentative`, `modifier` (validation et mise hors circuit d'un résultat remplacé ; la note n'est jamais retouchée) ; `data/ReferentielsDao.kt` — `QuestionDao.listePourEpreuve`, `CriterePratiqueDao.listePourEpreuve` (une question désactivée reste lisible pour un sujet déjà posé) ; `data/Tracage.kt` — `Resultat.resume()`.
+- `Navigation.kt` — `graphResultats` : routes `resultats` et `resultat/{resultatId}` (plus aucun écran « à venir » au menu) ; une correction ouvre le nouveau résultat.
+- `docs/02_PLAN_DE_TRAVAIL.md` (C11 🟢, prochaine étape C13), `docs/04_QUESTIONS_A_VALIDER.md` (Q2 bis : rapport au barème), `docs/05_CAS_UTILISATION.md` (routes des résultats).
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : 96 tests verts (83 + 13).
+- Émulateur : base vide, `superadmin` crée le centre et 3 questions de 10 points sur l'épreuve théorique B (barème 30 / seuil 20) ; `admin` crée l'auto-école et son compte, le candidat, valide le dossier, crée la session du jour, inscrit, fait l'appel (retard accepté) ; passage n° 1, sujet tiré au sort (3 questions, 30/30 posés), notes 10 + 10 + 0 = 20/30 → résultat **calculé automatiquement à la clôture**, statut « À valider », réussi (seuil 20 atteint) ; validation par l'ATT ; correction avec motif → nouvelle ligne, l'ancienne passe en « Remplacé » et reste lisible dans « Versions de ce passage » ; validation de la version corrigée ; `lalana` (auto-école) voit « 1 résultat validé » pour son candidat.
+- **Deux défauts trouvés pendant la vérification, corrigés** :
+  1. La saisie du motif de correction perdait des caractères : l'état du détail relit la base à chaque émission, donc chaque frappe repartait d'une valeur périmée. Le motif est désormais un `StateFlow` à part (`SaisieCorrection`), comme la saisie de la feuille d'examen en C9.
+  2. Un résultat corrigé restait au statut `CORRIGE` et ne pouvait plus être validé : il n'était donc **jamais** visible par l'auto-école ni par le candidat. Une correction repasse maintenant par la validation de l'ATT (la file « à valider » contient les résultats `CALCULE` **et** `CORRIGE`).
+
+**Décisions restantes**
+1. Q2 bis (nouvelle) : la note est **rapportée au barème** quand le sujet ou la grille ne totalise pas la note maximale (règle de trois). À confirmer avec l'ATT ; l'autre option serait de comparer le total brut au seuil.
+2. La correction recalcule depuis la saisie de l'examinateur : pour corriger une note, l'examinateur doit d'abord modifier sa feuille. Une correction « à la main » (saisir directement une note) n'est pas prévue : elle contournerait le barème.
+3. Un résultat validé ne peut plus être re-validé ; il ne peut qu'être corrigé (nouvelle ligne), et la correction repasse par la validation avant d'être publiée.
+4. Étape suivante : C13 (impression : convocation, liste d'appel, liste des admis, relevé de résultat).
+
+**À relire**
+- `app/src/main/java/mg/itu/att/metier/CalculResultat.kt`, `ReglesRepassage.kt` — nouveaux : tout le calcul et les règles de repassage, sans Android.
+- `app/src/test/java/mg/itu/att/metier/CalculResultatTest.kt`, `ReglesRepassageTest.kt` — nouveaux : 13 tests (seuil, faute éliminatoire, rapport au barème, conservation, délais).
+- `app/src/main/java/mg/itu/att/data/CalculEnBase.kt` — nouveau : le calcul côté base, à appeler dans une transaction.
+- `app/src/main/java/mg/itu/att/ui/resultats/` — nouveaux : ViewModel et deux écrans, filtrés par rôle.
+- `app/src/main/java/mg/itu/att/ui/evaluation/EvaluationTheorieViewModel.kt`, `EvaluationConduiteViewModel.kt` — une ligne ajoutée : le calcul enchaîné à la clôture.
+- `app/src/main/java/mg/itu/att/data/ExamensDao.kt`, `ReferentielsDao.kt`, `Tracage.kt` — requêtes et résumé ajoutés.
+- `app/src/main/java/mg/itu/att/Navigation.kt` — `graphResultats`.
+- `docs/02_PLAN_DE_TRAVAIL.md`, `docs/04_QUESTIONS_A_VALIDER.md`, `docs/05_CAS_UTILISATION.md`, `docs/captures/C11_*.png` — 6 captures de l'émulateur.

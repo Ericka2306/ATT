@@ -26,6 +26,7 @@ import mg.itu.att.data.StatutPresence
 import mg.itu.att.data.StatutTentative
 import mg.itu.att.data.Tentative
 import mg.itu.att.data.resume
+import mg.itu.att.data.enregistrerResultat
 import mg.itu.att.data.tracer
 import mg.itu.att.metier.NoteCritere
 import mg.itu.att.metier.ReglesConduite
@@ -214,6 +215,8 @@ class EvaluationConduiteViewModel(application: Application) : AndroidViewModel(a
                     db.presenceDao().modifier(modifiee)
                     db.tracer(EntitesHistorique.PRESENCE, presence.id, ActionsHistorique.MODIFICATION, utilisateur.id, ancienneValeur = presence.resume(), nouvelleValeur = modifiee.resume())
                 }
+                // Le calcul s'enchaîne à la clôture (UC10) : le résultat est CALCULE, l'ATT le valide ensuite.
+                db.enregistrerResultat(tentative.id, utilisateur.id)
             }
             erreur.value = null
             onTerminee()

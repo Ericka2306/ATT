@@ -102,4 +102,6 @@ fun Inscription.resume(): String = "inscription n° $id, candidat $candidatId, s
 
 fun Session.resume(): String = "session n° $id du $date à $heureConvocation, centre $centreId, catégorie $categorieId, épreuve $typeEpreuveId, capacité $capacite, statut $statut"
 
+fun Resultat.resume(): String = "résultat n° $id de la tentative $tentativeId : ${noteObtenue}/${noteMax} (seuil $seuil), ${if (reussi) "réussi" else "échec"}, $statut${remplaceResultatId?.let { ", remplace le n° $it" } ?: ""}"
+
 fun Centre.resume(): String = "$nom (région $regionId, $adresse, capacité ${capaciteParDefaut ?: "—"}, ${if (actif) "actif" else "inactif"})"

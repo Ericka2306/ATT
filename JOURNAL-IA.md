@@ -224,7 +224,24 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 16 — <date> — <tâche>
+## Entrée 16 — 17/09/2026 — Étape C11, calcul et validation des résultats (dev 2)
+
+- Code soumis : `metier/CalculResultat.kt`, `metier/ReglesRepassage.kt`, `data/CalculEnBase.kt`, `ui/resultats/`.
+- Remarque principale de l'IA : la décision laissée ouverte en C10 (la grille totalise 18 points, le barème 20) devait être tranchée pour calculer. L'IA propose de **rapporter la note au barème** (règle de trois) plutôt que de comparer le total brut au seuil, parce que le seuil est défini par rapport à la note maximale du barème ; la question est ajoutée dans docs/04 (Q2 bis) avec cette valeur par défaut « à confirmer ».
+
+⚠️ Le calcul est enchaîné dans la transaction qui clôt l'épreuve : si le calcul échoue (barème absent), la clôture réussit quand même et le résultat manque. L'IA a préféré cela à une clôture bloquée, mais le binôme peut vouloir l'inverse.
+
+⚠️ La correction recalcule depuis la saisie de l'examinateur : l'ATT ne peut pas saisir une note « à la main », ce qui contournerait le barème. Conséquence : corriger une note suppose que l'examinateur rouvre sa feuille. À discuter.
+
+⚠️ `ResultatDao` a maintenant un `@Update`, utilisé seulement pour la validation et pour marquer un résultat remplacé : la note, elle, n'est jamais réécrite. À vérifier en relecture, c'est la règle R6.
+
+⚠️ Deux défauts de l'IA trouvés à la vérification sur émulateur, pas par les tests : la saisie du motif perdait des caractères (l'état relisait la base à chaque frappe — exactement le défaut déjà rencontré en C9, que l'IA a reproduit), et un résultat corrigé ne pouvait plus être validé, donc restait invisible pour l'auto-école. Les tests JUnit sur les fonctions pures ne pouvaient pas les voir : ils portent sur le calcul, pas sur l'enchaînement des statuts.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 2>.
+
+---
+
+## Entrée 17 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :
