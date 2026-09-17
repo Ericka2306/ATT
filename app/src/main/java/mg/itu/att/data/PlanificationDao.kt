@@ -96,6 +96,9 @@ interface InscriptionDao {
 
 @Dao
 interface PresenceDao {
+    @Query("SELECT * FROM presences ORDER BY id ASC")
+    fun toutes(): Flow<List<Presence>>
+
     @Query("SELECT * FROM presences WHERE inscriptionId = :inscriptionId LIMIT 1")
     suspend fun parInscription(inscriptionId: Int): Presence?
 

@@ -30,6 +30,16 @@ Android Studio → File → Open → dossier `ATT` → attendre la synchronisati
 ./gradlew :app:testDebugUnitTest    # tests unitaires
 ```
 
+## Glossaire (mots de l'écran ↔ mots du cadrage et du code)
+
+| À l'écran | Dans le code et les documents | Sens |
+|---|---|---|
+| Passage | `Tentative` (cadrage §9, instructions §3) | un candidat passe une épreuve une fois ; numéroté, jamais effacé ; le résultat et les corrections s'y rattachent |
+| Inscription | `Inscription` | le candidat est convoqué à une session, avec un numéro d'appel et un créneau |
+| Appel / Présence | `Presence` | le candidat est venu (présent, en retard, absent) |
+| Session | `Session` | une épreuve d'une catégorie, dans un centre, à une date, avec des créneaux |
+| Dossier | `Dossier` | les pièces du candidat pour une catégorie, validées par l'ATT |
+
 ## Rejouer un scénario sur l'émulateur
 
 `outils/pilote_emulateur.sh` pilote l'application par le texte des boutons et des champs (`tap "Se connecter"`, `saisir "Identifiant" "admin"`). Les scénarios de vérification de chaque étape sont décrits dans `docs/COMPTES_RENDUS.md`.

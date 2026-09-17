@@ -20,7 +20,7 @@ fun EcranConfiguration(onCategories: () -> Unit, onRegles: () -> Unit, onCentres
             style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         CarteIcone(Icons.Filled.List, "Catégories et épreuves", "Catégories de permis, épreuves, barèmes, questions, critères", onCategories)
-        CarteIcone(Icons.Filled.Settings, "Règles", "Tentatives, délais, retards, capacités, pièces du dossier…", onRegles)
+        CarteIcone(Icons.Filled.Settings, "Règles", "Nombre de passages, délais, retards, capacités, pièces du dossier…", onRegles)
         CarteIcone(Icons.Filled.Place, "Centres d'examen", "Centres par région, capacité par défaut", onCentres)
     }
 }

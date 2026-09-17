@@ -232,7 +232,8 @@ Une seule `MainActivity`, un `NavHost`, routes en chaînes ; l'argument est touj
 ### 4.5 Évaluation et résultats
 | Route | Écran | UC |
 |---|---|---|
-| `evaluation` | `EcranSessionsExaminateur` (sessions du jour, candidats présents par numéro) | UC09 |
+| `evaluation` | `EcranSessionsExaminateur` (sessions du jour et à venir, présents et tentatives) | UC09 |
+| `session/{sessionId}/tentatives` | `EcranTentatives` (candidats par numéro d'appel, ouvrir / reprendre une tentative, motif de refus) | UC09 |
 | `tentative/{tentativeId}/theorie` | `EcranEvaluationTheorie` (questions/réponses ou points) | UC09 |
 | `tentative/{tentativeId}/conduite` | `EcranEvaluationConduite` (critères, fautes, observations) | UC09 |
 | `resultats` | `EcranResultatsAValider` (ATT) | UC10 |

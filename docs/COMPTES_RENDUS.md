@@ -327,3 +327,27 @@ Réassignée au dev 1 le 16/09 (le dev 2 n'avait pas commencé) ; le dev 2 repre
 1. Qui fait l'appel (Q6) : l'ATT dans cette version ; l'examinateur voit la liste sans les noms et sans boutons.
 2. Une présence marquée avant l'heure de convocation est « Présent » (avance) ; la tolérance ne s'applique qu'au retard.
 3. Étape suivante : C8 (tentatives).
+
+---
+
+## Étape C8 — Tentatives — 16/09/2026
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `metier/ReglesTentatives.kt` — `numeroSuivant` (jamais réutilisé, même après annulation), `peutOuvrir` (candidat présent ou en cours, reprise d'une tentative en cours, refus si une tentative existe déjà pour cette inscription, `TENTATIVES_MAX`). 4 tests.
+- `ui/evaluation/TentativesViewModel.kt` — sessions à évaluer (du jour et à venir, non planifiées ni annulées, région de l'examinateur), candidats d'une session avec présence, tentative existante, prochain numéro et motif de refus ; `ouvrirTentative` crée la n-ième tentative avec l'examinateur connecté (null si ouverte par l'ATT), passe la présence EN_COURS, trace, ou reprend la tentative en cours.
+- `ui/evaluation/EcranSessionsExaminateur.kt` (menu « Sessions du jour » de l'examinateur), `EcranTentatives.kt` (numéros d'appel seuls pour l'examinateur ; « Ouvrir la tentative n° N » / « Continuer l'évaluation » / motif de refus).
+- Captures `C8_passages.png` (ATT : passage n° 1 en cours, « Continuer l'évaluation »), `C8_examinateur.png` (numéros seuls).
+
+**Modifié**
+- `data/ExamensDao.kt` — `TentativeDao.toutes`, `parSession` (jointure inscriptions), `parIdEnDirect` ; `data/PlanificationDao.kt` — `PresenceDao.toutes` ; `data/Tracage.kt` — `Tentative.resume()`, entité `Tentative`.
+- `Navigation.kt` — routes `evaluation`, `session/{id}/tentatives`, `tentative/{id}/theorie` et `/conduite` (« à venir » pour C9/C10) ; `ui/sessions/EcranDetailSession.kt` — bouton « Tentatives » pour l'ATT.
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : 59 tests verts.
+- Émulateur : `admin` remet RAKOTO présent → Tentatives → « Ouvrir la tentative n° 1 » → écran C9 « à venir » → retour : « tentative n° 1 en cours » et « Continuer l'évaluation » (reprise sans doublon) ; création de l'examinateur `rabe` → connexion → « Sessions du jour » → session B → liste avec numéros d'appel sans les noms. Base : tentative n° 1 EN_COURS (examinateur null car ouverte par l'ATT), présence EN_COURS, historique CREATION.
+- Captures vérifiées une par une après le renommage « tentative » → « passage » à l'écran (décision du 17/09) : passage n° 1 en cours avec « Continuer l'évaluation », vue examinateur avec « n° 001 » sans nom.
+
+**Décisions restantes**
+1. Une tentative ouverte par l'ATT n'a pas d'examinateur ; il sera renseigné à la saisie (C9) par l'examinateur connecté (Q6).
+2. La règle `TENTATIVES_MAX` s'applique ici aussi (déjà à l'inscription) : double sécurité.
+3. Étape suivante : C9 (évaluation théorique, modes TIRAGE / DIRECT).

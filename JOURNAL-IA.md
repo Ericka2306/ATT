@@ -155,7 +155,20 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 11 — <date> — <tâche>
+## Entrée 11 — 16/09/2026 — Étape C8, tentatives
+
+- Code soumis : `metier/ReglesTentatives.kt`, `ui/evaluation/*`.
+- Remarque principale de l'IA : « ouvrir » et « reprendre » une tentative passent par la même fonction : s'il existe déjà une tentative en cours pour l'inscription, on la rouvre au lieu d'en créer une seconde ; s'il en existe une terminée, on refuse. Une tentative n'est donc jamais dupliquée ni écrasée (R6).
+
+⚠️ L'examinateur n'est pas affecté d'avance (R5) : la tentative enregistre l'examinateur connecté au moment de l'ouverture, ou rien si c'est l'ATT qui ouvre. Le binôme doit décider si l'ATT peut ouvrir une tentative (utile au guichet) ou si c'est réservé aux examinateurs (Q6).
+
+⚠️ Le pilote a raté une carte du menu pendant un enchaînement de retours ; sans conséquence sur le code, mais la démo de soutenance gagnera à repartir de l'accueil (`relancer` + connexion) à chaque scénario.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 1>.
+
+---
+
+## Entrée 12 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :
