@@ -196,7 +196,20 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 14 — <date> — <tâche>
+## Entrée 14 — 17/09/2026 — Étape C12a, historique des modifications (dev 2)
+
+- Code soumis : `metier/FiltresHistorique.kt`, `ui/historique/HistoriqueViewModel.kt`, `EcranHistorique.kt`, `graphHistorique` dans `Navigation.kt`.
+- Remarque principale de l'IA : docs/05 prévoit une route `historique/{entite}/{entiteId}`, mais chaque fiche affiche déjà son historique avec `LigneHistorique` ; l'IA propose de ne pas doubler cette vue et de faire l'inverse, ouvrir la fiche depuis l'écran global. Pour ouvrir une fiche gérée par un sous-parcours (`viewModelDuSousParcours`), il faut d'abord empiler la liste racine, sinon `getBackStackEntry` échoue.
+
+⚠️ Le filtre « Objet » du `SelecteurChoix` attend un identifiant entier : l'IA utilise la position de l'entité dans la liste des objets présents. Ça marche, mais c'est un détour ; une variante du sélecteur acceptant une chaîne serait plus directe. À discuter.
+
+⚠️ La date du jour est passée en paramètre aux fonctions de `FiltresHistorique` pour que les tests soient reproductibles, comme le `Random` injecté en C9.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 2>.
+
+---
+
+## Entrée 15 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :

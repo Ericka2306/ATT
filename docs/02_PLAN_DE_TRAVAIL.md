@@ -7,12 +7,12 @@
 
 | | |
 |---|---|
-| **Dernière étape terminée** | C10 (structure conduite) — 17/09/2026, en attente de fusion (branche `etape-C10-conduite`, après #10 à #13) |
-| **Étape en cours** | aucune |
-| **Prochaine étape** | C11 (calcul et validation des résultats) — dev 1 |
-| **Dev 2 peut démarrer** | à son arrivée : C12 (consultation, parcours candidat) sur une branche `etape-C12-…` depuis `main` ; modèle à suivre : `graphCandidats` dans `Navigation.kt` |
-| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape C10 » |
-| **Dernier commit poussé** | `etape-C9-theorie` — « Ajoute l'évaluation théorique orale (étape C9) », PR #13 |
+| **Dernière étape terminée** | C12a (historique des modifications) — 17/09/2026, en attente de relecture (branche `etape-C12a-historique`, PR #15) ; C10 fusionnée (PR #14) |
+| **Étape en cours** | C12 (consultation par rôle) : C12a 🟢, le reste de C12 en une seule pull request suivante |
+| **Prochaine étape** | C12 (sections inscriptions et passages de la fiche candidat, compte et parcours candidat, inscriptions de l'auto-école) — dev 2 |
+| **Qui fait quoi** | depuis le 17/09/2026, le dev 1 a livré jusqu'à C10 ; le dev 2 reprend C11, C12, C13 et D1, une pull request par étape du plan (comme les précédentes) |
+| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape C12a » |
+| **Dernier commit poussé** | `etape-C10-conduite` — « Ajoute l'évaluation de conduite (étape C10) », PR #14 fusionnée |
 
 Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une question à valider
 
@@ -51,7 +51,7 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 | C9 Évaluation théorique | saisie des réponses du candidat question par question (ou saisie directe du nombre de points si procédure papier), observations | `ui/evaluation/EcranEvaluationTheorie` | **Évaluer** ; réponses stockées | 🟢 17/09/2026 (Q1 : valeurs d'exemple configurables) |
 | C10 Structure conduite | écran de saisie des critères/notes/observations/fautes, sans grille imposée (données de configuration vides) | `ui/evaluation/EcranEvaluationConduite` | écran fonctionnel avec critères de démonstration marqués « à confirmer » | 🟢 17/09/2026 (Q2 : grille configurable) |
 | C11 Calcul des résultats | `metier/CalculResultat.kt` (pur), création `Resultat`, validation ATT, correction traçable (nouvelle ligne), échec → nouvelle tentative | `ui/resultats/`, tests JUnit | **Calculer selon le barème configurable** ; **conserver l'historique** ; tests verts | ⚪ |
-| C12 Consultation | parcours candidat (soi), vue auto-école (ses candidats), vues ATT (sessions, résultats, historique), filtres par région | `ui/candidats/EcranParcours`, `ui/resultats/EcranConsultation` | **Respecter les rôles** | ⚪ |
+| C12 Consultation | parcours candidat (soi), vue auto-école (ses candidats), vues ATT (sessions, résultats, historique), filtres par région | `ui/candidats/EcranParcours`, `ui/resultats/EcranConsultation` | **Respecter les rôles** | 🟡 C12a historique 🟢 17/09/2026 ; reste de C12 en cours (dev 2) ; résultats validés livrés avec C11 |
 | C13 Impression | convocation individuelle, liste d'appel de session, relevé de résultat (HTML → `PrintManager` ou PDF) | `ui/impression/` | **Imprimer les informations essentielles** ; fonctionne hors réseau | ⚪ |
 
 ## Phase D — Consolidation
@@ -69,7 +69,7 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 | Qui | Étapes | Remarque |
 |---|---|---|
 | Dev 1 (Ericka) + Claude | A4, B0 à B2, C1, C1b, C2, C3, **puis C4 et C5** (réassignés le 16/09/2026 : le dev 2 n'avait pas commencé), puis C6 à C11 | ne dépend de personne |
-| Dev 2 | à son arrivée : C12 (consultation par rôle, parcours candidat), C13 (impression), D1 (scénarios de test des cas particuliers) | branche par étape, relecture croisée avant merge ; reprend à partir du tableau « Où en est-on ? » |
+| Dev 2 (Mahery) | C12 (consultation par rôle, parcours candidat), C13 (impression), D1 (scénarios de test des cas particuliers), **puis C11** (reprise le 17/09/2026 : le dev 1 a terminé sa part à C10) | une branche et une pull request par sous-étape, relecture avant merge ; reprend à partir du tableau « Où en est-on ? » |
 | Ensemble | D2, D3 | relecture croisée, démo |
 
 Règle de passage de relais : le dev 2 reprend toujours à partir de `docs/COMPTES_RENDUS.md` (dernière étape terminée) et de `CLAUDE.md`, sans reprendre ce qui est marqué 🟢.
