@@ -17,7 +17,7 @@ import androidx.room.RoomDatabase
     entities = [
         // Référentiels
         Region::class, CategoriePermis::class, TypeEpreuve::class, Bareme::class, RegleConfig::class,
-        Question::class, Reponse::class, CriterePratique::class, Centre::class,
+        Question::class, CriterePratique::class, Centre::class,
         // Acteurs
         Utilisateur::class, AutoEcole::class, Candidat::class, Examinateur::class,
         // Dossiers
@@ -30,7 +30,7 @@ import androidx.room.RoomDatabase
         Historique::class,
     ],
     // v2 (16/09/2026, étape C7) : l'index unique (candidatId, sessionId) des inscriptions devient un index simple.
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -42,7 +42,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun baremeDao(): BaremeDao
     abstract fun regleConfigDao(): RegleConfigDao
     abstract fun questionDao(): QuestionDao
-    abstract fun reponseDao(): ReponseDao
     abstract fun criterePratiqueDao(): CriterePratiqueDao
     abstract fun centreDao(): CentreDao
 

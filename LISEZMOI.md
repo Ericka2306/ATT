@@ -58,4 +58,4 @@ tap "Auto-écoles"
 
 ## État d'avancement
 
-Voir la colonne « Statut » de [docs/02_PLAN_DE_TRAVAIL.md](docs/02_PLAN_DE_TRAVAIL.md). Phase A (cadrage) terminée ; phase B (socle technique) en cours.
+Voir la colonne « Statut » de [docs/02_PLAN_DE_TRAVAIL.md](docs/02_PLAN_DE_TRAVAIL.md). Phases A (cadrage) et B (socle technique) terminées ; phase C (fonctionnalités) en cours, jusqu'à l'évaluation théorique (C9).

@@ -32,11 +32,12 @@ class ValidationConfigurationTest {
     }
 
     @Test
-    fun `question, au moins deux reponses et une bonne`() {
-        assertNull(ValidationConfiguration.validerQuestion("Q ?", "1", listOf("A", "B", "", ""), 0))
-        assertNotNull(ValidationConfiguration.validerQuestion("Q ?", "1", listOf("A", "", "", ""), 0))
-        assertNotNull(ValidationConfiguration.validerQuestion("Q ?", "1", listOf("A", "B", "", ""), 2))
-        assertNotNull(ValidationConfiguration.validerQuestion("Q ?", "0", listOf("A", "B", "", ""), 0))
+    fun `question orale, enonce et points positifs`() {
+        assertNull(ValidationConfiguration.validerQuestion("Q ?", "1"))
+        assertNull(ValidationConfiguration.validerQuestion("Q ?", "2,5"))
+        assertNotNull(ValidationConfiguration.validerQuestion("", "1"))
+        assertNotNull(ValidationConfiguration.validerQuestion("Q ?", "0"))
+        assertNotNull(ValidationConfiguration.validerQuestion("Q ?", "abc"))
     }
 
     @Test

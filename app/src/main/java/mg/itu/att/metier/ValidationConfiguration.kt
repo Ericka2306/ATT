@@ -45,15 +45,11 @@ object ValidationConfiguration {
     }
 
     /** Une question a un énoncé, des points positifs, au moins deux réponses non vides et exactement une bonne. */
-    fun validerQuestion(enonce: String, points: String, reponses: List<String>, indexBonne: Int?): String? {
-        val renseignees = reponses.filter { it.isNotBlank() }
-        return when {
-            enonce.isBlank() -> "L'énoncé est obligatoire."
-            (points.toDoubleOrNull() ?: 0.0) <= 0 -> "Les points doivent être un nombre positif."
-            renseignees.size < 2 -> "Saisissez au moins deux réponses."
-            indexBonne == null || indexBonne !in reponses.indices || reponses[indexBonne].isBlank() -> "Indiquez quelle réponse est la bonne."
-            else -> null
-        }
+    /** Question orale : un énoncé et des points ; la réponse attendue est facultative. */
+    fun validerQuestion(enonce: String, points: String): String? = when {
+        enonce.isBlank() -> "L'énoncé est obligatoire."
+        (points.replace(',', '.').toDoubleOrNull() ?: 0.0) <= 0 -> "Les points doivent être un nombre positif."
+        else -> null
     }
 
     fun validerCritere(libelle: String, points: String): String? = when {

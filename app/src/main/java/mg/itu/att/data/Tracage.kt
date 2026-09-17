@@ -34,6 +34,7 @@ object EntitesHistorique {
     const val INSCRIPTION = "Inscription"
     const val PRESENCE = "Presence"
     const val TENTATIVE = "Tentative"
+    const val EVALUATION = "Evaluation"
     const val RESULTAT = "Resultat"
     const val REGLE_CONFIG = "RegleConfig"
     const val CATEGORIE = "CategoriePermis"
@@ -87,11 +88,13 @@ fun Bareme.resume(): String = "version $version : note max $noteMax, seuil $seui
 
 fun RegleConfig.resume(): String = "$cle = $valeur${categorieId?.let { " (catégorie $it)" } ?: ""}${if (aConfirmer) ", à confirmer" else ""}"
 
-fun Question.resume(): String = "« ${enonce.take(60)} » ($points pt, ${if (actif) "active" else "inactive"})"
+fun Question.resume(): String = "« ${enonce.take(60)} » ($points pt${reponseAttendue?.let { ", attendu : ${it.take(40)}" } ?: ""}, ${if (actif) "active" else "inactive"})"
 
 fun CriterePratique.resume(): String = "$libelle ($points pt${if (eliminatoire) ", éliminatoire" else ""}, ${if (actif) "actif" else "inactif"})"
 
 fun Tentative.resume(): String = "tentative n° $numero du candidat $candidatId, épreuve $typeEpreuveId, inscription $inscriptionId, examinateur ${examinateurId ?: "—"}, $statut, $dateHeure"
+
+fun Evaluation.resume(): String = "évaluation de la tentative $tentativeId, barème $baremeId, saisie le $dateSaisie${observations?.let { ", observations : ${it.take(60)}" } ?: ""}"
 
 fun Presence.resume(): String = "présence de l'inscription $inscriptionId : $statut${heureArrivee?.let { ", arrivée $it" } ?: ""}${remarque?.let { ", $it" } ?: ""}"
 

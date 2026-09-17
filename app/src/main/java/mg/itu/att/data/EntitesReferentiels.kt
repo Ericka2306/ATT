@@ -140,9 +140,13 @@ object ClesRegles {
     const val SEPARATEUR_PIECES = ";"
 }
 
-// ---------- QUESTIONS ET RÉPONSES (épreuve théorique) ----------
+// ---------- QUESTIONS (épreuve théorique, orale) ----------
 
-/** Une question de l'épreuve théorique. Désactivée plutôt que supprimée : d'anciennes évaluations la référencent. */
+/**
+ * Une question de l'épreuve théorique, posée à l'oral : l'examinateur note la réponse du candidat et lui attribue
+ * des points (pas de choix multiples, témoignage du dev 1, 17/09/2026). Désactivée plutôt que supprimée :
+ * d'anciennes évaluations la référencent.
+ */
 @Entity(
     tableName = "questions",
     foreignKeys = [
@@ -155,24 +159,11 @@ data class Question(
     val typeEpreuveId: Int,
     val enonce: String,
     val points: Double,
+    /** Aide-mémoire pour l'examinateur, jamais montré à l'auto-école ni au candidat. */
+    val reponseAttendue: String? = null,
     val ordre: Int = 0,
     val actif: Boolean = true,
     val aConfirmer: Boolean = true,
-)
-
-/** Une réponse proposée à une question. */
-@Entity(
-    tableName = "reponses",
-    foreignKeys = [
-        ForeignKey(entity = Question::class, parentColumns = ["id"], childColumns = ["questionId"]),
-    ],
-    indices = [Index("questionId")],
-)
-data class Reponse(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val questionId: Int,
-    val texte: String,
-    val estCorrecte: Boolean,
 )
 
 // ---------- CRITÈRES PRATIQUES (épreuve de conduite, structure seulement) ----------

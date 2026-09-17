@@ -69,7 +69,7 @@ fun EcranEpreuve(
             items(etat.questions) { q ->
                 Row {
                     Text(
-                        "${q.ordre}. ${q.enonce} (${q.points} pt, ${etat.nombreReponses[q.id] ?: 0} réponses)" + if (q.actif) "" else " — inactive",
+                        "${q.ordre}. ${q.enonce} (${q.points} pt)" + (q.reponseAttendue?.let { " — attendu : $it" } ?: "") + if (q.actif) "" else " — inactive",
                         style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f).padding(vertical = 4.dp),
                         color = if (q.actif) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -113,16 +113,14 @@ fun EcranFormulaireBareme(viewModel: ConfigurationViewModel, epreuveId: Int, onC
     }
 }
 
-/** Nouvelle question à choix multiple : énoncé, points, jusqu'à quatre réponses, une seule bonne. */
+/** Nouvelle question orale : énoncé, points, réponse attendue facultative (vue seulement par l'examinateur). */
 @Composable
 fun EcranFormulaireQuestion(viewModel: ConfigurationViewModel, epreuveId: Int, onCree: () -> Unit, onRetour: () -> Unit) {
     val f by viewModel.formulaireQuestion.collectAsState()
-    val lettres = listOf("A", "B", "C", "D")
     EcranStandard(titre = "Nouvelle question", onRetour = onRetour, defilant = true) {
         ChampTexte(f.enonce, { v -> viewModel.modifierQuestion { it.copy(enonce = v) } }, "Énoncé *", uneLigne = false)
         ChampTexte(f.points, { v -> viewModel.modifierQuestion { it.copy(points = v) } }, "Points *", clavier = KeyboardType.Decimal)
-        f.reponses.forEachIndexed { i, r -> ChampTexte(r, { v -> viewModel.changerReponse(i, v) }, "Réponse ${lettres[i]}" + if (i < 2) " *" else "") }
-        SelecteurChoix("Bonne réponse", lettres.indices.map { Option(it, lettres[it]) }, f.indexBonne, { v -> viewModel.modifierQuestion { it.copy(indexBonne = v) } }, libelleVide = "à choisir *")
+        ChampTexte(f.reponseAttendue, { v -> viewModel.modifierQuestion { it.copy(reponseAttendue = v) } }, "Réponse attendue", uneLigne = false, aide = "Aide-mémoire pour l'examinateur ; le candidat répond à l'oral")
         CaseACocher(f.aConfirmer, { v -> viewModel.modifierQuestion { it.copy(aConfirmer = v) } }, "Question à confirmer par l'ATT")
         TexteErreur(f.erreur)
         BoutonPrincipal("Créer la question", { viewModel.creerQuestion(epreuveId, onSucces = onCree) })

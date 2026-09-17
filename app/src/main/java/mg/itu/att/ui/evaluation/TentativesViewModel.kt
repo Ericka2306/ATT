@@ -78,8 +78,6 @@ class TentativesViewModel(application: Application) : AndroidViewModel(applicati
         if (this.session.value != session) this.session.value = session
     }
 
-    private fun peutEvaluer(s: SessionUtilisateur?) = s?.role == Role.EXAMINATEUR || s?.role == Role.ADMIN_ATT || s?.role == Role.SUPER_ADMIN
-
     // ----- Sessions à évaluer (examinateur : du jour et à venir, non annulées) -----
 
     private data class Referentiels(val categories: List<CategoriePermis>, val epreuves: List<TypeEpreuve>, val centres: List<Centre>)
@@ -150,7 +148,7 @@ class TentativesViewModel(application: Application) : AndroidViewModel(applicati
                         }
                         .sortedBy { it.inscription.numeroAnonymat },
                     nomsVisibles = s?.role != Role.EXAMINATEUR,
-                    peutOuvrir = peutEvaluer(s) && se.statut != StatutSession.TERMINEE && se.statut != StatutSession.ANNULEE,
+                    peutOuvrir = s.peutEvaluer() && se.statut != StatutSession.TERMINEE && se.statut != StatutSession.ANNULEE,
                     erreur = e,
                 )
             }
@@ -162,7 +160,7 @@ class TentativesViewModel(application: Application) : AndroidViewModel(applicati
      */
     fun ouvrirTentative(inscriptionId: Int, onOuverte: (Int) -> Unit) {
         val utilisateur = session.value ?: return
-        if (!peutEvaluer(utilisateur)) return
+        if (!utilisateur.peutEvaluer()) return
         viewModelScope.launch {
             val i = db.inscriptionDao().parId(inscriptionId) ?: return@launch
             val se = db.sessionDao().parId(i.sessionId) ?: return@launch
