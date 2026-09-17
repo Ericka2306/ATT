@@ -149,6 +149,10 @@ interface QuestionDao {
     @Query("SELECT * FROM questions WHERE typeEpreuveId = :typeEpreuveId AND actif = 1 ORDER BY ordre ASC, id ASC")
     suspend fun activesPourEpreuve(typeEpreuveId: Int): List<Question>
 
+    /** Toutes les questions, même désactivées : un sujet déjà posé garde ses questions (calcul du résultat). */
+    @Query("SELECT * FROM questions WHERE typeEpreuveId = :typeEpreuveId ORDER BY ordre ASC, id ASC")
+    suspend fun listePourEpreuve(typeEpreuveId: Int): List<Question>
+
     @Query("SELECT * FROM questions WHERE id = :id")
     suspend fun parId(id: Int): Question?
 
@@ -166,6 +170,10 @@ interface CriterePratiqueDao {
 
     @Query("SELECT * FROM criteres_pratiques WHERE typeEpreuveId = :typeEpreuveId AND actif = 1 ORDER BY id ASC")
     suspend fun actifsPourEpreuve(typeEpreuveId: Int): List<CriterePratique>
+
+    /** Tous les critères, même désactivés : une grille déjà saisie garde ses critères (calcul du résultat). */
+    @Query("SELECT * FROM criteres_pratiques WHERE typeEpreuveId = :typeEpreuveId ORDER BY id ASC")
+    suspend fun listePourEpreuve(typeEpreuveId: Int): List<CriterePratique>
 
     @Query("SELECT * FROM criteres_pratiques WHERE id = :id")
     suspend fun parId(id: Int): CriterePratique?

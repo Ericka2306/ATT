@@ -123,6 +123,17 @@ interface ResultatDao {
     @Query("SELECT * FROM resultats WHERE statut = :statut ORDER BY dateCalcul ASC")
     fun parStatut(statut: StatutResultat): Flow<List<Resultat>>
 
+    /** Les versions successives d'un résultat (corrections comprises), lecture ponctuelle. */
+    @Query("SELECT * FROM resultats WHERE tentativeId = :tentativeId ORDER BY id DESC")
+    suspend fun listePourTentative(tentativeId: Int): List<Resultat>
+
+    /** Tous les résultats : la consultation par rôle filtre ensuite selon l'utilisateur connecté (UC12). */
+    @Query("SELECT * FROM resultats ORDER BY id DESC")
+    fun tous(): Flow<List<Resultat>>
+
+    @Query("SELECT * FROM resultats WHERE id = :id")
+    fun parIdEnDirect(id: Int): Flow<Resultat?>
+
     @Query("SELECT * FROM resultats WHERE id = :id")
     suspend fun parId(id: Int): Resultat?
 
@@ -134,7 +145,14 @@ interface ResultatDao {
     )
     suspend fun dernierReussi(candidatId: Int, typeEpreuveId: Int): Resultat?
 
-    /** Seule écriture autorisée : on ajoute, on ne modifie jamais. */
+    /** On ajoute une ligne à chaque calcul ou correction : un résultat n'est jamais réécrit (R6). */
     @Insert
     suspend fun inserer(resultat: Resultat): Long
+
+    /**
+     * Seules évolutions permises sur une ligne existante : la validation par l'ATT (statut, validateur, date)
+     * et la mise hors circuit d'un résultat remplacé par une correction. La note, elle, n'est jamais retouchée.
+     */
+    @Update
+    suspend fun modifier(resultat: Resultat)
 }

@@ -239,8 +239,8 @@ Une seule `MainActivity`, un `NavHost`, routes en chaînes ; l'argument est touj
 | `session/{sessionId}/tentatives` | `EcranTentatives` (candidats par numéro d'appel, ouvrir / reprendre une tentative, motif de refus) | UC09 |
 | `tentative/{tentativeId}/theorie` | `EcranEvaluationTheorie` (questions/réponses ou points) | UC09 |
 | `tentative/{tentativeId}/conduite` | `EcranEvaluationConduite` (critères, fautes, observations) | UC09 |
-| `resultats` | `EcranResultatsAValider` (ATT) | UC10 |
-| `resultat/{resultatId}` | `EcranDetailResultat` (détail du calcul, valider, corriger avec motif, historique) | UC10, UC11 |
+| `resultats` | `EcranResultats` — un seul écran filtré par rôle : file « à valider » de l'ATT, résultats validés de l'auto-école et du candidat, évaluations saisies par l'examinateur | UC10, UC12 |
+| `resultat/{resultatId}` | `EcranDetailResultat` (détail du calcul, épreuves à repasser, valider, corriger avec motif, versions, historique) | UC10, UC11 |
 
 ### 4.6 Impression
 | Route | Écran | UC |
