@@ -16,7 +16,7 @@ Region ──< Centre ──< Session ──< Creneau
    └──< AutoEcole ──< Candidat ──< Dossier ──< PieceDossier
                           │            │
                           │       CategoriePermis ──< TypeEpreuve ──< Bareme
-                          │                                │    ├──< Question ──< Reponse
+                          │                                │    ├──< Question (orale)
                           │                                │    └──< CriterePratique
                           │                                │
                           └──< Inscription (Session, Creneau?, Dossier) ── Presence
@@ -87,21 +87,17 @@ Une épreuve d'une catégorie (théorie, conduite ; extensible : manœuvres, cir
 
 Règle : on ne modifie jamais un barème déjà utilisé par un résultat ; on crée une nouvelle version.
 
-### Question / Reponse (épreuve théorique)
-| Question | | |
+### Question (épreuve théorique, orale)
+| Champ | Type | Note |
 |---|---|---|
 | id | Int | PK |
 | typeEpreuveId | Int | FK → TypeEpreuve |
-| enonce | String | |
-| points | Double | |
+| enonce | String | posée à l'oral par l'examinateur |
+| points | Double | ce que vaut la question (3, 5, 10…) ; le sujet est composé jusqu'à la note max du barème |
+| reponseAttendue | String? | aide-mémoire pour l'examinateur, jamais montré à l'auto-école ni au candidat |
 | actif | Boolean | une question désactivée reste en base (référencée par d'anciennes évaluations) |
 
-| Reponse | | |
-|---|---|---|
-| id | Int | PK |
-| questionId | Int | FK → Question |
-| texte | String | |
-| estCorrecte | Boolean | |
+Pas de QCM ni de réponses proposées (témoignage du dev 1, 17/09/2026 : l'examinateur pose des questions, note la réponse donnée et les points ; le cadrage et la presse parlaient de QCM, à tort). La table `reponses` du schéma v2 a été retirée (schéma v3).
 
 ### CriterePratique (épreuve de conduite — structure seulement)
 | Champ | Type | Note |
@@ -299,13 +295,14 @@ Contraintes : une seule inscription **active** (DEMANDE, INSCRIT, CONFIRME) par 
 | dateSaisie | String | |
 | observations | String? | |
 
-### ReponseCandidat (théorie)
+### ReponseCandidat (théorie — une ligne de la feuille d'examen)
 | Champ | Type | Note |
 |---|---|---|
 | id | Int | PK |
 | evaluationId | Int | FK → Evaluation |
-| questionId | Int | FK → Question |
-| reponseId | Int? | FK → Reponse, null = sans réponse |
+| questionId | Int | FK → Question (posée, tirée au sort ou choisie par l'examinateur) |
+| reponseDonnee | String? | ce que le candidat a répondu, écrit par l'examinateur |
+| pointsAttribues | Double? | entre 0 et `Question.points` ; null = pas encore noté (interdit à la clôture) |
 
 ### EvaluationCritere (conduite — structure)
 | Champ | Type | Note |

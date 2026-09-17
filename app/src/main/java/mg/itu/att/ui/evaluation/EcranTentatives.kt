@@ -13,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -61,15 +62,18 @@ fun EcranTentatives(viewModel: TentativesViewModel, sessionId: Int, onTentative:
                             l.tentative?.let { "passage n° ${it.numero} ${it.statut.libelle()} (${it.dateHeure.replace('T', ' ')})" } ?: "prochain passage : n° ${l.prochainNumero}",
                             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                        if (e.peutOuvrir) {
-                            Spacer(Modifier.height(6.dp))
-                            when {
-                                l.tentative?.statut == StatutTentative.EN_COURS ->
-                                    Button(onClick = { viewModel.ouvrirTentative(l.inscription.id) { id -> onTentative(id, e.codeEpreuve) } }) { Text("Continuer l'évaluation") }
-                                l.refus == null ->
-                                    Button(onClick = { viewModel.ouvrirTentative(l.inscription.id) { id -> onTentative(id, e.codeEpreuve) } }) { Text("Ouvrir le passage n° ${l.prochainNumero}") }
-                                else -> Text(l.refus, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-                            }
+                        val tentative = l.tentative
+                        Spacer(Modifier.height(6.dp))
+                        when {
+                            // Passage clos : consultation en lecture seule (l'écran d'épreuve se verrouille tout seul).
+                            tentative != null && tentative.statut != StatutTentative.EN_COURS ->
+                                OutlinedButton(onClick = { onTentative(tentative.id, e.codeEpreuve) }) { Text("Consulter l'épreuve") }
+                            !e.peutOuvrir -> {}
+                            tentative != null ->
+                                Button(onClick = { viewModel.ouvrirTentative(l.inscription.id) { id -> onTentative(id, e.codeEpreuve) } }) { Text("Continuer l'évaluation") }
+                            l.refus == null ->
+                                Button(onClick = { viewModel.ouvrirTentative(l.inscription.id) { id -> onTentative(id, e.codeEpreuve) } }) { Text("Ouvrir le passage n° ${l.prochainNumero}") }
+                            else -> Text(l.refus, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                         }
                     }
                 }

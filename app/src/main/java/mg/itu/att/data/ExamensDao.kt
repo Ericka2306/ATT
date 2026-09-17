@@ -51,6 +51,9 @@ interface EvaluationDao {
     @Query("SELECT * FROM evaluations WHERE tentativeId = :tentativeId LIMIT 1")
     suspend fun parTentative(tentativeId: Int): Evaluation?
 
+    @Query("SELECT * FROM evaluations WHERE tentativeId = :tentativeId LIMIT 1")
+    fun parTentativeEnDirect(tentativeId: Int): Flow<Evaluation?>
+
     @Query("SELECT * FROM evaluations WHERE id = :id")
     suspend fun parId(id: Int): Evaluation?
 
@@ -69,8 +72,18 @@ interface ReponseCandidatDao {
     @Query("SELECT * FROM reponses_candidat WHERE evaluationId = :evaluationId ORDER BY questionId ASC")
     suspend fun listePourEvaluation(evaluationId: Int): List<ReponseCandidat>
 
+    /** Les lignes dans l'ordre où les questions ont été posées (l'ordre du sujet). */
+    @Query("SELECT * FROM reponses_candidat WHERE evaluationId = :evaluationId ORDER BY id ASC")
+    fun parEvaluationDansLOrdre(evaluationId: Int): Flow<List<ReponseCandidat>>
+
+    @Query("SELECT * FROM reponses_candidat WHERE evaluationId = :evaluationId AND questionId = :questionId LIMIT 1")
+    suspend fun pourQuestion(evaluationId: Int, questionId: Int): ReponseCandidat?
+
     @Insert
     suspend fun inserer(reponse: ReponseCandidat): Long
+
+    @Insert
+    suspend fun insererToutes(reponses: List<ReponseCandidat>)
 
     @Update
     suspend fun modifier(reponse: ReponseCandidat)

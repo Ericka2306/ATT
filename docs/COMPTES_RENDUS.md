@@ -351,3 +351,45 @@ Réassignée au dev 1 le 16/09 (le dev 2 n'avait pas commencé) ; le dev 2 repre
 1. Une tentative ouverte par l'ATT n'a pas d'examinateur ; il sera renseigné à la saisie (C9) par l'examinateur connecté (Q6).
 2. La règle `TENTATIVES_MAX` s'applique ici aussi (déjà à l'inscription) : double sécurité.
 3. Étape suivante : C9 (évaluation théorique, modes TIRAGE / DIRECT).
+
+---
+
+## Étape C9 — Évaluation théorique (orale) — 17/09/2026
+
+> Première version faite en QCM (réponses A/B/C/D, case « sur papier »), d'après la presse et le cadrage. Corrigée le jour même sur le témoignage du dev 1 : l'épreuve est **orale**, l'examinateur a une feuille avec les questions posées, les réponses données et les points, puis un total. Tout ce qui suit décrit la version corrigée ; la table `reponses` (QCM) a été retirée, schéma v3.
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `metier/ReglesTheorie.kt` — `ModesTheorie` (TIRAGE / DIRECT), `tirerSujet` (mélange puis prend chaque question qui tient dans la note max du barème : jamais au-dessus, jamais deux fois la même, points variables 2/3/5/10…), `proposables` / `proposer` / `pointsDisponibles` (mode direct : questions non posées qui tiennent dans les points restants, filtre par points), `verifierOuverture` (barème courant, questions actives, mode connu → sinon renvoi à la configuration), `pointsValides` (0 à max de la question, virgule acceptée), `totalAttribue`, `sansNote`, `verifierFin` (au moins une question, toutes notées). Le hasard est injecté (`Random`) pour être testable. 8 tests.
+- `ui/evaluation/EvaluationTheorieViewModel.kt` — à l'ouverture, crée l'`Evaluation` figée sur le barème courant et, en mode TIRAGE, les lignes `ReponseCandidat` du sujet ; en mode DIRECT, propose une question au hasard (graine locale, « Une autre », filtre par points) et « Poser cette question » ajoute une ligne. `saisir` (réponse donnée, points) garde la frappe en local et met la base à jour derrière ; `terminer` : toutes les lignes réécrites, observations figées, tentative TERMINEE, présence TERMINE, examinateur connecté enregistré si la tentative avait été ouverte par l'ATT (décision C8 n° 1), trois traces dans une seule transaction. `SessionUtilisateur.peutEvaluer()` partagé avec les tentatives.
+- `ui/evaluation/EcranEvaluationTheorie.kt` — la feuille d'examen à l'écran : en-tête (passage, candidat, mode, points posés / note max, total attribué, durée et heure d'ouverture), bloc « Prochaine question » en mode direct, une carte par question posée (énoncé, points, réponse attendue en italique, champ « Réponse du candidat », champ « Points attribués (0 à N) »), observations, « Terminer l'épreuve » avec rappel des questions non notées ; lecture seule une fois le passage clos.
+- Captures `C9_theorie_tirage.png`, `C9_theorie_direct.png`, `C9_passages.png`.
+
+**Modifié**
+- `data/EntitesReferentiels.kt` — entité `Reponse` supprimée, `Question.reponseAttendue` ; `data/EntitesExamens.kt` — `ReponseCandidat` = `reponseDonnee` + `pointsAttribues` (plus de `reponseId`), `Evaluation` sans `pointsSaisisDirectement` ; `data/AppDatabase.kt` — **schéma v3** (base de l'émulateur recréée) ; `data/ReferentielsDao.kt` — `ReponseDao` supprimé ; `data/ExamensDao.kt` — `EvaluationDao.parTentativeEnDirect`, `ReponseCandidatDao.parEvaluationDansLOrdre`, `pourQuestion`, `insererToutes` ; `data/Tracage.kt` — entité `Evaluation`, `Evaluation.resume()`, `Question.resume()` avec la réponse attendue.
+- `metier/ValidationConfiguration.kt` — `validerQuestion(enonce, points)` ; `ui/configuration/ConfigurationViewModel.kt`, `EcranEpreuve.kt` — formulaire de question : énoncé, points, réponse attendue facultative ; liste des questions avec « attendu : … ».
+- `ui/evaluation/EcranTentatives.kt` — un passage clos affiche « Consulter l'épreuve » au lieu du motif de refus en rouge ; `TentativesViewModel.kt` — utilise `peutEvaluer()` partagé.
+- `Navigation.kt` — route `tentative/{tentativeId}/theorie` branchée sur `EcranEvaluationTheorie` (la conduite reste « à venir », C10).
+- `docs/03` (Question, ReponseCandidat, schéma v3), `docs/04` (Q1 réécrite sur le témoignage), `docs/05` (UC09), `docs/HORS_COURS.md` (n° 23 `Random` injecté), `LISEZMOI.md`.
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : 67 tests verts.
+- Émulateur (pilote par texte, **base vide, schéma v3**) : `superadmin` crée le centre ATT Soarano, une version 2 du barème théorique B (20 / 12, depuis l'écran), 4 questions orales (10, 5, 3, 2 pt) avec réponse attendue, l'auto-école ; `admin` crée la session du jour, RAKOTO puis RASOA (dossier B validé, inscription, appel) ; passage de RASOA en TIRAGE : sujet de 4 questions = 20/20 posés, réponse « Arret obligatoire au feu », points 10 / 5 / 0 / 1 → total 16 / 20, observation, « Terminer » → « Consulter l'épreuve » ; `superadmin` passe `MODE_THEORIE` à `DIRECT` depuis Configuration → Règles ; RABE (3ᵉ candidat) : « Prochaine question (7 pt restants) » après deux questions posées (13/20), « Une autre », « Poser cette question », réponse saisie. Base : 3 évaluations (2 closes, 1 en cours), lignes `ReponseCandidat` avec réponse et points, historique CREATION / VALIDATION d'évaluation, tentatives et présences tracées.
+- Défaut trouvé et corrigé pendant la vérification : la première version affichait dans le champ « Réponse du candidat » la valeur relue à travers le `combine` de l'état ; la frappe rapide du pilote a donné « Arret oigatoireb ». La saisie est maintenant un `StateFlow` exposé directement (même duo `_uiState`/`uiState` que le cours), la base est mise à jour derrière.
+- Captures vérifiées une par une (Read) : `C9_theorie_tirage.png` (RASOA, 20/20 posés, total 16/20, réponse et points saisis, réponse attendue en italique), `C9_theorie_direct.png` (RABE, 13/20 posés, proposition « Distance de securite ? », filtre par points), `C9_passages.png` (deux passages terminés avec « Consulter l'épreuve », un en cours).
+
+**Décisions restantes**
+1. Une note partielle sur une question (par ex. 2 sur 3) est admise ; si l'ATT note en tout ou rien, rien à changer, l'examinateur saisit 0 ou le maximum (Q1).
+2. En mode DIRECT, rien n'oblige l'examinateur à atteindre la note max avant de terminer ; le calcul (C11) rapportera le total à la note max du barème. À confirmer (Q1 bis).
+3. Le sujet et la feuille sont en base ; leur impression relève de C13.
+4. Étape suivante : C10 (structure de l'épreuve de conduite).
+
+**À relire**
+- `app/src/main/java/mg/itu/att/metier/ReglesTheorie.kt` — nouveau : tirage, propositions, points valides, contrôles d'ouverture et de fin.
+- `app/src/test/java/mg/itu/att/metier/ReglesTheorieTest.kt` — nouveau : 8 tests ; `ValidationConfigurationTest.kt` — test de la question orale.
+- `app/src/main/java/mg/itu/att/ui/evaluation/EvaluationTheorieViewModel.kt` — nouveau : création de l'évaluation et du sujet, saisie (réponse, points) exposée directement, clôture tracée.
+- `app/src/main/java/mg/itu/att/ui/evaluation/EcranEvaluationTheorie.kt` — nouveau : la feuille d'examen à l'écran.
+- `app/src/main/java/mg/itu/att/ui/evaluation/EcranTentatives.kt` — « Consulter l'épreuve » pour un passage clos ; `TentativesViewModel.kt` — `peutEvaluer()` factorisé.
+- `app/src/main/java/mg/itu/att/data/EntitesReferentiels.kt`, `EntitesExamens.kt`, `AppDatabase.kt` (v3), `ReferentielsDao.kt`, `ExamensDao.kt`, `Tracage.kt` — QCM retiré, feuille d'examen en base.
+- `app/src/main/java/mg/itu/att/metier/ValidationConfiguration.kt`, `ui/configuration/ConfigurationViewModel.kt`, `EcranEpreuve.kt` — question orale : énoncé, points, réponse attendue.
+- `app/src/main/java/mg/itu/att/Navigation.kt` — route théorie branchée.
+- `docs/02_PLAN_DE_TRAVAIL.md`, `docs/03_MODELE_DE_DONNEES.md`, `docs/04_QUESTIONS_A_VALIDER.md` (Q1 réécrite), `docs/05_CAS_UTILISATION.md`, `docs/HORS_COURS.md`, `JOURNAL-IA.md`, `LISEZMOI.md`, `docs/captures/C9_*.png`.

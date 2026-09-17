@@ -160,30 +160,6 @@ interface QuestionDao {
 }
 
 @Dao
-interface ReponseDao {
-    @Query("SELECT * FROM reponses WHERE questionId = :questionId ORDER BY id ASC")
-    fun parQuestion(questionId: Int): Flow<List<Reponse>>
-
-    @Query("SELECT * FROM reponses WHERE questionId = :questionId ORDER BY id ASC")
-    suspend fun listePourQuestion(questionId: Int): List<Reponse>
-
-    @Query("SELECT * FROM reponses ORDER BY questionId ASC, id ASC")
-    fun toutes(): Flow<List<Reponse>>
-
-    @Insert
-    suspend fun insererToutes(reponses: List<Reponse>)
-
-    @Insert
-    suspend fun inserer(reponse: Reponse): Long
-
-    @Update
-    suspend fun modifier(reponse: Reponse)
-
-    @Query("DELETE FROM reponses WHERE id = :id")
-    suspend fun supprimer(id: Int)
-}
-
-@Dao
 interface CriterePratiqueDao {
     @Query("SELECT * FROM criteres_pratiques WHERE typeEpreuveId = :typeEpreuveId ORDER BY id ASC")
     fun parEpreuve(typeEpreuveId: Int): Flow<List<CriterePratique>>

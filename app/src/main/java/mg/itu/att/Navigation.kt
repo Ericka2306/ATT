@@ -39,7 +39,9 @@ import mg.itu.att.ui.configuration.EcranFormulaireEpreuve
 import mg.itu.att.ui.configuration.EcranFormulaireQuestion
 import mg.itu.att.ui.configuration.EcranFormulaireRegle
 import mg.itu.att.ui.configuration.EcranRegles
+import mg.itu.att.ui.evaluation.EcranEvaluationTheorie
 import mg.itu.att.ui.evaluation.EcranSessionsExaminateur
+import mg.itu.att.ui.evaluation.EvaluationTheorieViewModel
 import mg.itu.att.ui.evaluation.EcranTentatives
 import mg.itu.att.ui.evaluation.TentativesViewModel
 import mg.itu.att.ui.appel.AppelViewModel
@@ -222,14 +224,20 @@ private fun NavGraphBuilder.graphSessions(nav: NavHostController, session: () ->
         v.definirSession(s)
         EcranTentatives(v, id, onTentative = { tentativeId, code -> nav.navigate(RoutesEvaluation.saisie(tentativeId, code)) }, onRetour = retour)
     }
-    // ---------- ÉVALUATION (UC09, étape C8 ; saisie en C9/C10) ----------
+    // ---------- ÉVALUATION (UC09, étape C8 ; théorie C9, conduite C10) ----------
     composable(RoutesEvaluation.SESSIONS) {
         val s = session() ?: return@composable
         val v: TentativesViewModel = viewModel()
         v.definirSession(s)
         EcranSessionsExaminateur(v, onOuvrir = { nav.navigate(RoutesSessions.tentatives(it)) }, onRetour = retour)
     }
-    composable(RoutesEvaluation.THEORIE) { EcranAVenir("Évaluation théorique (étape C9)", onRetour = retour) }
+    composable(RoutesEvaluation.THEORIE) { entree ->
+        val s = session() ?: return@composable
+        val id = entree.idArgument("tentativeId") ?: return@composable
+        val v: EvaluationTheorieViewModel = viewModel()
+        v.definirSession(s)
+        EcranEvaluationTheorie(v, id, onTerminee = retour, onRetour = retour)
+    }
     composable(RoutesEvaluation.CONDUITE) { EcranAVenir("Évaluation de conduite (étape C10)", onRetour = retour) }
 }
 

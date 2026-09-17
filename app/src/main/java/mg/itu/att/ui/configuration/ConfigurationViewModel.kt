@@ -23,7 +23,6 @@ import mg.itu.att.data.EntitesHistorique
 import mg.itu.att.data.Question
 import mg.itu.att.data.RegleConfig
 import mg.itu.att.data.Region
-import mg.itu.att.data.Reponse
 import mg.itu.att.data.TypeEpreuve
 import mg.itu.att.data.resume
 import mg.itu.att.data.tracer
@@ -53,16 +52,15 @@ data class EtatEpreuve(
     val categorie: CategoriePermis? = null,
     val baremes: List<Bareme> = emptyList(),
     val questions: List<Question> = emptyList(),
-    val nombreReponses: Map<Int, Int> = emptyMap(),
     val criteres: List<CriterePratique> = emptyList(),
 )
 
 data class EtatFormulaireBareme(val noteMax: String = "", val seuil: String = "", val aConfirmer: Boolean = true, val erreur: String? = null)
 
-/** Une question et ses 4 réponses possibles (les vides sont ignorées) ; `indexBonne` désigne la bonne. */
+/** Une question orale : énoncé, points, réponse attendue facultative (aide-mémoire de l'examinateur). */
 data class EtatFormulaireQuestion(
-    val enonce: String = "", val points: String = "1", val reponses: List<String> = listOf("", "", "", ""),
-    val indexBonne: Int? = null, val aConfirmer: Boolean = true, val erreur: String? = null,
+    val enonce: String = "", val points: String = "1", val reponseAttendue: String = "",
+    val aConfirmer: Boolean = true, val erreur: String? = null,
 )
 
 data class EtatFormulaireCritere(val libelle: String = "", val points: String = "1", val eliminatoire: Boolean = false, val aConfirmer: Boolean = true, val erreur: String? = null)
@@ -211,13 +209,10 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
         idEpreuve.flatMapLatest { id ->
             combine(
                 db.typeEpreuveDao().parIdEnDirect(id), db.categoriePermisDao().toutes(), db.baremeDao().parEpreuve(id),
-                combine(db.questionDao().parEpreuve(id), db.reponseDao().toutes()) { q, r -> q to r },
+                db.questionDao().parEpreuve(id),
                 db.criterePratiqueDao().parEpreuve(id),
-            ) { e, categories, baremes, (questions, reponses), criteres ->
-                EtatEpreuve(
-                    epreuve = e, categorie = categories.find { it.id == e?.categorieId }, baremes = baremes,
-                    questions = questions, nombreReponses = reponses.groupingBy { it.questionId }.eachCount(), criteres = criteres,
-                )
+            ) { e, categories, baremes, questions, criteres ->
+                EtatEpreuve(epreuve = e, categorie = categories.find { it.id == e?.categorieId }, baremes = baremes, questions = questions, criteres = criteres)
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EtatEpreuve())
 
@@ -251,21 +246,18 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
     val formulaireQuestion: StateFlow<EtatFormulaireQuestion> = _formulaireQuestion
     fun modifierQuestion(t: (EtatFormulaireQuestion) -> EtatFormulaireQuestion) = _formulaireQuestion.update { t(it).copy(erreur = null) }
 
-    fun changerReponse(index: Int, texte: String) =
-        modifierQuestion { it.copy(reponses = it.reponses.mapIndexed { i, r -> if (i == index) texte else r }) }
-
     fun creerQuestion(epreuveId: Int, onSucces: () -> Unit) {
         val f = _formulaireQuestion.value
         val auteur = idUtilisateur() ?: return
         viewModelScope.launch {
-            val erreur = ValidationConfiguration.validerQuestion(f.enonce, f.points, f.reponses, f.indexBonne)
+            val erreur = ValidationConfiguration.validerQuestion(f.enonce, f.points)
             if (erreur != null) return@launch _formulaireQuestion.update { it.copy(erreur = erreur) }
             db.withTransaction {
-                val question = Question(typeEpreuveId = epreuveId, enonce = f.enonce.trim(), points = f.points.toDouble(), ordre = epreuve.value.questions.size + 1, aConfirmer = f.aConfirmer)
-                val id = db.questionDao().inserer(question).toInt()
-                db.reponseDao().insererToutes(
-                    f.reponses.mapIndexedNotNull { i, texte -> if (texte.isBlank()) null else Reponse(questionId = id, texte = texte.trim(), estCorrecte = i == f.indexBonne) },
+                val question = Question(
+                    typeEpreuveId = epreuveId, enonce = f.enonce.trim(), points = f.points.replace(',', '.').toDouble(),
+                    reponseAttendue = f.reponseAttendue.trim().ifBlank { null }, ordre = epreuve.value.questions.size + 1, aConfirmer = f.aConfirmer,
                 )
+                val id = db.questionDao().inserer(question).toInt()
                 db.tracer(EntitesHistorique.QUESTION, id, ActionsHistorique.CREATION, auteur, nouvelleValeur = question.resume())
             }
             _formulaireQuestion.value = EtatFormulaireQuestion()

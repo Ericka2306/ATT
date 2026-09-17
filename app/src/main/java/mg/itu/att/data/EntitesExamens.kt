@@ -57,25 +57,26 @@ data class Evaluation(
     val baremeId: Int,
     val dateSaisie: String,
     val observations: String? = null,
-    /** Saisie directe des points quand l'épreuve s'est faite sur papier (Q1) ; null = calcul par réponses. */
-    val pointsSaisisDirectement: Double? = null,
 )
 
-/** La réponse choisie par le candidat à une question (théorie). null = sans réponse. */
+/**
+ * Une ligne de la feuille d'examen théorique (épreuve orale) : la question posée, ce que le candidat a répondu,
+ * les points que l'examinateur lui attribue (entre 0 et les points de la question ; null = pas encore noté).
+ */
 @Entity(
     tableName = "reponses_candidat",
     foreignKeys = [
         ForeignKey(entity = Evaluation::class, parentColumns = ["id"], childColumns = ["evaluationId"]),
         ForeignKey(entity = Question::class, parentColumns = ["id"], childColumns = ["questionId"]),
-        ForeignKey(entity = Reponse::class, parentColumns = ["id"], childColumns = ["reponseId"]),
     ],
-    indices = [Index(value = ["evaluationId", "questionId"], unique = true), Index("questionId"), Index("reponseId")],
+    indices = [Index(value = ["evaluationId", "questionId"], unique = true), Index("questionId")],
 )
 data class ReponseCandidat(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val evaluationId: Int,
     val questionId: Int,
-    val reponseId: Int? = null,
+    val reponseDonnee: String? = null,
+    val pointsAttribues: Double? = null,
 )
 
 /** La note d'un critère de conduite (structure seulement, grille à confirmer, Q2). */

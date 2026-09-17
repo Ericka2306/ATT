@@ -168,7 +168,22 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 12 — <date> — <tâche>
+## Entrée 12 — 17/09/2026 — Étape C9, évaluation théorique
+
+- Code soumis : `metier/ReglesTheorie.kt`, `ui/evaluation/EvaluationTheorieViewModel.kt`, `EcranEvaluationTheorie.kt`, schéma v3.
+- Remarque principale de l'IA : la première version était un QCM (réponses A/B/C/D) parce que la presse et le cadrage le disaient ; le dev 1, qui vient de passer l'épreuve, a décrit une épreuve orale avec une feuille « question posée / réponse donnée / points / total ». L'IA avait respecté la règle « ne pas inventer » en suivant les sources écrites, mais une source de terrain vaut plus qu'un article : la question Q1 est réécrite, la table QCM supprimée, l'écran devient la feuille d'examen.
+
+⚠️ Le tirage au sort reste une fonction pure qui reçoit son générateur de hasard (`Random(graine)`) : avec une graine fixe le sujet est reproductible, le test vérifie qu'il atteint la note max sans la dépasser ni répéter, avec des questions à points variables.
+
+⚠️ Le sujet est créé en base dès l'ouverture de l'écran (gardé par « une seule fois par identifiant ») pour être figé avant la première réponse. Un écran qui écrit à l'ouverture est inhabituel dans le cours : à discuter en binôme.
+
+⚠️ Ce que tape l'examinateur est gardé dans le ViewModel et recopié en base à chaque frappe (et en bloc à la clôture) : si l'écran affichait la valeur relue depuis Room, le curseur sauterait. À relire.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 1>.
+
+---
+
+## Entrée 13 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :
