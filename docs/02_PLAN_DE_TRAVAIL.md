@@ -7,12 +7,12 @@
 
 | | |
 |---|---|
-| **Dernière étape terminée** | C11 (calcul, validation et correction des résultats) — 17/09/2026, en attente de relecture (branche `etape-C11-resultats`) ; C12 fusionnée (PR #16) |
+| **Dernière étape terminée** | C13 (impression : convocation, liste d'appel, liste des admis, relevé) — 17/09/2026, en attente de relecture (branche `etape-C13-impression`) ; C11 fusionnée (PR #17) |
 | **Étape en cours** | aucune |
-| **Prochaine étape** | C13 (impression : convocation, liste d'appel, liste des admis, relevé) — dev 2 |
+| **Prochaine étape** | D1 (tests et cas particuliers : les 10 contraintes du cadrage §11) — dev 2 |
 | **Qui fait quoi** | depuis le 17/09/2026, le dev 1 a livré jusqu'à C10 ; le dev 2 reprend C11, C12, C13 et D1, une pull request par étape du plan (comme les précédentes) |
-| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape C11 » |
-| **Dernier commit poussé** | `etape-C12-consultation` — « Ajoute la consultation par rôle (étape C12) », PR #16 fusionnée |
+| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape C13 » |
+| **Dernier commit poussé** | `etape-C11-resultats` — « Ajoute le calcul, la validation et la correction des résultats (étape C11) », PR #17 fusionnée |
 
 Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une question à valider
 
@@ -52,7 +52,7 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 | C10 Structure conduite | écran de saisie des critères/notes/observations/fautes, sans grille imposée (données de configuration vides) | `ui/evaluation/EcranEvaluationConduite` | écran fonctionnel avec critères de démonstration marqués « à confirmer » | 🟢 17/09/2026 (Q2 : grille configurable) |
 | C11 Calcul des résultats | `metier/CalculResultat.kt` (pur), création `Resultat`, validation ATT, correction traçable (nouvelle ligne), échec → nouvelle tentative | `ui/resultats/`, tests JUnit | **Calculer selon le barème configurable** ; **conserver l'historique** ; tests verts | 🟢 17/09/2026 (dev 2 ; calcul enchaîné à la clôture de l'épreuve, Q2 bis : note rapportée au barème) |
 | C12 Consultation | parcours candidat (soi), vue auto-école (ses candidats), vues ATT (sessions, résultats, historique), filtres par région | `ui/candidats/EcranParcours`, `ui/resultats/EcranConsultation` | **Respecter les rôles** | 🟢 17/09/2026 (dev 2 ; la consultation des résultats validés est livrée avec C11) |
-| C13 Impression | convocation individuelle, liste d'appel de session, relevé de résultat (HTML → `PrintManager` ou PDF) | `ui/impression/` | **Imprimer les informations essentielles** ; fonctionne hors réseau | ⚪ |
+| C13 Impression | convocation individuelle, liste d'appel de session, relevé de résultat (HTML → `PrintManager` ou PDF) | `ui/impression/` | **Imprimer les informations essentielles** ; fonctionne hors réseau | 🟢 17/09/2026 (dev 2 ; 4 documents, liste d'appel en version ATT et examinateur) |
 
 ## Phase D — Consolidation
 

@@ -241,7 +241,22 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 17 — <date> — <tâche>
+## Entrée 17 — 17/09/2026 — Étape C13, impression (dev 2)
+
+- Code soumis : `metier/DocumentsImpression.kt`, `ui/impression/ImpressionViewModel.kt`, `EcranImpression.kt`.
+- Remarque principale de l'IA : garder la mise en page dans des fonctions pures (du texte HTML) rend les documents testables par JUnit — on vérifie par exemple que la version examinateur ne contient aucun nom, ce qu'un test d'interface ne saurait pas faire simplement. Seul l'aperçu et l'appel au service d'impression touchent Android.
+
+⚠️ `AndroidView` (afficher une `WebView` dans Compose) n'était pas dans `HORS_COURS.md` : ajouté en n° 24 avant usage, comme l'exige R7.
+
+⚠️ Défaut découvert par hasard en ajoutant les boutons : dans `EcranDetailSession`, toutes les actions étaient dans une seule `Row` qui déborde de l'écran, si bien que « Démarrer » et « Terminer » étaient inaccessibles. Corrigé en répartissant sur plusieurs lignes. À vérifier ailleurs : d'autres écrans peuvent avoir le même défaut.
+
+⚠️ Le choix de la version de la liste d'appel (avec ou sans noms) dépend du rôle connecté, pas d'un bouton. Simple, mais peu visible : à discuter en binôme.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 2>.
+
+---
+
+## Entrée 18 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :

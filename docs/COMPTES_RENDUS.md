@@ -549,3 +549,40 @@ Réassignée au dev 1 le 16/09 (le dev 2 n'avait pas commencé) ; le dev 2 repre
 - `app/src/main/java/mg/itu/att/data/ExamensDao.kt`, `ReferentielsDao.kt`, `Tracage.kt` — requêtes et résumé ajoutés.
 - `app/src/main/java/mg/itu/att/Navigation.kt` — `graphResultats`.
 - `docs/02_PLAN_DE_TRAVAIL.md`, `docs/04_QUESTIONS_A_VALIDER.md`, `docs/05_CAS_UTILISATION.md`, `docs/captures/C11_*.png` — 6 captures de l'émulateur.
+
+---
+
+## Étape C13 — Impression des documents — 17/09/2026
+
+> Quatre documents imprimables (UC13), tous construits en HTML par des fonctions pures puis confiés au service d'impression d'Android (imprimante ou enregistrement en PDF). Fonctionne sans réseau : c'est la procédure de secours du cadrage §10.
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `metier/DocumentsImpression.kt` — `page` (squelette commun : en-tête ATT, styles d'impression, pied de page avec la mention « document interne, sans valeur officielle » et la date d'édition), `echapper` (un nom avec `&` ou `<` ne casse pas la page), puis `convocation`, `listeAppel` (version ATT avec les noms / version examinateur avec les numéros seuls, colonnes Présent / Absent / Retard à cocher), `listeAdmis` (uniquement les résultats validés par l'ATT) et `releve`. Fonctions pures. 9 tests.
+- `ui/impression/ImpressionViewModel.kt` — rassemble les données de chaque document et **vérifie les droits** : une auto-école n'imprime que les convocations et relevés de ses candidats, un candidat que les siens, la liste des admis est réservée à l'ATT, et un relevé non validé n'est imprimable que par l'ATT.
+- `ui/impression/EcranImpression.kt` — un seul écran d'aperçu : la page est affichée dans une `WebView` (`AndroidView`) et le bouton « Imprimer » la remet à `PrintManager`.
+- Captures `C13_convocation.png`, `C13_liste_appel.png`, `C13_liste_admis.png`, `C13_releve.png`, `C13_convocation_auto_ecole.png` (prises sur l'émulateur).
+
+**Modifié**
+- `Navigation.kt` — `graphImpression` : les quatre routes de docs/05 §4.6 (`impression/convocation/{inscriptionId}`, `…/appel/{sessionId}`, `…/admis/{sessionId}`, `…/releve/{resultatId}`).
+- Boutons d'accès : `EcranDetailSession` (« Liste d'appel », « Liste des admis »), `EcranInscriptions` (« Convocation » par inscrit), `EcranMesInscriptions` (« Imprimer la convocation » pour une session à venir), `EcranDetailResultat` (« Imprimer le relevé »).
+- `docs/HORS_COURS.md` — notion n° 24 (`AndroidView` + `PrintManager`) déclarée avant usage (R7) ; `docs/02_PLAN_DE_TRAVAIL.md` (C13 🟢, prochaine étape D1).
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : 105 tests verts (96 + 9).
+- Émulateur : `admin` imprime la liste d'appel (1 candidat, n° 001, cases à cocher), la liste des admis (« 1 sur 1 résultat(s) validé(s) », RAKOTO Jean admis 20/30), la convocation (centre, date, heure de passage estimée, 4 pièces à apporter) et le relevé (note, réussite, date de validation) ; `lalana` (auto-école) imprime la convocation de son propre candidat depuis « Mes inscriptions ». Chaque document porte la mention et la date d'édition.
+- **Défaut trouvé et corrigé** (hors périmètre C13, mais bloquant) : dans `EcranDetailSession`, tous les boutons d'action étaient dans une seule `Row`, qui déborde de l'écran — « Démarrer » et « Terminer » étaient invisibles et inaccessibles. Les actions sont désormais réparties sur trois lignes.
+
+**Décisions restantes**
+1. La liste d'appel « version examinateur » est produite quand un examinateur imprime la liste ; l'ATT obtient la version nommée. C'est le rôle connecté qui décide, il n'y a pas de bouton séparé.
+2. La liste des admis n'affiche que les résultats **validés** : un résultat calculé mais non validé n'y figure pas (UC10).
+3. L'impression passe par le service d'Android : sur un émulateur sans imprimante, l'option « Enregistrer au format PDF » est disponible.
+4. Étape suivante : D1 (tests et cas particuliers, les 10 contraintes du cadrage §11).
+
+**À relire**
+- `app/src/main/java/mg/itu/att/metier/DocumentsImpression.kt` — nouveau : les quatre documents, en HTML, sans Android.
+- `app/src/test/java/mg/itu/att/metier/DocumentsImpressionTest.kt` — nouveau : 9 tests (échappement, mention, anonymat de la version examinateur, comptage des admis).
+- `app/src/main/java/mg/itu/att/ui/impression/ImpressionViewModel.kt` — nouveau : assemblage des données et contrôle des droits.
+- `app/src/main/java/mg/itu/att/ui/impression/EcranImpression.kt` — nouveau : aperçu `WebView` + `PrintManager`.
+- `app/src/main/java/mg/itu/att/Navigation.kt` — `graphImpression` et les boutons passés aux écrans.
+- `app/src/main/java/mg/itu/att/ui/sessions/EcranDetailSession.kt` — boutons répartis sur plusieurs lignes (défaut d'affichage corrigé) ; `ui/inscriptions/EcranInscriptions.kt`, `EcranMesInscriptions.kt`, `ui/resultats/EcranDetailResultat.kt` — un bouton d'impression chacun.
+- `docs/HORS_COURS.md` (n° 24), `docs/02_PLAN_DE_TRAVAIL.md`, `docs/captures/C13_*.png` — 5 captures de l'émulateur.
