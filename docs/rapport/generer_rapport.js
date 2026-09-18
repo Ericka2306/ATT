@@ -726,7 +726,25 @@ const document = new Document({
   ],
 });
 
-Packer.toBuffer(document).then((buffer) => {
+/**
+ * Word (surtout sur Mac) refuse d'afficher les images quand plusieurs partagent le même identifiant `wp:docPr`
+ * (« Nous ne pouvons pas afficher l'image »). La bibliothèque les numérote toutes 1 : on renumérote après coup
+ * et on donne un nom à chaque image.
+ */
+async function numeroterImages(buffer) {
+  const JSZip = require("./node_modules/jszip");
+  const zip = await JSZip.loadAsync(buffer);
+  const chemin = "word/document.xml";
+  let xml = await zip.file(chemin).async("string");
+  let n = 0;
+  xml = xml.replace(/<wp:docPr id="\d+" name=""/g, () => { n += 1; return `<wp:docPr id="${n}" name="Figure ${n}"`; });
+  xml = xml.replace(/<pic:cNvPr id="0" name=""/g, () => `<pic:cNvPr id="0" name="Image"`);
+  zip.file(chemin, xml);
+  console.log("Images renumérotées :", n);
+  return zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" });
+}
+
+Packer.toBuffer(document).then(numeroterImages).then((buffer) => {
   const sortie = path.join(__dirname, "Rapport_technique_ATT.docx");
   fs.writeFileSync(sortie, buffer);
   console.log("Écrit :", sortie, Math.round(buffer.length / 1024), "Ko");
