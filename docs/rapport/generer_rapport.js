@@ -94,6 +94,19 @@ const figure = (nomFichier, legende, largeurCm = 7) => {
   return contenu;
 };
 
+/** Une image de code (fabriquée par capturer_code.js), sur toute la largeur utile, sans numéro de figure. */
+const imageCode = (nomFichier, largeurCm = 16) => {
+  const chemin = path.join(DOSSIER_CAPTURES, nomFichier);
+  if (!fs.existsSync(chemin)) return aCompleter("image de code manquante : " + nomFichier);
+  const donnees = fs.readFileSync(chemin);
+  const px = Math.round(largeurCm * 37.8);
+  return new Paragraph({
+    alignment: AlignmentType.CENTER, spacing: { before: 80, after: 200 },
+    border: { top: { style: BorderStyle.SINGLE, size: 4, color: "D0D0D0", space: 4 }, bottom: { style: BorderStyle.SINGLE, size: 4, color: "D0D0D0", space: 4 }, left: { style: BorderStyle.SINGLE, size: 4, color: "D0D0D0", space: 4 }, right: { style: BorderStyle.SINGLE, size: 4, color: "D0D0D0", space: 4 } },
+    children: [new ImageRun({ type: "png", data: donnees, transformation: { width: px, height: Math.round(px * donnees.readUInt32BE(20) / donnees.readUInt32BE(16)) } })],
+  });
+};
+
 /** Tableau simple : bordures noires fines, aucun fond, en-tête en gras ; `largeurs` en centièmes de la largeur utile (somme 100). */
 const tableau = (entetes, lignes, largeurs) => {
   const total = 9020;
@@ -702,59 +715,19 @@ function annexes() {
   return [
     titre1("Annexe A — Extraits de code commentés"),
     titre2("A.1 Écriture et historique dans une même transaction"),
-    ...paras("Extrait simplifié de AppelViewModel (la version réelle vérifie d'abord le statut de la session et de la présence)."),
-    ...bloc([
-      "db.withTransaction {",
-      "    val modifiee = presence.copy(statut = StatutPresence.PRESENT)",
-      "    db.presenceDao().modifier(modifiee)",
-      "    db.tracer(EntitesHistorique.PRESENCE, presence.id, ActionsHistorique.MODIFICATION,",
-      "        utilisateur.id, ancienneValeur = presence.resume(), nouvelleValeur = modifiee.resume())",
-      "}",
-    ]),
+    ...paras("Les extraits ci-dessous sont le code réel du projet, tel qu'il apparaît dans l'éditeur d'Android Studio, avec ses numéros de ligne."),
+    imageCode("code_A1.png"),
     espace(),
     ...paras("La modification et sa trace sont dans le même bloc : Room les écrit ensemble ou n'écrit rien. L'historique ne peut donc jamais raconter autre chose que ce qui s'est passé."),
     titre2("A.2 Une règle pure et son test"),
-    ...bloc([
-      "// Règle d'ouverture d'une tentative (couche métier)",
-      "fun peutOuvrir(statutPresence: StatutPresence?, tentativeDeCetteInscription: Tentative?,",
-      "               nombreTentatives: Int, tentativesMax: Int): String? = when {",
-      "    tentativeDeCetteInscription != null -> when (tentativeDeCetteInscription.statut) {",
-      "        StatutTentative.EN_COURS -> null                         // reprise du passage en cours",
-      "        else -> \"Un passage existe déjà pour cette inscription.\"",
-      "    }",
-      "    statutPresence != StatutPresence.PRESENT && statutPresence != StatutPresence.EN_COURS ->",
-      "        \"Le candidat n'est pas marqué présent (appel).\"",
-      "    tentativesMax > 0 && nombreTentatives >= tentativesMax -> \"Nombre maximal de passages atteint.\"",
-      "    else -> null",
-      "}",
-      "",
-      "// Son test unitaire",
-      "@Test fun `ouverture reservee aux presents`() {",
-      "    assertNull(ReglesTentatives.peutOuvrir(StatutPresence.PRESENT, null, 0, 0))",
-      "    assertNotNull(ReglesTentatives.peutOuvrir(StatutPresence.ABSENT, null, 0, 0))",
-      "}",
-    ]),
-    ...paras("Extrait simplifié (les messages réels citent le numéro et le statut du passage). La fonction ne connaît ni Android ni la base : elle reçoit des valeurs et renvoie un message d'erreur ou null. Le ViewModel fait les requêtes, la fonction fait le jugement, le test JUnit tourne sans téléphone."),
+    imageCode("code_A2a.png"),
+    imageCode("code_A2b.png"),
+    ...paras("La fonction ne connaît ni Android ni la base : elle reçoit des valeurs et renvoie un message d'erreur ou null. Le ViewModel fait les requêtes, la fonction fait le jugement, le test JUnit tourne sans téléphone."),
     titre2("A.3 Un ViewModel branché sur Room"),
-    ...bloc([
-      "val etat: StateFlow<EtatTentatives> =",
-      "    idSession.flatMapLatest { id ->",
-      "        combine(db.sessionDao().parIdEnDirect(id), db.inscriptionDao().parSession(id),",
-      "                db.presenceDao().parSession(id), db.tentativeDao().parSession(id)) { s, i, p, t -> ... }",
-      "    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EtatTentatives())",
-    ]),
-    ...paras("L'écran collecte un seul état immuable, recalculé par Room à chaque changement d'une des tables : aucune lecture manuelle, aucun rafraîchissement à déclencher."),
+    imageCode("code_A3.png"),
+    ...paras("La partie repliée construit les lignes du tableau des passages. L'écran collecte un seul état immuable, recalculé par Room à chaque changement d'une des tables : aucune lecture manuelle, aucun rafraîchissement à déclencher."),
     titre2("A.4 Le tirage du sujet, reproductible"),
-    ...bloc([
-      "fun tirerSujet(questionsActives: List<Question>, noteMax: Double, aleatoire: Random = Random.Default): List<Question> {",
-      "    val sujet = mutableListOf<Question>(); var total = 0.0",
-      "    for (q in questionsActives.filter { it.actif && it.points > 0 }.shuffled(aleatoire)) {",
-      "        if (total >= noteMax) break",
-      "        if (total + q.points <= noteMax) { sujet += q; total += q.points }",
-      "    }",
-      "    return sujet",
-      "}",
-    ]),
+    imageCode("code_A4.png"),
     ...paras("Le hasard est un paramètre : en production, le générateur par défaut ; en test, une graine fixe, et le test vérifie que le sujet atteint la note maximale sans la dépasser ni répéter une question."),
     titre1("Annexe B — Sources"),
     tableau(["Sujet", "Source", "Fiabilité"], [
