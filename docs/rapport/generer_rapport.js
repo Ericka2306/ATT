@@ -408,7 +408,7 @@ function parcours() {
       "Pour la conduite, l'application propose une grille : un critère par ligne avec ses points, une case « faute éliminatoire » quand le critère l'admet, une observation. La grille elle-même n'est pas imposée : elle vient de la configuration et reste à confirmer par l'ATT. Une faute éliminatoire vaut zéro sur le critère et fait perdre l'épreuve quel que soit le total, ce que l'écran annonce en rouge.",
       "06_13_conduite.png", "Grille de conduite : points par critère, faute éliminatoire, observations"),
     ...etape(14, "Résultat, validation et correction",
-      "Le résultat est calculé automatiquement à la clôture de l'épreuve, avec la version du barème en vigueur, copiée dans le résultat pour rester lisible même si le barème change. Si le sujet posé ou la grille ne totalise pas la note maximale du barème, la note est rapportée au barème par une règle de trois (question Q2 bis, à confirmer) ; les points attribués et les points proposés restent affichés et imprimés tels quels. Il attend la validation de l'administrateur ATT ; jusque-là, ni l'auto-école ni le candidat ne le voient. Une erreur de notation se corrige en rouvrant la feuille de l'examinateur puis en recalculant : l'application crée un nouveau résultat avec un motif, l'ancien reste en base et lisible, marqué « remplacé ».",
+      "Le résultat est calculé automatiquement à la clôture de l'épreuve, avec la version du barème en vigueur, copiée dans le résultat pour rester lisible même si le barème change. Si le sujet posé ou la grille ne totalise pas la note maximale du barème, la note est rapportée au barème par une règle de trois (question Q2 bis, à confirmer) ; les points attribués et les points proposés restent affichés et imprimés tels quels. Le résultat attend ensuite la validation de l'administrateur ATT ; jusque-là, ni l'auto-école ni le candidat ne le voient. Une erreur de notation se corrige en rouvrant la feuille de l'examinateur puis en recalculant : l'application crée un nouveau résultat avec un motif, l'ancien reste en base et lisible, marqué « remplacé ».",
       "06_14_resultat.png", "Détail d'un résultat avant validation par l'ATT"),
     ...figure("06_14b_resultats.png", "« Résultats à valider » : la file de l'ATT, avec l'état d'envoi au serveur", 5.5),
     ...figure("06_14c_resultat_corrige.png", "Résultat corrigé : une nouvelle ligne avec son motif, l'ancienne reste consultable", 5.5),
@@ -455,7 +455,7 @@ function architecture() {
     ], [18, 44, 38]),
     espace(),
     titre2("7.2 Modèle de données"),
-    ...paras(`${nombreEntites()} entités Room, reliées par des clés étrangères, en six familles. Le schéma complet, avec chaque attribut et chaque statut, est décrit dans le document de conception du modèle de données ; Room en exporte une copie JSON à chaque version.`),
+    ...paras(`${nombreEntites()} entités Room, reliées par des clés étrangères, en six familles. Room exporte le schéma complet, avec chaque attribut et chaque statut, en JSON à chaque version ; il est versionné avec le code.`),
     tableau(["Famille", "Entités", "Choix de conception"], [
       ["Référentiels", "Region, CategoriePermis, TypeEpreuve, Bareme, Question, CriterePratique, RegleConfig, Centre", "Tout ce qui est une règle administrative est une ligne de table, jamais une constante ; le barème est versionné (une version se ferme, ne se modifie pas)"],
       ["Acteurs", "Utilisateur, AutoEcole, Examinateur, Candidat", "Un compte porte son rôle et, selon le rôle, l'auto-école, l'examinateur ou le candidat qu'il représente ; le compte candidat est facultatif"],
@@ -468,11 +468,11 @@ function architecture() {
     ...paras(
       "Un exemple de bout en bout. Sur l'écran des inscriptions, l'administrateur choisit un candidat et appuie sur « Inscrire ». L'écran appelle la fonction inscrire du ViewModel avec l'identifiant du candidat. Le ViewModel rassemble ce qu'il faut (session, créneaux, inscriptions existantes, règles configurées) et appelle la fonction pure ReglesInscription.verifier, qui renvoie soit un message (« Session complète », « Le candidat est déjà inscrit »), soit rien. S'il y a un message, il est placé dans l'état et l'écran l'affiche dans un encart rouge. Sinon, le ViewModel ouvre une transaction : insertion de l'inscription avec son numéro d'appel et son créneau, puis la ligne d'historique. Room réémet alors les flux des tables concernées, la fonction combine recalcule l'état, et l'écran se redessine avec la nouvelle ligne et les places restantes : aucune relecture manuelle, aucun rafraîchissement à déclencher.",
     ),
-    ...paras("L'annexe A montre les quatre briques de ce flux : l'écriture et sa ligne d'historique dans une même transaction (A.1), une règle pure et son test (A.2), un ViewModel qui combine les flux de Room en un seul état (A.3) et le tirage du sujet avec le hasard injecté (A.4)."),
+    ...paras("L'annexe A montre ces quatre briques, prises dans d'autres écrans : une écriture et sa ligne d'historique dans une même transaction (A.1), une règle pure et son test (A.2), un ViewModel qui combine les flux de Room en un seul état (A.3) et le tirage du sujet avec le hasard injecté (A.4)."),
     titre2("7.4 Sécurité"),
     ...puces(
       "Mots de passe jamais en clair : empreinte PBKDF2 (fonction de dérivation de clé de la bibliothèque Java, plusieurs milliers d'itérations) avec un sel aléatoire par compte ; seule l'empreinte est stockée et comparée.",
-      "Session de connexion en mémoire, reconnexion à chaque lancement ; chaque ViewModel filtre ses requêtes selon le rôle du compte connecté, un examinateur qui ouvre l'appel d'une session ne reçoit que les numéros.",
+      "Session de connexion en mémoire, reconnexion à chaque lancement ; chaque ViewModel filtre ses requêtes selon le rôle du compte connecté : un examinateur qui ouvre l'appel d'une session ne reçoit que les numéros.",
       "Les comptes se désactivent et ne se suppriment pas ; les mots de passe initiaux sont à changer depuis « Mon mot de passe ».",
       "Les fichiers joints sont copiés dans le stockage privé de l'application, inaccessible aux autres applications, mais non chiffré (limite au chapitre 13).",
     ),
@@ -577,14 +577,14 @@ function usageIA() {
     ...paras(
       "Le module s'intitule « assistée par IA » : ce chapitre dit ce que nous avons fait avec l'IA, ce qu'elle a fait de bien et de mal, et ce que nous avons refusé.",
       "L'outil : Claude Code, un agent de développement qui lit et écrit les fichiers du projet, lance la construction et les tests, et pilote l'émulateur. Il a été utilisé au niveau « agent » décrit dans l'état de l'art du module, avec un fichier de règles à la racine du projet qui lui impose les technologies du cours, l'interdiction d'inventer une règle administrative, la traçabilité, et un cycle de fin d'étape : construction et tests verts, vérification sur émulateur, compte rendu, entrée dans le journal, puis relecture humaine avant tout commit.",
-      "La proportion : l'IA a produit la majorité du code de chaque étape à partir de nos documents de cadrage (règles, plan, modèle de données, cas d'utilisation), que nous avons écrits et validés avant la première ligne. Nous avons relu chaque fichier dans la demande de fusion (pull request) de l'étape avant de la fusionner, et rejoué chaque scénario sur l'émulateur. Un journal tenu à chaque étape consigne ce qui a été soumis, la remarque principale de l'IA, les points d'alerte, et notre verdict.",
+      "La proportion : l'IA a produit la majorité du code de chaque étape à partir de nos documents de cadrage (règles, plan, modèle de données, cas d'utilisation), que nous avons écrits et validés avant la première ligne. Nous avons relu chaque fichier dans la demande de fusion (pull request) de l'étape avant de la fusionner, et rejoué chaque scénario sur l'émulateur. Un journal IA, tenu à chaque étape, consigne ce qui a été soumis, la remarque principale de l'IA, les points d'alerte, et notre verdict ; les cas ci-dessous en sont tirés.",
     ),
     titre2("10.1 Ce que nous avons refusé ou corrigé"),
     ...puces(
       [gras("Le patron Repository, refusé. "), texte("Proposé dès le cadrage comme couche intermédiaire entre ViewModel et DAO, « pour faire propre », il a été écarté parce que le cours ne l'a jamais écrit et que les ViewModels appellent les DAO directement sans perdre en clarté.")],
-      [gras("Une version de bibliothèque fausse. "), texte("L'IA a d'abord proposé la version de KSP citée par une documentation ; la construction a échoué. La bonne version a été trouvée en lisant le message d'erreur, et la règle « vérifier sur le dépôt de la bibliothèque avant d'écrire une version » a été ajoutée (journal, entrée 2).")],
-      [gras("Une contrainte de base contraire à la règle métier. "), texte("Un index unique sur le couple candidat et session empêchait de réinscrire un candidat après un report ; le test unitaire passait, seule la base réelle a révélé la contradiction. Leçon consignée : un invariant qui dépend d'un statut se met dans une fonction pure, pas dans un index (entrée 10).")],
-      [gras("Un questionnaire à choix multiples inventé. "), texte("L'IA a construit l'épreuve théorique en QCM d'après la presse ; le passage de l'examen par l'une de nous a montré une épreuve orale. L'IA avait respecté la règle « ne pas inventer » en suivant une source écrite ; c'est le témoignage de terrain qui a tranché, et l'écran a été refait le jour même (entrée 12).")],
+      [gras("Une version de bibliothèque fausse. "), texte("L'IA a d'abord proposé la version de KSP citée par une documentation ; la construction a échoué. La bonne version a été trouvée en lisant le message d'erreur, et la règle « vérifier sur le dépôt de la bibliothèque avant d'écrire une version » a été ajoutée.")],
+      [gras("Une contrainte de base contraire à la règle métier. "), texte("Un index unique sur le couple candidat et session empêchait de réinscrire un candidat après un report ; le test unitaire passait, seule la base réelle a révélé la contradiction. Leçon consignée : un invariant qui dépend d'un statut se met dans une fonction pure, pas dans un index.")],
+      [gras("Un questionnaire à choix multiples inventé. "), texte("L'IA a construit l'épreuve théorique en QCM d'après la presse ; le passage de l'examen par l'une de nous a montré une épreuve orale. L'IA avait respecté la règle « ne pas inventer » en suivant une source écrite ; c'est le témoignage de terrain qui a tranché, et l'écran a été refait le jour même.")],
       [gras("Un texte qui perdait des lettres. "), texte("Sur trois écrans successifs, l'IA a reproduit le même défaut de saisie (un champ qui relit sa valeur à travers un flux combiné) ; il a été trouvé à chaque fois sur l'émulateur, jamais par les tests. Nous savons maintenant reconnaître le motif et l'expliquer.")],
     ),
     titre2("10.2 Ce que l'IA fait bien, ce qu'elle fait mal"),
@@ -627,7 +627,7 @@ function deroulement() {
     titre2("11.3 Durée réelle et bilan"),
     ...paras(
       "Le plan prévoyait dix semaines ; le développement s'est fait en peu de jours, à deux, précédé de la recherche documentaire de l'annexe B. Le cadrage (règles, plan, modèle de données, cas d'utilisation) a été écrit le premier jour, avant la première ligne de code, et n'a presque pas bougé ensuite : c'est ce qui a permis d'enchaîner les étapes sans revenir en arrière. Le socle technique et les premières fonctionnalités ont suivi ; puis les évaluations, les résultats, la consultation et l'impression ; enfin les tests, la relecture croisée, la refonte de l'interface et ce rapport.",
-      "Ce qui a pris plus de temps que prévu : comprendre le vrai déroulement de l'examen. La première version de l'épreuve théorique était un questionnaire à choix multiples, construit d'après la presse ; elle a été refaite le jour même, après le passage de l'examen par l'une de nous, sous la forme d'une feuille d'examen orale. La leçon vaut pour tout le projet : un témoignage de terrain vaut plus qu'un article, et ce que l'on ne sait pas doit rester une configuration marquée « à confirmer », pas une hypothèse gravée dans le code.",
+      "Ce qui a pris plus de temps que prévu : comprendre le vrai déroulement de l'examen, avec l'épreuve théorique refaite en oral le jour même (voir 2.3 et 10.1). La leçon vaut pour tout le projet : un témoignage de terrain vaut plus qu'un article, et ce que l'on ne sait pas doit rester une configuration marquée « à confirmer », pas une hypothèse gravée dans le code.",
     ),
   ];
 }
@@ -638,7 +638,7 @@ function coursAppliques() {
     ...paras("Le module a été construit comme « une application, sept couches, une couche par séance ». Ce chapitre montre, séance par séance, où et comment chaque notion est mise en œuvre dans l'application."),
     tableau(["Séance", "Notions du cours", "Où et comment dans l'application"], [
       ["1 — Kotlin essentiel", "data class, val et copy, null safety sans !!, when, collections (map, filter, groupBy, sumOf, sortedBy)", "Toutes les entités et tous les états d'écran sont des data class immuables modifiées par copy ; les règles métier (metier/) utilisent les fonctions de collection quand elles suffisent : total des points par sumOf, candidats éligibles par filter, meilleur passage par maxByOrNull ; l'opérateur !! est interdit par nos règles et absent du code"],
-      ["2 — Coroutines", "suspend, launch, Flow ; jamais bloquer le thread de l'interface ; runBlocking réservé aux tests", "Toute écriture passe par viewModelScope.launch, jamais rien ne bloque le fil d'exécution (thread) de l'interface ; les DAO exposent des fonctions suspend pour les écritures et des Flow pour les lectures ; le faux serveur simule l'aller-retour réseau par delay, sans bloquer l'écran"],
+      ["2 — Coroutines", "suspend, launch, Flow ; jamais bloquer le thread de l'interface ; runBlocking réservé aux tests", "Toute écriture passe par viewModelScope.launch, rien ne bloque jamais le fil d'exécution (thread) de l'interface ; les DAO exposent des fonctions suspend pour les écritures et des Flow pour les lectures ; le faux serveur simule l'aller-retour réseau par delay, sans bloquer l'écran"],
       ["3 — Anatomie Android", "Activity, cycle de vie, manifeste, Intents, Logcat, pile de retour", "Une seule MainActivity ; l'état survit à la rotation parce qu'il vit dans les ViewModels ; l'impression utilise le service d'Android ; la pile de retour est gérée par Navigation Compose (popBackStack, popUpTo à la connexion et à la déconnexion)"],
       ["4 — Jetpack Compose", "L'interface est une fonction de l'état ; @Composable, Column, Row, Card, LazyColumn, Modifier, remember pour l'état purement local", "Tous les écrans sont des composables qui affichent un état et signalent des gestes ; les listes sont des LazyColumn ; l'ouverture d'un menu déroulant est le principal état local (remember), tout le reste vit dans les ViewModels ; un jeu de composants communs (cadre d'écran, champs, cartes, encarts) évite la répétition"],
       ["5 — Navigation", "Navigation Compose, routes en chaînes, identifiant en argument, écrans qui reçoivent des lambdas", "Un NavHost, des routes comme session/{sessionId}/appel, l'identifiant relu par toIntOrNull sans plantage ; aucun écran ne connaît le navController : l'écran signale, la navigation décide"],
@@ -655,11 +655,11 @@ function coursAppliques() {
       [gras("Séance 4. "), texte("Composants communs : le cadre d'écran, les champs et les cartes sont des composables réutilisés par tous les écrans ; l'ouverture d'un menu déroulant (remember dans le sélecteur) est le principal état local ; le reste vit dans les ViewModels.")],
       [gras("Séance 5. "), texte("Navigation : routes comme tentative/{tentativeId}/theorie, identifiant relu par idArgument (toIntOrNull), écrans qui reçoivent des lambdas onRetour et onOuvrir ; aucun écran ne reçoit le navController.")],
       [gras("Séance 6. "), texte("Chaque ViewModel expose un StateFlow<EtatXxx> construit par combine(...).stateIn(...) sur les flux Room, et garde ses MutableStateFlow privés ; le ViewModel de connexion est créé au-dessus du NavHost et partagé par tous les écrans.")],
-      [gras("Séance 7. "), texte("DAO des examens : requêtes Flow pour ce qui s'affiche, suspend pour les écritures, SQL vérifié à la compilation ; la synchronisation reprend la file d'attente à drapeau de la démonstration demosync, avec les deux différences expliquées en 7.5.")],
+      [gras("Séance 7. "), texte("DAO des examens : requêtes Flow pour ce qui s'affiche, suspend pour les écritures, SQL vérifié à la compilation ; la synchronisation reprend la file d'attente à drapeau de la démonstration de synchronisation vue en cours, avec les deux différences expliquées en 7.5.")],
       [gras("Séance 8. "), texte("La synthèse du cours demandait sur quelle tâche nous aurions appris moins avec l'IA : la réponse est au chapitre 10.")],
     ),
     titre2("12.2 Ce qui dépasse le cours, et pourquoi"),
-    ...paras("Quelques notions non vues en cours ont été nécessaires ; chacune est expliquée dans un document du projet avant son usage, avec l'équivalent vu en cours et la justification :"),
+    ...paras("Quelques notions non vues en cours ont été nécessaires ; chacune est expliquée dans un document tenu par le binôme avant son usage, avec l'équivalent vu en cours et la justification :"),
     ...puces(
       "clés étrangères et index Room, transactions (une écriture et sa ligne d'historique ensemble ou pas du tout) ;",
       "hachage des mots de passe avec sel (bibliothèque standard Java) ;",
@@ -667,15 +667,15 @@ function coursAppliques() {
       "affichage d'une page HTML pour l'impression et service d'impression d'Android ;",
       "fonctions pures testées par JUnit, avec le hasard injecté pour rendre le tirage reproductible.",
     ),
-    ...paras(`Le tableau complet, avec pour chaque notion l'étape où elle est apparue, l'équivalent vu en cours et la décision du binôme, est tenu dans un document du projet (${nombreHorsCours()} entrées). Deux exemples de ce que nous avons refusé ou remplacé : le patron Repository (couche intermédiaire entre ViewModel et DAO), proposé au départ pour « faire propre », a été écarté parce que le cours n'en a jamais écrit et que les ViewModels appellent les DAO directement sans perdre en clarté ; les boutons radio de la première épreuve théorique ont disparu avec le questionnaire à choix multiples, remplacés par les champs de texte du cours.`),
+    ...paras(`Le tableau complet, avec pour chaque notion l'étape où elle est apparue, l'équivalent vu en cours et la décision du binôme, est tenu par le binôme (${nombreHorsCours()} entrées). Ce que nous avons refusé ou remplacé est raconté en 10.1 : le patron Repository, et les boutons radio du questionnaire à choix multiples, remplacés par les champs de texte du cours.`),
   ];
 }
 
 function limites() {
   return [
     titre1("13. Limites et perspectives"),
-    titre2("13.1 Ce que l'application ne fait pas encore, et pourquoi c'est bloquant pour un centre"),
-    ...paras("Un jury pardonne une limite écrite ; un centre d'examen, lui, ne peut pas travailler avec. Voici ce qui manque avant tout usage réel."),
+    titre2("13.1 Ce qui manque avant un usage réel"),
+    ...paras("Un jury pardonne une limite écrite ; un centre d'examen ne le peut pas. Voici ce qui manque avant tout usage réel dans un centre."),
     ...puces(
       [gras("Un seul appareil. "), texte("Tous les rôles partagent la même base locale ; sans serveur central, une auto-école ou un examinateur sur son propre téléphone ne verrait rien de ce que l'ATT saisit. Le serveur devra diffuser la configuration, les dossiers et les inscriptions dans les deux sens ; la synchronisation actuelle ne remonte que les résultats validés.")],
       [gras("Aucune sauvegarde. "), texte("Un téléphone perdu ou cassé emporte les dossiers, les passages et l'historique du centre. Un export chiffré de la base et sa restauration sont indispensables avant déploiement.")],
@@ -725,7 +725,7 @@ function annexes() {
     ...paras("La fonction ne connaît ni Android ni la base : elle reçoit des valeurs et renvoie un message d'erreur ou null. Le ViewModel fait les requêtes, la fonction fait le jugement, le test JUnit tourne sans téléphone."),
     titre2("A.3 Un ViewModel branché sur Room"),
     imageCode("code_A3.png"),
-    ...paras("La partie repliée construit les lignes du tableau des passages. L'écran collecte un seul état immuable, recalculé par Room à chaque changement d'une des tables : aucune lecture manuelle, aucun rafraîchissement à déclencher."),
+    ...paras("La partie repliée construit les lignes du tableau des passages. L'écran collecte un seul état immuable, recalculé par combine à chaque émission de Room, c'est-à-dire à chaque changement d'une des tables : aucune lecture manuelle, aucun rafraîchissement à déclencher."),
     titre2("A.4 Le tirage du sujet, reproductible"),
     imageCode("code_A4.png"),
     ...paras("Le hasard est un paramètre : en production, le générateur par défaut ; en test, une graine fixe, et le test vérifie que le sujet atteint la note maximale sans la dépasser ni répéter une question."),
@@ -778,7 +778,7 @@ function annexes() {
     ], [30, 70]),
     espace(),
     titre1("Annexe D — Comptes de démonstration"),
-    ...paras("Comptes disponibles au premier lancement d'une version de développement, rappelés sur l'écran de connexion avec un bouton par rôle ; les trois derniers n'existent pas dans la version livrée, et les deux premiers y ont un mot de passe initial documenté, qu'il faut changer soi-même : l'application ne l'impose pas encore (13.1)."),
+    ...paras("Comptes disponibles au premier lancement d'une version de développement, rappelés sur l'écran de connexion avec un bouton par rôle. Les trois derniers n'existent qu'en version de développement. Les deux premiers existent dans la version livrée avec un mot de passe initial documenté ; l'application n'impose pas encore son changement (13.1)."),
     tableau(["Rôle", "Identifiant", "Mot de passe initial"], [
       ["Super administrateur", "superadmin", "ChangezMoi2026"], ["Administrateur ATT", "admin", "admin2026"], ["Auto-école", "autoecole", "autoecole2026"], ["Examinateur", "examinateur", "examinateur2026"], ["Candidat", "candidat", "candidat2026"],
     ], [34, 30, 36]),
