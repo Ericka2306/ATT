@@ -21,3 +21,4 @@ local.properties
 *.hprof
 *.db
 *.db-journal
+node_modules/

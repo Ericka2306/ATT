@@ -18,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mg.itu.att.data.StatutResultat
 import mg.itu.att.metier.formatDate
 import mg.itu.att.ui.communs.CarteIcone
 import mg.itu.att.ui.communs.EcranStandard
@@ -56,7 +57,8 @@ fun EcranResultats(viewModel: ResultatsViewModel, onOuvrir: (Int) -> Unit, onRet
                     icone = Icons.AutoMirrored.Filled.List,
                     titre = "${l.nomCandidat} — permis ${l.codeCategorie}, ${l.libelleEpreuve}",
                     description = "passage n° ${l.tentative?.numero ?: "?"} · ${r.noteLisible()} · ${formatDate(r.dateCalcul)}" +
-                        (if (etat.peutValider) "\n${l.nomAutoEcole} · ${r.statut.libelle()}" else "\n${r.statut.libelle()}"),
+                        (if (etat.peutValider) "\n${l.nomAutoEcole} · ${r.statut.libelle()}" else "\n${r.statut.libelle()}") +
+                        (if (etat.peutValider && r.statut == StatutResultat.VALIDE_ATT) (if (r.synchronisee) " · envoyé à l'ATT" else " · à envoyer") else ""),
                     onClick = { onOuvrir(r.id) },
                     complement = { PastilleReussite(r.reussi) },
                 )

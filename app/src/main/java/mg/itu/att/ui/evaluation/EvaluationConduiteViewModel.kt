@@ -32,6 +32,7 @@ import mg.itu.att.metier.NoteCritere
 import mg.itu.att.metier.ReglesConduite
 import mg.itu.att.metier.maintenantIso
 import mg.itu.att.ui.communs.ViewModelAvecSession
+import mg.itu.att.ui.communs.formatPoints
 import mg.itu.att.ui.connexion.SessionUtilisateur
 
 // ---------- ÉTATS ----------

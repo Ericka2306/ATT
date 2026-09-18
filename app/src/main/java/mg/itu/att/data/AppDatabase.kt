@@ -35,7 +35,7 @@ import androidx.room.RoomDatabase
     ],
     // v2 (16/09/2026, étape C7) : l'index unique (candidatId, sessionId) des inscriptions devient un index simple.
     // v3 (17/09/2026, étape C11) : résultats corrigés (`remplaceResultatId`, motif de correction).
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {

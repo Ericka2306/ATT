@@ -24,6 +24,7 @@ object Routes {
     const val HISTORIQUE = "historique"
     const val PARCOURS = "parcours"
     const val MES_INSCRIPTIONS = "mes-inscriptions"
+    const val SYNCHRONISATION = "synchronisation"
     const val MOT_DE_PASSE = "mot-de-passe"
 
     /** Écran générique « à venir » : `avenir/{libelle}`. */
@@ -45,6 +46,7 @@ fun menuPour(role: Role): List<EntreeMenu> = when (role) {
         EntreeMenu("Sessions", Routes.SESSIONS, "Sessions, créneaux, inscriptions, appel"),
         EntreeMenu("Résultats à valider", Routes.RESULTATS, "Résultats calculés en attente de validation"),
         EntreeMenu("Historique", Routes.HISTORIQUE, "Journal des modifications"),
+        EntreeMenu("Synchronisation", Routes.SYNCHRONISATION, "Résultats validés à remonter au serveur de l'ATT"),
     )
     Role.ADMIN_ATT -> listOf(
         EntreeMenu("Auto-écoles", Routes.AUTO_ECOLES, "Auto-écoles agréées et leurs comptes"),
@@ -54,6 +56,7 @@ fun menuPour(role: Role): List<EntreeMenu> = when (role) {
         EntreeMenu("Sessions", Routes.SESSIONS, "Créer, inscrire, faire l'appel, imprimer"),
         EntreeMenu("Résultats à valider", Routes.RESULTATS, "Résultats calculés en attente de validation"),
         EntreeMenu("Historique", Routes.HISTORIQUE, "Journal des modifications"),
+        EntreeMenu("Synchronisation", Routes.SYNCHRONISATION, "Résultats validés à remonter au serveur de l'ATT"),
     )
     Role.AUTO_ECOLE -> listOf(
         EntreeMenu("Mes candidats", Routes.CANDIDATS, "Créer un candidat, constituer et soumettre un dossier"),

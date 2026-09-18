@@ -29,15 +29,13 @@ import mg.itu.att.ui.communs.BoutonPrincipal
 import mg.itu.att.ui.communs.CarteFiche
 import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.formatPoints
 import mg.itu.att.ui.communs.EncartInfo
 import mg.itu.att.ui.communs.LigneInfo
 import mg.itu.att.ui.communs.Option
 import mg.itu.att.ui.communs.SelecteurChoix
 import mg.itu.att.ui.communs.TexteErreur
 import mg.itu.att.ui.communs.TitreSection
-
-/** "12.0" → "12", "12.5" → "12,5" : les points s'affichent sans décimale inutile. */
-fun formatPoints(points: Double): String = if (points == points.toLong().toDouble()) points.toLong().toString() else points.toString().replace('.', ',')
 
 /**
  * Épreuve théorique orale d'un passage (UC09, étape C9) : la feuille d'examen à l'écran. Sujet tiré au sort (TIRAGE)

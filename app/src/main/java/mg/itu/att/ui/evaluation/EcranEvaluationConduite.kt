@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import mg.itu.att.data.StatutTentative
 import mg.itu.att.metier.formatDate
 import mg.itu.att.ui.communs.BoutonPrincipal
+import mg.itu.att.ui.communs.formatPoints
 import mg.itu.att.ui.communs.CarteFiche
 import mg.itu.att.ui.communs.CaseACocher
 import mg.itu.att.ui.communs.ChampTexte

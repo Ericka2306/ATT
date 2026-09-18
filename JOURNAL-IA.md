@@ -284,7 +284,20 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 20 — <date> — <tâche>
+## Entrée 20 — 18/09/2026 — Étape D2c, synchronisation hors ligne d'abord
+
+- Code soumis : `data/FauxServeurATT.kt`, `data/Synchronisation.kt`, `ui/synchronisation/*`, drapeau `synchronisee` sur `Resultat` (schéma v4).
+- Remarque principale de l'IA : reproduire la démo `demosync` du cours à l'identique (drapeau sur l'entité, file d'attente = requête, boucle qui s'arrête au premier échec, interrupteur réseau simulé) plutôt qu'inventer un mécanisme : c'est ce que le jury connaît, et un vrai serveur remplacerait le faux sans toucher au reste.
+
+⚠️ Le drapeau est levé par une requête `UPDATE … SET synchronisee = 1`, pas par un `@Update` de l'objet entier : la note et le statut d'un résultat ne doivent jamais être réécrits (R6), même par accident.
+
+⚠️ Le dev 2 avait « figé » le schéma en v3 (D2) ; cette étape le passe en v4. Le binôme doit refaire le point sur le schéma final avant la soutenance.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 1>.
+
+---
+
+## Entrée 21 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :

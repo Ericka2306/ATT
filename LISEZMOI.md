@@ -84,6 +84,9 @@ Parcours complet, d'une base vide jusqu'au relevé imprimé. Compter une vingtai
 18. Pour montrer la traçabilité : « Corriger (recalculer) » avec un motif crée une **nouvelle** ligne ; l'ancienne reste lisible, marquée « Remplacé ».
 19. Historique : les modifications du parcours, avec leur auteur, filtrables par période, objet et utilisateur.
 
+**7 bis. Synchronisation — `admin`**
+19 bis. Synchronisation : le résultat validé est « Envoyé » (réseau on). Couper le réseau avec l'interrupteur, valider un autre résultat : « En attente », l'application ne bloque pas ; rétablir le réseau, « Synchroniser maintenant » : la file se vide et le panneau serveur se remplit.
+
 **8. Consultation — `lalana`**
 20. Mes inscriptions et Résultats : l'auto-école ne voit que ses candidats, et le résultat seulement une fois validé.
 

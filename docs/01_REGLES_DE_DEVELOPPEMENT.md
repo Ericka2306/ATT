@@ -95,7 +95,7 @@ Ecran* (Compose)  →  XxxViewModel (StateFlow<EtatXxx>)  →  XxxDao (Room)  �
 - **Toute écriture** passe par `viewModelScope.launch { dao.xxx() }` ; toute liste affichée vient d'un `Flow` du DAO.
 - **Logique métier** (calcul de résultat, contrôle de capacité, éligibilité, tentatives) dans des fonctions pures Kotlin, `object` sans dépendance Android (`metier/`), appelées par les ViewModels et testées par JUnit.
 - **Navigation** : routes chaînes en français (`"candidats"`, `"candidat/{candidatId}"`, `"session/{sessionId}/appel"`), argument = identifiant lu par `toIntOrNull()`, null géré sans plantage ; les écrans reçoivent des lambdas (`onRetour`, `onCandidatClick`).
-- **Offline-first** : Room est la source de vérité ; l'application fonctionne intégralement sans réseau. Pas de synchronisation réseau dans le MVP (pas de serveur) ; si une démonstration de synchronisation est demandée, reproduire le pattern `demosync` (champ `synchronisee`, `FauxServeur`).
+- **Offline-first** : Room est la source de vérité ; l'application fonctionne intégralement sans réseau. La synchronisation reproduit la démo `demosync` du cours (18/09/2026, demande du dev 1) : drapeau `synchronisee` sur `Resultat`, file d'attente = requête, `FauxServeurATT` en mémoire avec interrupteur réseau, `Synchronisation.synchroniserResultats` appelée après chaque validation et par l'écran « Synchronisation ». Un vrai serveur remplacerait `FauxServeurATT` sans changer le reste.
 - **Permissions** : chaque ViewModel reçoit l'utilisateur courant (`SessionUtilisateur`) et filtre ses requêtes (auto-école → ses candidats ; candidat → lui-même ; Admin ATT régional → sa région). Les écrans n'affichent que les actions autorisées.
 
 ### 4.1 Arborescence

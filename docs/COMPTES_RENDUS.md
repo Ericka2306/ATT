@@ -698,3 +698,30 @@ Le refus d'un report ou d'une annulation sans motif se posait dans l'erreur de l
 - `app/src/main/java/mg/itu/att/ui/evaluation/EcranEvaluationTheorie.kt`, `EcranEvaluationConduite.kt`, `ui/resultats/Statuts.kt` — message trompeur, virgule des notes.
 - `app/src/main/java/mg/itu/att/data/AppDatabase.kt`, `app/build.gradle.kts`, `app/schemas/` — schéma figé et exporté.
 - `docs/06_GUIDE_DU_CODE.md` (nouveau), `LISEZMOI.md`, `outils/pilote_emulateur.sh`, `docs/captures/D2_*.png`.
+
+---
+
+## Étape D2c — Synchronisation hors ligne d'abord (cours S7) — 18/09/2026
+
+**Pourquoi** : le dev 1 a constaté que le dernier cours (Room et offline-first, démo `demosync`) n'était pas appliqué : pas de synchronisation ni de bouton « Synchroniser ». Le rapport technique doit montrer chaque cours appliqué.
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `data/FauxServeurATT.kt` — serveur central simulé en mémoire : `reseauDisponible`, `envoyer` (délai de 600 ms, échec si réseau coupé), `contenu()`, date de dernière synchronisation. Même rôle que `FauxServeur` du cours.
+- `data/Synchronisation.kt` — `synchroniserResultats(db)` : boucle sur la file d'attente, arrêt au premier échec, marque `synchronisee = 1` par une requête `UPDATE` qui ne touche qu'au drapeau (R6). Partagée par la validation et l'écran.
+- `ui/synchronisation/SynchronisationViewModel.kt`, `EcranSynchronisation.kt` — état du réseau (interrupteur de démonstration), compteur « n en attente », « Synchroniser maintenant » (actif seulement s'il y a quelque chose à envoyer), résultats validés avec pastille « Envoyé / En attente », panneau « serveur » de ce qui est remonté.
+
+**Modifié**
+- `data/EntitesExamens.kt` — `Resultat.synchronisee: Boolean = false` ; `data/AppDatabase.kt` — **schéma v4** (`app/schemas/…/4.json` exporté) ; `data/ExamensDao.kt` — `enAttenteDeSynchronisation`, `nombreEnAttenteDeSynchronisation` (Flow), `marquerSynchronise`.
+- `ui/resultats/ResultatsViewModel.kt` — après `valider` : « la base d'abord, le réseau ensuite », tentative de remontée immédiate ; `EcranResultats.kt` — « envoyé à l'ATT / à envoyer » sur les résultats validés (vue ATT).
+- `ui/accueil/MenuParRole.kt` — entrée « Synchronisation » pour le Super Admin et l'Admin ATT ; `EcranAccueil.kt` — icône et couleur ; `Navigation.kt` — route `synchronisation`.
+- `docs/01` (offline-first), `docs/03` (champ, v4), `docs/05` (route), `docs/02`, rapport technique (section 7.5, étape 19 du parcours, chapitre 11 « les cours appliqués »).
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : 121 tests verts ; base de l'émulateur recréée (v4).
+- Démonstration à rejouer en quatre temps, comme au cours : réseau on → valider un résultat → il passe « Envoyé » ; réseau off → valider → « En attente », compteur à 1, l'application ne bloque pas ; fermer et rouvrir : toujours là ; réseau on → « Synchroniser maintenant » → file vidée, panneau serveur rempli.
+
+**Décisions restantes**
+1. Seuls les résultats validés sont synchronisés (c'est la liste des admis que l'ATT publie) ; les autres données restent locales. À élargir si un vrai serveur arrive.
+2. Le serveur reçoit le numéro d'appel, jamais le nom : cohérent avec l'anonymat.
+
+**À relire** : les fichiers ci-dessus ; entrée 20 du journal IA.

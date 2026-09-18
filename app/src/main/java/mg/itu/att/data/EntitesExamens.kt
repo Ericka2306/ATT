@@ -130,4 +130,9 @@ data class Resultat(
     val dateValidation: String? = null,
     val remplaceResultatId: Int? = null,
     val motifCorrection: String? = null,
+    /**
+     * Offline-first (cours S7, démo `demosync`) : false = validé localement, pas encore remonté au serveur central
+     * de l'ATT. La base locale reste la source de vérité ; le réseau ne fait que la nourrir.
+     */
+    val synchronisee: Boolean = false,
 )
