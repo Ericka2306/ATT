@@ -147,7 +147,8 @@ function entreeJournal(numero) {
   if (debut < 0) return [];
   const fin = texteJournal.indexOf("\n---", debut);
   const bloc = texteJournal.slice(debut, fin < 0 ? undefined : fin).split("\n").filter((l) => l.trim() !== "");
-  const lignes = bloc.map((l) => l.replace(/^## /, "").replace(/`/g, "").replace(/\*\*/g, ""));
+  // Le verdict du binôme s'écrit dans le fichier, à la main ; tant qu'il n'est pas rédigé, la ligne vide reste hors du rapport.
+  const lignes = bloc.filter((l) => !l.includes("<à compléter")).map((l) => l.replace(/^## /, "").replace(/`/g, "").replace(/\*\*/g, ""));
   return [titre3(lignes[0]), ...lignes.slice(1).map((l) => para(texte(l, { size: 20 })))];
 }
 function nombreTests() {
@@ -667,7 +668,7 @@ function limites() {
     ...paras(
       "Nous étions partis d'un cahier de cadrage et d'une question simple : pourquoi passer l'examen du permis reste-t-il si long et si opaque, pour le candidat comme pour l'administration ? En suivant un candidat de son dossier à son résultat, nous avons construit une application qui couvre toute la chaîne de l'ATT : dossiers vérifiés avant la convocation, sessions découpées en créneaux, appel par numéro, feuille d'examen à l'écran, résultat calculé selon un barème configurable, validé, corrigeable sans rien effacer, imprimable, et remonté à un serveur central quand le réseau le permet.",
       "Ce projet nous a beaucoup intéressés, et d'abord parce qu'il est vrai. Ce que nous avons observé nous-mêmes le jour de l'examen, un candidat renvoyé pour une pièce manquante, un « présent » que personne n'entend dans la foule, trouve une réponse concrète dans ce que nous avons construit. Nous avons aussi appris, au passage, à ne pas inventer une règle administrative que nous ne connaissions pas : tout ce qui reste incertain est marqué « à confirmer » et attend l'ATT.",
-      "Il faut aussi être honnêtes : ce que nous livrons est le minimum qu'un projet universitaire, mené en quatre jours à deux, pouvait atteindre. Il pourrait être tellement mieux. Les barèmes et la grille de conduite sont des exemples ; le serveur est simulé et tout tient sur un seul appareil ; les photos des pièces ne sont pas chiffrées ; l'interface mériterait d'être testée avec de vrais agents dans un vrai centre. Aucune de ces limites n'est un mur : chacune est nommée au chapitre 13, et l'architecture a été pensée pour les accueillir sans tout reprendre.",
+      "Il faut aussi être honnêtes : ce que nous livrons est le minimum qu'un projet universitaire, mené en quatre jours à deux, pouvait atteindre. Il peut être largement amélioré. Les barèmes et la grille de conduite sont des exemples ; le serveur est simulé et tout tient sur un seul appareil ; les photos des pièces ne sont pas chiffrées ; l'interface mériterait d'être testée avec de vrais agents dans un vrai centre. Aucune de ces limites n'est un mur : chacune est nommée au chapitre 13, et l'architecture a été pensée pour les accueillir sans tout reprendre.",
       "Nous espérons qu'un jour l'État, à travers l'ATT, se saisira d'un outil de ce genre, celui-ci ou un autre, parce que le besoin est là et que les candidats, les auto-écoles et les agents y gagneraient tous. Si ce travail a au moins montré que c'était possible avec des moyens modestes, en respectant les règles et en gardant le candidat sans smartphone au centre, alors il aura servi à quelque chose.",
     ),
   ];
@@ -811,10 +812,10 @@ function annexes() {
     ], [42, 58]),
     espace(),
     titre1("Annexe G — Trois entrées du journal IA, telles quelles"),
-    ...paras("Le journal complet est le fichier JOURNAL-IA.md du dépôt. Les trois entrées ci-dessous, recopiées sans retouche, correspondent aux refus et corrections cités au chapitre 10."),
-    ...entreeJournal(2),
+    ...paras("Le journal complet est le fichier JOURNAL-IA.md du dépôt. Les trois entrées ci-dessous sont recopiées sans retouche : la contradiction entre un index SQL et une règle métier (chapitre 10), le passage du QCM à l'épreuve orale sur un témoignage de terrain (chapitres 2 et 10), et la reprise de la démonstration du cours pour la synchronisation (chapitres 7.5 et 12)."),
     ...entreeJournal(10),
     ...entreeJournal(12),
+    ...entreeJournal(20),
   ];
 }
 
