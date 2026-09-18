@@ -725,3 +725,27 @@ Le refus d'un report ou d'une annulation sans motif se posait dans l'erreur de l
 2. Le serveur reçoit le numéro d'appel, jamais le nom : cohérent avec l'anonymat.
 
 **À relire** : les fichiers ci-dessus ; entrée 20 du journal IA.
+
+---
+
+## Étape D2d — Rejeu de A à Z, audit et rapport technique — 18/09/2026
+
+**Objet** : rejouer tout le parcours depuis une base vide en traquant les petits défauts (front et back), en corrigeant au passage, et en prenant les captures du rapport technique.
+
+**Défauts trouvés et corrigés pendant le rejeu**
+1. Fiche d'une épreuve : la pastille « à confirmer » affichait le drapeau du barème, pas celui de l'épreuve ; le barème a maintenant son propre indicateur et un bouton « Confirmer » sur la version courante (`ConfigurationViewModel.confirmerBareme`, tracé).
+2. Sélecteurs (région, catégorie, épreuve…) : la zone cliquable n'exposait aucun texte ; invisibles pour un lecteur d'écran et pour l'automate de test. Correction : description « Région : Analamanga » et rôle bouton (`Selecteurs.kt`).
+3. Interrupteur réseau de l'écran de synchronisation : même défaut, même correction.
+4. En-tête de l'écran des inscriptions : date brute « 2026-09-18 » au lieu de « 18/09/2026 ».
+5. Nombres « 20.0 » dans l'écran de synchronisation, le panneau serveur et les résumés d'historique : format commun `formatPoints` / `nombreLisible`.
+6. Sections « Historique » vides sur cinq fiches : un titre suivi de rien ; désormais « Aucune modification enregistrée pour l'instant. » (`HistoriqueVide`).
+7. Aperçu d'impression illisible sur petit écran (étiquettes repliées) : page de 640 px et aperçu à l'échelle (`viewport`, `useWideViewPort`).
+8. Pilote d'émulateur : coordonnées de défilement prévues pour un grand écran, « retour » système envoyé sans clavier ouvert (quittait l'écran), captures dans le mauvais dossier. Corrigé (`descendre`, `monter`, `fermer_clavier` conditionnel, `retour`, `bas`, `DOSSIER_CAPTURES`).
+
+**Rapport technique** (`docs/rapport/`) : 20 captures prises pendant le rejeu (720 × 1280), chapitre 6 rédigé étape par étape (19 étapes), annexes A (index des figures), B (quatre extraits commentés), C (sources), F (questions Q1 à Q14) rédigées ; chapitre 11 « les cours appliqués » ; section 10.3 bilan ; conclusion. Plus aucun passage « à compléter ». Le nombre de tests et la liste des classes de test sont lus dans le projet à la génération.
+
+**Tests** : `assembleDebug` vert, `testDebugUnitTest` : 121 tests verts ; base de l'émulateur recréée (schéma v4) ; parcours complet rejoué : configuration, auto-école, examinateur, deux candidats, dossiers, sessions théorie et conduite, appels, trois passages, résultats validés dont un échec, synchronisation en quatre temps, parcours candidat, relevé, historique.
+
+**Décisions restantes**
+1. Les résumés d'historique déjà écrits gardent l'ancien format des nombres ; la base de démonstration sera recréée avant la soutenance.
+2. Le rapport se relit dans Word ; la version PDF s'exporte depuis Word au moment du rendu.

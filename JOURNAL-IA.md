@@ -297,7 +297,20 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 21 — <date> — <tâche>
+## Entrée 21 — 18/09/2026 — Rejeu de A à Z, audit et rapport technique
+
+- Code soumis : corrections dans `Selecteurs.kt`, `EcranEpreuve.kt`, `ConfigurationViewModel.kt`, `Tracage.kt`, `DocumentsImpression.kt`, `EcranImpression.kt`, cinq fiches (état vide de l'historique), `outils/pilote_emulateur.sh` ; rédaction de `docs/rapport/generer_rapport.js`.
+- Remarque principale de l'IA : rejouer le parcours avec un automate qui ne voit que le texte des éléments a révélé un défaut invisible à l'œil : les sélecteurs et l'interrupteur réseau n'exposaient aucun nom, donc un lecteur d'écran ne les aurait pas annoncés. L'accessibilité et la testabilité sont la même propriété.
+
+⚠️ Le badge « à confirmer » de la fiche d'une épreuve montrait celui du barème : un affichage juste par rapport à la base mais faux par rapport à ce que l'utilisatrice venait de modifier. Règle retenue : un indicateur doit porter sur l'objet que l'écran permet de modifier, ou dire clairement à quoi il se rapporte.
+
+⚠️ Le rapport est généré par un script : le nombre de tests et la liste des classes sont lus dans le projet, les captures remplacent d'elles-mêmes les cadres « à insérer ». Le binôme relit le texte dans Word ; le script reste la source.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 1>.
+
+---
+
+## Entrée 22 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :

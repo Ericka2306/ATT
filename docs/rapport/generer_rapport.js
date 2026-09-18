@@ -67,10 +67,14 @@ const figure = (nomFichier, legende, largeurCm = 7) => {
   const chemin = path.join(DOSSIER_CAPTURES, nomFichier);
   const contenu = [];
   if (fs.existsSync(chemin)) {
+    const donnees = fs.readFileSync(chemin);
+    // Dimensions lues dans l'en-tête PNG (octets 16 à 24) : la figure garde les proportions de l'écran capturé.
+    const largeurPng = donnees.readUInt32BE(16);
+    const hauteurPng = donnees.readUInt32BE(20);
     const px = Math.round(largeurCm * 37.8);
     contenu.push(new Paragraph({
       alignment: AlignmentType.CENTER,
-      children: [new ImageRun({ type: "png", data: fs.readFileSync(chemin), transformation: { width: px, height: Math.round(px * 2400 / 1080) } })],
+      children: [new ImageRun({ type: "png", data: donnees, transformation: { width: px, height: Math.round(px * hauteurPng / largeurPng) } })],
     }));
   } else {
     contenu.push(new Table({
@@ -111,6 +115,24 @@ const tableau = (entetes, lignes, largeurs) => {
   });
 };
 const espace = () => new Paragraph({ spacing: { after: 160 }, children: [] });
+
+// ---------- LECTURES DANS LE PROJET (tests) ----------
+
+const RACINE_PROJET = path.resolve(__dirname, "..", "..");
+function classesDeTest() {
+  const dossier = path.join(RACINE_PROJET, "app", "src", "test", "java");
+  const noms = [];
+  const parcourir = (d) => { for (const f of fs.readdirSync(d)) { const c = path.join(d, f); if (fs.statSync(c).isDirectory()) parcourir(c); else if (f.endsWith("Test.kt")) noms.push(f.replace(".kt", "")); } };
+  if (fs.existsSync(dossier)) parcourir(dossier);
+  return noms.sort();
+}
+function nombreTests() {
+  const dossier = path.join(RACINE_PROJET, "app", "build", "test-results", "testDebugUnitTest");
+  if (!fs.existsSync(dossier)) return "plus de cent";
+  let total = 0;
+  for (const f of fs.readdirSync(dossier)) if (f.endsWith(".xml")) { const m = fs.readFileSync(path.join(dossier, f), "utf8").match(/tests="(\d+)"/); if (m) total += Number(m[1]); }
+  return total || "plus de cent";
+}
 
 // ---------- PAGE DE GARDE ----------
 
@@ -157,7 +179,6 @@ function introduction() {
 function problematique() {
   return [
     titre1("2. Problématique"),
-    consigne("Décrire ce qui a été observé sur le terrain et dans la presse ; chaque point de cette liste trouve sa réponse au chapitre 4."),
     ...paras("Passer l'examen du permis à Madagascar reste aujourd'hui un parcours long et opaque, pour le candidat comme pour l'administration. Les difficultés relevées sont les suivantes."),
     titre2("2.1 Pour le candidat et l'auto-école"),
     ...puces(
@@ -256,34 +277,67 @@ function acteurs() {
 }
 
 function parcours() {
-  const etape = (n, titre, legendeCapture, fichier, consigneTexte) => [
-    titre2(`6.${n} ${titre}`),
-    consigne(consigneTexte),
-    aCompleter(`décrire l'écran, ce que fait l'utilisateur et ce que l'application contrôle (${titre.toLowerCase()}).`),
-    ...figure(fichier, legendeCapture),
-  ];
+  const etape = (n, titre, texte, fichier, legende) => [titre2(`6.${n} ${titre}`), ...paras(texte), ...figure(fichier, legende)];
   return [
     titre1("6. Le parcours dans l'application, de A à Z"),
-    ...paras("Ce chapitre suit un candidat de son inscription en auto-école jusqu'à son résultat, dans l'ordre réel des opérations. Chaque étape est illustrée par une capture d'écran de l'application ; les comptes utilisés sont ceux du tableau en annexe E."),
-    ...etape(1, "Connexion et accueil par rôle", "Écran de connexion", "06_01_connexion.png", "Connexion, session en mémoire, menu selon le rôle."),
-    ...etape(2, "Configuration par le Super Admin", "Catégories, épreuves et barèmes", "06_02_configuration.png", "Catégories de permis, épreuves théorique et conduite, barème versionné, questions orales, critères de conduite, règles ; tout marqué « à confirmer » tant que l'ATT n'a pas validé."),
-    ...etape(3, "Centres d'examen", "Centre rattaché à une région", "06_03_centre.png", "Vingt-quatre régions préchargées ; un centre appartient à une région."),
-    ...etape(4, "Auto-écoles et comptes", "Fiche d'une auto-école et son compte", "06_04_auto_ecole.png", "Créée par l'ATT avec son compte ; pourquoi une auto-école ne s'inscrit pas elle-même."),
-    ...etape(5, "Examinateurs", "Création d'un examinateur avec son compte", "06_05_examinateur.png", "Examinateur et compte créés ensemble ; mot de passe initial à changer."),
-    ...etape(6, "Candidat et dossier", "Dossier soumis par l'auto-école", "06_06_dossier.png", "Fiche candidat, pièces attendues selon la catégorie, soumission ; âge minimum contrôlé."),
-    ...etape(7, "Décision de l'ATT sur le dossier", "Validation, incomplet ou refus avec motif", "06_07_decision.png", "Dossiers à traiter ; motif obligatoire pour incomplet et refusé ; historique."),
-    ...etape(8, "Session et créneaux", "Création d'une session et aperçu des créneaux", "06_08_session.png", "Catégorie, épreuve, centre, date, capacité, durée et marge : les créneaux se calculent ; avertissement en cas de conflit de centre."),
-    ...etape(9, "Inscription et convocation", "Inscription d'un candidat éligible", "06_09_inscription.png", "Contrôles : dossier validé, capacité, doublon, même jour, délai de repassage, théorie réussie avant conduite ; numéro d'appel et créneau ; convocation imprimable."),
-    ...etape(10, "Appel et présence", "Liste d'appel le jour de l'examen", "06_10_appel.png", "Présent, absent, retard accepté ou refusé selon la tolérance configurée ; liste d'appel imprimable."),
-    ...etape(11, "Passages et vue de l'examinateur", "Passages d'une session, sans les noms", "06_11_passages.png", "Ouverture d'un passage numéroté pour un candidat présent ; jamais réutilisé ni effacé."),
-    ...etape(12, "Épreuve théorique orale", "Feuille d'examen : questions, réponses, points", "06_12_theorie.png", "Sujet tiré au sort jusqu'à la note max du barème, ou choisi par l'examinateur (règle MODE_THEORIE) ; réponse donnée et points par question ; total."),
-    ...etape(13, "Épreuve de conduite", "Grille de conduite : points, faute éliminatoire, observations", "06_13_conduite.png", "Structure sans grille imposée ; faute éliminatoire ; grille à confirmer par l'ATT."),
-    ...etape(14, "Résultat, validation et correction", "Détail du calcul et validation par l'ATT", "06_14_resultat.png", "Calcul automatique selon le barème figé ; validation ; correction en nouvelle ligne avec motif ; l'ancien résultat reste lisible."),
-    ...etape(15, "Échec et nouvelle tentative", "Épreuves à repasser et délai", "06_15_repassage.png", "Délai de repassage, nombre maximal de passages, conservation d'une épreuve réussie : règles configurables."),
-    ...etape(16, "Consultation par rôle", "Parcours du candidat", "06_16_parcours.png", "Auto-école, candidat, ATT : chacun sa vue."),
-    ...etape(17, "Impression", "Relevé de résultat", "06_17_releve.png", "Convocation, liste d'appel (version examinateur sans noms), liste des admis, relevé ; enregistrement en PDF."),
-    ...etape(18, "Historique", "Journal des modifications avec filtres", "06_18_historique.png", "Auteur, date, action, ancienne et nouvelle valeur, motif ; filtres par période, objet et utilisateur."),
-    ...etape(19, "Synchronisation avec le serveur central", "File d'attente, interrupteur réseau, résultats envoyés", "06_19_synchronisation.png", "La base d'abord, le réseau ensuite : un résultat validé est acquis même sans réseau ; « Synchroniser maintenant » remonte la file d'attente ; démonstration avec le réseau coupé puis rétabli."),
+    ...paras("Ce chapitre suit un candidat de son inscription en auto-école jusqu'à son résultat, dans l'ordre réel des opérations. Chaque étape est illustrée par une capture prise sur un petit téléphone (720 × 1280) ; les comptes utilisés sont ceux de l'annexe E."),
+    ...etape(1, "Connexion et accueil par rôle",
+      "L'application s'ouvre sur un écran de connexion. Le mot de passe n'est jamais stocké en clair : une empreinte avec sel est comparée à celle saisie. Une fois connecté, chaque rôle arrive sur son propre accueil, un menu en tuiles qui ne montre que ce qu'il a le droit de faire (figure 1 du chapitre 5 pour l'administrateur ATT). La session vit en mémoire : fermer l'application demande une nouvelle connexion.",
+      "06_01_connexion.png", "Écran de connexion"),
+    ...etape(2, "Configuration par le Super Admin",
+      "Avant tout examen, le Super Admin décrit ce que l'ATT attend : les catégories de permis (A', A, B, C, D, E) avec leur âge minimum, les épreuves de chaque catégorie, le barème de chaque épreuve (note maximale, seuil), les questions orales avec leurs points et une réponse attendue facultative, les critères de conduite, et les règles générales (délais, capacités, tolérance de retard). Un barème est versionné : créer une nouvelle version ferme l'ancienne à la date du jour, et un résultat déjà calculé garde la version qui a servi. Sur la figure, le barème de l'épreuve théorique B a été porté à 20 points avec un seuil de 12 ; l'ancienne version reste lisible. Chaque valeur qui n'a pas été validée par l'ATT porte un drapeau « à confirmer », que le Super Admin lève d'un bouton.",
+      "06_02_configuration.png", "Épreuve théorique de la catégorie B : barème versionné et questions"),
+    ...etape(3, "Centres d'examen",
+      "Un centre d'examen appartient toujours à une région : les vingt-quatre régions de Madagascar sont préchargées. Le centre porte une capacité par défaut, reprise à la création des sessions. Un administrateur régional ne voit que les centres de sa région.",
+      "06_03_centre.png", "Liste des centres, rattachés à leur région"),
+    ...etape(4, "Auto-écoles et comptes",
+      "L'ATT crée les auto-écoles agréées et leur compte de connexion : une auto-école ne s'inscrit pas elle-même, parce que l'agrément est une décision de l'ATT et que l'application n'a pas de serveur pour recevoir des demandes. La fiche montre la région, l'adresse, l'agrément, les comptes rattachés et l'historique des modifications. Une auto-école ne se supprime jamais : elle se désactive, et son compte suit.",
+      "06_04_auto_ecole.png", "Fiche d'une auto-école et ses comptes"),
+    ...etape(5, "Examinateurs",
+      "L'administrateur ATT crée l'examinateur et son compte en une seule opération : il n'existe pas d'examinateur sans compte ni de compte orphelin. L'identifiant et le mot de passe initial sont communiqués à l'examinateur, qui le change depuis « Mon mot de passe ». Aucun examinateur n'est affecté à l'avance à un candidat : c'est une exigence du cadrage, cohérente avec l'anonymat.",
+      "06_05_examinateur.png", "Création d'un examinateur avec son compte"),
+    ...etape(6, "Candidat et dossier",
+      "L'auto-école crée ses candidats et, pour chacun, ouvre un dossier dans une catégorie. Les pièces attendues viennent de la configuration (la liste officielle du portail Torolalana, différente pour les catégories qui exigent déjà le permis B). L'auto-école coche ce qu'elle fournit puis soumet le dossier à l'ATT ; l'âge minimum de la catégorie est contrôlé à la soumission. Un dossier ne se supprime pas : il passe par les statuts brouillon, soumis, validé, incomplet ou refusé, tous tracés.",
+      "06_06_dossier.png", "Dossier constitué par l'auto-école, prêt à être soumis"),
+    ...etape(7, "Décision de l'ATT sur le dossier",
+      "L'administrateur ATT retrouve les dossiers soumis dans « Dossiers à traiter ». Il valide, ou marque le dossier incomplet ou refusé avec un motif obligatoire, que l'auto-école lit sur sa propre fiche. C'est ce contrôle en amont qui évite le cas vécu d'un candidat renvoyé le jour de l'examen : seul un dossier validé permet une inscription.",
+      "06_07_decision.png", "Décision de l'ATT : valider, incomplet ou refuser avec motif"),
+    ...etape(8, "Session et créneaux",
+      "Une session est une épreuve d'une catégorie, dans un centre, à une date, avec une heure de convocation et une capacité. L'administrateur indique combien de candidats passent par créneau, la durée d'un créneau et la marge entre deux ; l'application calcule les créneaux et les affiche avant même la création. Une seconde session le même jour dans le même centre déclenche un avertissement. La session passe ensuite par les statuts planifiée, ouverte aux inscriptions, complète, en cours, terminée ou annulée avec motif.",
+      "06_08_session.png", "Création d'une session : les créneaux se calculent à la saisie"),
+    ...etape(9, "Inscription et convocation",
+      "L'administrateur inscrit un candidat éligible : dossier validé pour la catégorie, capacité de la session et du créneau non dépassées, pas de double inscription, pas d'autre session le même jour, délai de repassage écoulé, théorie réussie si l'épreuve est la conduite. Le candidat reçoit un numéro d'appel (001, 002…) et un créneau, donc une heure de passage estimée. La convocation s'imprime depuis cette liste ; une inscription se reporte ou s'annule avec motif, et la place est libérée.",
+      "06_09_inscription.png", "Inscriptions d'une session : numéro d'appel, créneau, actions"),
+    ...etape(10, "Appel et présence",
+      "Le jour de l'examen, l'agent fait l'appel par créneau, avec peu de candidats à la fois. Chaque candidat est marqué présent ou absent ; au-delà de la tolérance de retard configurée, l'application propose d'accepter ou de refuser le retard. Un statut se corrige, ce qui répond au cas observé du « présent » non entendu dans la foule. La liste d'appel s'imprime en secours ; l'examinateur en reçoit une version sans les noms.",
+      "06_10_appel.png", "Appel d'une session : présents, retards, absents"),
+    ...etape(11, "Passages et vue de l'examinateur",
+      "L'examinateur connecté voit les sessions du jour et, pour chacune, les candidats présents identifiés par leur seul numéro d'appel. Il ouvre un passage : le n-ième pour ce candidat et cette épreuve, jamais réutilisé, jamais effacé, tracé dans l'historique. Un passage déjà terminé se consulte en lecture seule.",
+      "06_11_passages.png", "Vue de l'examinateur : numéros d'appel, sans les noms"),
+    ...etape(12, "Épreuve théorique orale",
+      "L'épreuve théorique est orale, comme nous l'avons vécue. L'écran reproduit la feuille de l'examinateur : le sujet est tiré au sort par l'application jusqu'à la note maximale du barème, ou choisi question par question par l'examinateur selon la règle configurée. Pour chaque question, il écrit la réponse donnée par le candidat et les points attribués, de zéro au maximum de la question ; la réponse attendue s'affiche en aide-mémoire. Le total se calcule au fil de la saisie. « Terminer l'épreuve » fige la feuille, clôt le passage et calcule aussitôt le résultat.",
+      "06_12_theorie.png", "Feuille d'examen théorique : questions posées, réponses, points"),
+    ...etape(13, "Épreuve de conduite",
+      "Pour la conduite, l'application propose une grille : un critère par ligne avec ses points, une case « faute éliminatoire » quand le critère l'admet, une observation. La grille elle-même n'est pas imposée : elle vient de la configuration et reste à confirmer par l'ATT. Une faute éliminatoire vaut zéro sur le critère et fait perdre l'épreuve quel que soit le total, ce que l'écran annonce en rouge.",
+      "06_13_conduite.png", "Grille de conduite : points par critère, faute éliminatoire, observations"),
+    ...etape(14, "Résultat, validation et correction",
+      "Le résultat est calculé automatiquement à la clôture de l'épreuve, avec la version du barème en vigueur, copiée dans le résultat pour rester lisible même si le barème change. Il attend la validation de l'administrateur ATT ; jusque-là, ni l'auto-école ni le candidat ne le voient. Une erreur de notation se corrige en rouvrant la feuille de l'examinateur puis en recalculant : l'application crée un nouveau résultat avec un motif, l'ancien reste en base et lisible, marqué « remplacé ».",
+      "06_14_resultat.png", "Détail d'un résultat avant validation par l'ATT"),
+    ...etape(15, "Échec et nouvelle tentative",
+      "En cas d'échec, l'écran indique les épreuves à repasser et la date à partir de laquelle le candidat peut être réinscrit, d'après le délai de repassage configuré ; une épreuve réussie reste acquise pendant la durée configurée. Le prochain passage portera le numéro suivant : rien n'est écrasé, le parcours complet reste visible.",
+      "06_15_repassage.png", "Résultat en échec : épreuves à repasser et date de réinscription"),
+    ...etape(16, "Consultation par rôle",
+      "Chacun voit ce qui le concerne. L'auto-école suit ses candidats, leurs inscriptions et leurs résultats validés ; le candidat qui dispose d'un compte lit son parcours, dossier, convocations, passages et résultats ; l'ATT voit tout et filtre par région. Un candidat sans smartphone n'est pas pénalisé : son auto-école et l'ATT ont la même information, et les documents s'impriment.",
+      "06_16_parcours.png", "Parcours du candidat, vu avec son compte"),
+    ...etape(17, "Impression",
+      "Quatre documents s'impriment depuis l'application, sans réseau : la convocation individuelle avec l'heure de passage estimée et les pièces à apporter, la liste d'appel d'une session (avec ou sans noms selon le rôle), la liste des admis et le relevé de résultat. La page est produite en HTML, montrée en aperçu, puis confiée au service d'impression d'Android, qui permet aussi d'enregistrer un PDF.",
+      "06_17_releve.png", "Relevé de résultat, prêt à imprimer"),
+    ...etape(18, "Historique",
+      "Toute modification sensible est enregistrée avec son auteur, sa date, l'action, l'ancienne et la nouvelle valeur et le motif, dans la même transaction que la modification elle-même. L'historique se lit depuis chaque fiche et depuis un écran global, filtrable par période, par objet et par utilisateur.",
+      "06_18_historique.png", "Journal des modifications, filtrable"),
+    ...etape(19, "Synchronisation avec le serveur central",
+      "L'application fonctionne entièrement hors ligne : la base locale est la source de vérité. Les résultats validés sont remontés à un serveur central de l'ATT quand le réseau le permet ; sinon ils restent en file d'attente, sans rien bloquer, et « Synchroniser maintenant » les renvoie plus tard. Sur la figure, le réseau est coupé par l'interrupteur de démonstration : un résultat attend, l'autre a déjà été envoyé.",
+      "06_19_synchronisation.png", "Synchronisation : réseau coupé, un résultat en attente, un envoyé"),
   ];
 }
 
@@ -308,11 +362,18 @@ function architecture() {
     ], [18, 44, 38]),
     espace(),
     titre2("7.2 Modèle de données"),
-    consigne("Insérer le schéma des entités (docs/03) et commenter les choix : barème versionné, tentative jamais effacée, résultat en nouvelle ligne, historique."),
-    aCompleter("schéma des entités et commentaire."),
+    ...paras("Vingt-cinq entités Room, reliées par des clés étrangères, en six familles. Le schéma complet, avec chaque attribut et chaque statut, est dans le document docs/03 du dépôt ; il est exporté par Room dans app/schemas à chaque version."),
+    tableau(["Famille", "Entités", "Choix de conception"], [
+      ["Référentiels", "Region, CategoriePermis, TypeEpreuve, Bareme, Question, CriterePratique, RegleConfig, Centre", "Tout ce qui est une règle administrative est une ligne de table, jamais une constante ; le barème est versionné (une version se ferme, ne se modifie pas)"],
+      ["Acteurs", "Utilisateur, AutoEcole, Examinateur, Candidat", "Un compte porte son rôle et, selon le rôle, l'auto-école, l'examinateur ou le candidat qu'il représente ; le compte candidat est facultatif"],
+      ["Dossiers", "Dossier, PieceDossier", "Un dossier par catégorie, avec ses pièces déclarées ; statuts brouillon, soumis, validé, incomplet, refusé"],
+      ["Planification", "Session, Creneau, Inscription, Presence", "Une session = une épreuve, un centre, une date ; l'inscription porte le numéro d'appel et le créneau ; la présence est une ligne à part, corrigeable"],
+      ["Examens", "Tentative, Evaluation, ReponseCandidat, EvaluationCritere, Resultat", "Une tentative n'est jamais effacée ; l'évaluation fige la version du barème ; un résultat ne se modifie pas, une correction en crée un nouveau qui pointe vers l'ancien"],
+      ["Traçabilité", "Historique", "Auteur, date, action, ancienne et nouvelle valeur, motif : écrit dans la même transaction que la modification"],
+    ], [18, 34, 48]),
     titre2("7.3 Flux d'un écran"),
     ...paras("Exemple type : l'écran des inscriptions collecte un StateFlow construit par combine sur les flux Room ; chaque action appelle une fonction du ViewModel qui vérifie la règle pure puis écrit dans une transaction avec sa ligne d'historique."),
-    aCompleter("extrait de code commenté (annexe B) et explication de la transaction « écriture + historique »."),
+    ...paras("L'annexe B montre les quatre briques de ce flux : l'écriture et sa ligne d'historique dans une même transaction (B.1), une règle pure et son test (B.2), un ViewModel qui combine les flux de Room en un seul état (B.3) et le tirage du sujet avec le hasard injecté (B.4)."),
     titre2("7.4 Sécurité et hors ligne"),
     ...puces(
       "Mots de passe jamais en clair : empreinte PBKDF2 avec sel, comparaison d'empreintes.",
@@ -363,7 +424,6 @@ function regles() {
       ["Catégories et âges minimums", "A', A, B, C, D, E ; 16 / 18 / 21 ans", "liste officielle, âges à confirmer"],
     ], [44, 32, 24]),
     espace(),
-    consigne("Renvoyer à l'annexe F pour la liste complète des questions posées à l'ATT et à l'enseignant."),
   ];
 }
 
@@ -372,7 +432,8 @@ function qualite() {
     titre1("9. Qualité, tests et traçabilité"),
     titre2("9.1 Tests unitaires"),
     ...paras("Les règles métier sont testées par JUnit, sans émulateur : tirage du sujet reproductible, contrôles d'inscription, calcul du résultat, règles de repassage, contraintes du cadrage. Le tirage au sort reçoit son générateur de hasard en paramètre, ce qui le rend reproductible en test."),
-    aCompleter("nombre de tests au moment du rendu et liste des classes de test."),
+    ...paras(`Au moment de la rédaction, ${nombreTests()} tests unitaires passent. Les classes de test, une par famille de règles :`),
+    ...puces(...classesDeTest()),
     titre2("9.2 Cas particuliers du cadrage"),
     tableau(["Contrainte", "Comment elle est couverte"], [
       ["Dossier incomplet ou refusé", "Décision avec motif obligatoire, resoumission possible, historique"],
@@ -417,7 +478,11 @@ function deroulement() {
       ["Tests et qualité", "Tests des contraintes du cadrage, relecture croisée, schéma figé, refonte de l'interface"],
     ], [30, 70]),
     espace(),
-    aCompleter("durée réelle par phase et bilan (ce qui a pris plus de temps que prévu)."),
+    titre2("10.3 Durée réelle et bilan"),
+    ...paras(
+      "Le cadrage (règles, plan, modèle de données, cas d'utilisation) a été écrit avant la première ligne de code, en une journée, et n'a presque pas bougé ensuite : c'est ce qui a permis d'enchaîner les étapes sans revenir en arrière. Le socle technique et les premières fonctionnalités ont suivi en deux jours ; les évaluations, les résultats, la consultation et l'impression en deux jours de plus ; puis les tests, la relecture croisée, la refonte de l'interface et ce rapport.",
+      "Ce qui a pris plus de temps que prévu : comprendre le vrai déroulement de l'examen. La première version de l'épreuve théorique était un questionnaire à choix multiples, construit d'après la presse ; elle a été refaite le jour même, après notre propre passage de l'examen, en feuille orale. La leçon vaut pour tout le projet : un témoignage de terrain vaut plus qu'un article, et ce que l'on ne sait pas doit rester une configuration marquée « à confirmer », pas une hypothèse gravée dans le code.",
+    ),
   ];
 }
 
@@ -445,7 +510,9 @@ function coursAppliques() {
       "affichage d'une page HTML pour l'impression et service d'impression d'Android ;",
       "fonctions pures testées par JUnit, avec le hasard injecté pour rendre le tirage reproductible.",
     ),
-    aCompleter("renvoyer au tableau complet de docs/HORS_COURS.md et citer un ou deux exemples de notion refusée ou remplacée par l'équivalent du cours."),
+    ...paras(
+      "Le tableau complet, avec pour chaque notion l'étape où elle est apparue, l'équivalent vu en cours et la décision du binôme, est le fichier docs/HORS_COURS.md du dépôt (vingt-sept entrées). Deux exemples de ce que nous avons refusé ou remplacé : le Repository, proposé au départ pour « faire propre », a été écarté parce que le cours n'en a jamais écrit et que les ViewModels appellent les DAO directement sans perdre en clarté ; les boutons radio de la première épreuve théorique ont disparu avec le questionnaire à choix multiples, remplacés par les champs de texte du cours.",
+    ),
   ];
 }
 
@@ -478,10 +545,17 @@ function limites() {
 function annexes() {
   return [
     titre1("Annexe A — Captures d'écran"),
-    consigne("Index des figures du chapitre 6, plus les écrans secondaires utiles (formulaires, états vides, messages d'erreur)."),
-    aCompleter("captures complémentaires."),
+    ...paras("Les captures du chapitre 6 ont été prises sur l'émulateur Android d'un petit téléphone (720 × 1280), avec les comptes de démonstration, en rejouant le parcours complet depuis une base vide. Elles sont regroupées ici par étape ; les fichiers se trouvent dans le dossier docs/rapport/captures du dépôt."),
+    tableau(["Figure", "Écran", "Fichier"], [
+      ["1", "Accueil de l'administrateur ATT", "05_accueil_admin.png"],
+      ["2", "Connexion", "06_01_connexion.png"], ["3", "Configuration : épreuve théorique B", "06_02_configuration.png"], ["4", "Centres d'examen", "06_03_centre.png"],
+      ["5", "Fiche d'une auto-école", "06_04_auto_ecole.png"], ["6", "Création d'un examinateur", "06_05_examinateur.png"], ["7", "Dossier du candidat", "06_06_dossier.png"],
+      ["8", "Décision de l'ATT sur le dossier", "06_07_decision.png"], ["9", "Création d'une session", "06_08_session.png"], ["10", "Inscriptions", "06_09_inscription.png"],
+      ["11", "Appel", "06_10_appel.png"], ["12", "Passages (examinateur)", "06_11_passages.png"], ["13", "Épreuve théorique", "06_12_theorie.png"],
+      ["14", "Épreuve de conduite", "06_13_conduite.png"], ["15", "Résultat à valider", "06_14_resultat.png"], ["16", "Échec et repassage", "06_15_repassage.png"],
+      ["17", "Parcours du candidat", "06_16_parcours.png"], ["18", "Relevé imprimable", "06_17_releve.png"], ["19", "Historique", "06_18_historique.png"], ["20", "Synchronisation", "06_19_synchronisation.png"],
+    ], [12, 50, 38]),
     titre1("Annexe B — Extraits de code commentés"),
-    consigne("Un extrait par idée forte, court, avec un commentaire de trois lignes : l'écriture tracée dans une transaction, une règle pure et son test, un ViewModel avec combine et stateIn, le tirage du sujet."),
     titre2("B.1 Écriture et historique dans une même transaction"),
     ...bloc([
       "db.withTransaction {",
@@ -492,9 +566,51 @@ function annexes() {
       "}",
     ]),
     espace(),
-    aCompleter("B.2 règle pure et son test, B.3 ViewModel et flux, B.4 tirage du sujet."),
+    ...paras("La modification et sa trace sont dans le même bloc : Room les écrit ensemble ou n'écrit rien. L'historique ne peut donc jamais raconter autre chose que ce qui s'est passé."),
+    titre2("B.2 Une règle pure et son test"),
+    ...bloc([
+      "// metier/ReglesTentatives.kt",
+      "fun peutOuvrir(statutPresence: StatutPresence?, tentativeDeCetteInscription: Tentative?,",
+      "               nombreTentatives: Int, tentativesMax: Int): String? = when {",
+      "    tentativeDeCetteInscription != null -> when (tentativeDeCetteInscription.statut) {",
+      "        StatutTentative.EN_COURS -> null                         // reprise du passage en cours",
+      "        else -> \"Un passage existe déjà pour cette inscription.\"",
+      "    }",
+      "    statutPresence != StatutPresence.PRESENT && statutPresence != StatutPresence.EN_COURS ->",
+      "        \"Le candidat n'est pas marqué présent (appel).\"",
+      "    tentativesMax > 0 && nombreTentatives >= tentativesMax -> \"Nombre maximal de passages atteint.\"",
+      "    else -> null",
+      "}",
+      "",
+      "// test/ReglesTentativesTest.kt",
+      "@Test fun `ouverture reservee aux presents`() {",
+      "    assertNull(ReglesTentatives.peutOuvrir(StatutPresence.PRESENT, null, 0, 0))",
+      "    assertNotNull(ReglesTentatives.peutOuvrir(StatutPresence.ABSENT, null, 0, 0))",
+      "}",
+    ]),
+    ...paras("La fonction ne connaît ni Android ni la base : elle reçoit des valeurs et rend un message d'erreur ou null. Le ViewModel fait les requêtes, la fonction fait le jugement, le test JUnit tourne sans téléphone."),
+    titre2("B.3 Un ViewModel branché sur Room"),
+    ...bloc([
+      "val etat: StateFlow<EtatTentatives> =",
+      "    idSession.flatMapLatest { id ->",
+      "        combine(db.sessionDao().parIdEnDirect(id), db.inscriptionDao().parSession(id),",
+      "                db.presenceDao().parSession(id), db.tentativeDao().parSession(id)) { s, i, p, t -> ... }",
+      "    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EtatTentatives())",
+    ]),
+    ...paras("L'écran collecte un seul état immuable, recalculé par Room à chaque changement d'une des tables : aucune lecture manuelle, aucun rafraîchissement à déclencher."),
+    titre2("B.4 Le tirage du sujet, reproductible"),
+    ...bloc([
+      "fun tirerSujet(questionsActives: List<Question>, noteMax: Double, aleatoire: Random = Random.Default): List<Question> {",
+      "    val sujet = mutableListOf<Question>(); var total = 0.0",
+      "    for (q in questionsActives.filter { it.actif && it.points > 0 }.shuffled(aleatoire)) {",
+      "        if (total >= noteMax) break",
+      "        if (total + q.points <= noteMax) { sujet += q; total += q.points }",
+      "    }",
+      "    return sujet",
+      "}",
+    ]),
+    ...paras("Le hasard est un paramètre : en production, le générateur par défaut ; en test, une graine fixe, et le test vérifie que le sujet atteint la note maximale sans la dépasser ni répéter une question."),
     titre1("Annexe C — Sources"),
-    consigne("Sources utilisées pour les règles métier, avec leur niveau de fiabilité ; reprises de la recherche documentaire du projet."),
     tableau(["Sujet", "Source", "Fiabilité"], [
       ["Pièces du dossier, frais, étapes officielles", "Portail Torolalana (gouvernement) — torolalana.gov.mg", "Officiel"],
       ["Code de la route, catégories", "Loi n° 2017-002 du 6 juillet 2017 ; décret 2026-974", "Officiel"],
@@ -506,7 +622,15 @@ function annexes() {
       ["Android, Kotlin, Compose, Room", "developer.android.com, kotlinlang.org, supports du cours", "Officiel"],
     ], [30, 50, 20]),
     espace(),
-    aCompleter("adresses complètes des articles (docs/references/RECHERCHE_ATT_ET_ANDROID.md)."),
+    ...paras("Adresses principales :"),
+    ...puces(
+      "torolalana.gov.mg/fr/services/obtenir-son-permis-de-conduire (portail officiel : étapes, pièces, frais)",
+      "lexpress.mg, newsmada.com, studiosifaka.org (articles 2020 à 2026 : anonymat, digitalisation, volumes, formation des examinateurs)",
+      "fiarakodia.com, terraformalis.com (sites d'auto-écoles : déroulement, délais, catégories)",
+      "fr.wikipedia.org/wiki/Région_de_Madagascar (liste des 24 régions)",
+      "developer.android.com, m3.material.io, kotlinlang.org (documentation technique)",
+    ),
+    ...paras("Le détail des sources, avec le niveau de fiabilité et la citation exacte, est dans le fichier docs/references/RECHERCHE_ATT_ET_ANDROID.md du dépôt."),
     titre1("Annexe D — Glossaire"),
     tableau(["Terme", "Sens dans l'application"], [
       ["Passage (tentative)", "Un candidat passe une épreuve une fois ; numéroté, jamais effacé"],
@@ -524,8 +648,24 @@ function annexes() {
     ], [50, 50]),
     espace(),
     titre1("Annexe F — Questions à valider avec l'ATT"),
-    consigne("Reprendre la liste Q1 à Q14 de docs/04 : question, ce qu'on a trouvé, valeur retenue en attendant."),
-    aCompleter("liste des questions."),
+    ...paras("Aucune de ces règles n'a été inventée : chacune a une valeur par défaut « à confirmer », modifiable dans l'application, et une question à poser à l'ATT."),
+    tableau(["Question", "Ce que nous avons retenu en attendant"], [
+      ["Q1 — Épreuve théorique : note maximale, seuil, notation", "Orale (témoignage) ; questions à points variables ; barème d'exemple 20 / 12"],
+      ["Q1 bis — Choix des questions", "Tirage au sort par l'application, ou choix de l'examinateur (règle MODE_THEORIE)"],
+      ["Q2 — Épreuve de conduite : grille", "Aucune grille préchargée ; critères, points et fautes éliminatoires configurables"],
+      ["Q2 bis — Sujet ou grille qui ne totalise pas la note max", "Note rapportée au barème (règle de trois)"],
+      ["Q3 — Repassage", "25 jours entre deux passages, nombre illimité, épreuve réussie acquise 365 jours"],
+      ["Q4 — Appel, retard, absence", "Tolérance 15 minutes ; absent = nouvelle inscription ; appel par numéro"],
+      ["Q5 — Sessions", "Capacité 30, créneaux de 15 minutes avec 5 de marge, 5 candidats par créneau"],
+      ["Q6 — Examinateur", "Aucune affectation préalable ; l'ATT valide chaque résultat"],
+      ["Q7 — Dossier", "Pièces du portail Torolalana ; pièces jointes numériques prévues"],
+      ["Q8 — Qui inscrit", "L'ATT ; l'auto-école peut demander si la règle l'autorise"],
+      ["Q9 — Théorie avant conduite", "Oui (règle configurable)"],
+      ["Q10 — Catégories et âges", "A', A, B, C, D, E ; 16 / 18 / 21 ans, à confirmer"],
+      ["Q11 — Régions", "24 régions ; centres et auto-écoles rattachés ; examen hors région autorisé par défaut"],
+      ["Q12 — Formats locaux", "CIN et téléphone en texte, validation souple"],
+      ["Q14 — Auto-école qui demande son agrément", "Non dans le MVP : créée par l'ATT"],
+    ], [42, 58]),
   ];
 }
 

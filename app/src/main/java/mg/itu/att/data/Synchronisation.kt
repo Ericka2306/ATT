@@ -1,5 +1,7 @@
 package mg.itu.att.data
 
+import mg.itu.att.metier.formatDate
+
 /**
  * Synchronisation offline-first des résultats validés vers le serveur central de l'ATT (cours S7).
  *
@@ -10,6 +12,9 @@ package mg.itu.att.data
  * Partagée par le ViewModel des résultats (après une validation) et par l'écran de synchronisation.
  */
 object Synchronisation {
+
+    /** "20.0" → "20", "12.5" → "12,5" (même règle que l'affichage). */
+    private fun formatNombre(x: Double): String = if (x == x.toLong().toDouble()) x.toLong().toString() else x.toString().replace('.', ',')
 
     /**
      * Remonte au serveur tout ce qui est en attente, dans l'ordre. Sans réseau : s'arrête au premier échec, ne casse rien.
@@ -31,6 +36,6 @@ object Synchronisation {
         val tentative = db.tentativeDao().parId(r.tentativeId)
         val inscription = tentative?.let { db.inscriptionDao().parId(it.inscriptionId) }
         val epreuve = tentative?.let { db.typeEpreuveDao().parId(it.typeEpreuveId) }
-        return "n° ${inscription?.numeroAnonymat ?: "?"} · ${epreuve?.libelle ?: "épreuve"} · ${r.noteObtenue} / ${r.noteMax} · ${if (r.reussi) "réussi" else "échec"} · validé le ${r.dateValidation ?: "?"}"
+        return "n° ${inscription?.numeroAnonymat ?: "?"} · ${epreuve?.libelle ?: "épreuve"} · ${formatNombre(r.noteObtenue)} / ${formatNombre(r.noteMax)} · ${if (r.reussi) "réussi" else "échec"} · validé le ${r.dateValidation?.let(::formatDate) ?: "?"}"
     }
 }

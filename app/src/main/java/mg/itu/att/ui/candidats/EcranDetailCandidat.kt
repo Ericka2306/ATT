@@ -21,6 +21,7 @@ import mg.itu.att.metier.formatDate
 import mg.itu.att.ui.communs.CarteFiche
 import mg.itu.att.ui.communs.CarteIcone
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.HistoriqueVide
 import mg.itu.att.ui.communs.LigneHistorique
 import mg.itu.att.ui.communs.LigneInfo
 import mg.itu.att.ui.communs.Option
@@ -105,7 +106,7 @@ fun EcranDetailCandidat(
                     }
                 }
             }
-            item { TitreSection("Historique") }
+            item { TitreSection("Historique"); if (etat.historique.isEmpty()) HistoriqueVide() }
             items(etat.historique) { LigneHistorique(it) }
         }
     }

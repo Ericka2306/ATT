@@ -22,6 +22,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import mg.itu.att.metier.formatDate
@@ -61,7 +63,7 @@ fun EcranSynchronisation(viewModel: SynchronisationViewModel, onRetour: () -> Un
                             )
                             e.derniereSynchronisation?.let { Text("Dernière synchronisation : ${formatDate(it)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         }
-                        Switch(checked = e.reseau, onCheckedChange = viewModel::basculerReseau)
+                        Switch(checked = e.reseau, onCheckedChange = viewModel::basculerReseau, modifier = Modifier.semantics { contentDescription = "Interrupteur réseau" })
                     }
                 }
                 Spacer(Modifier.height(8.dp))

@@ -45,14 +45,23 @@ EOF
 
 # Les gestes de défilement partent de la marge gauche (x = 60) : un glissement qui commence dans un
 # champ de texte est capté par le champ (sélection), et l'écran ne défile pas.
-descendre() { $ADB shell input swipe 60 1800 60 700 400; sleep 1.0; }
-monter()    { $ADB shell input swipe 60 700 60 1800 400; sleep 1.0; }
+descendre() { $ADB shell input swipe 360 900 360 300 300; sleep 1.2; }
+monter()    { $ADB shell input swipe 360 300 360 900 300; sleep 1.2; }
 
 # remonte en haut de l'écran
 haut() { monter; monter; }
 
 # ferme le clavier (y compris le panneau de saisie vocale, qui recouvre le bas de l'écran)
-fermer_clavier() { $ADB shell input keyevent KEYCODE_BACK; sleep 1.2; }
+# ferme le clavier seulement s'il est ouvert : un « retour » système sans clavier quitterait l'écran
+fermer_clavier() {
+  if $ADB shell dumpsys input_method | grep -q "mInputShown=true"; then $ADB shell input keyevent KEYCODE_BACK; sleep 1.2; fi
+}
+
+# appuie sur la flèche « Retour » de la barre de titre (jamais le bouton système, qui dépend du clavier)
+retour() { fermer_clavier; tap "Retour" 1.5; }
+
+# fait défiler vers le bas (cinq fois) pour atteindre un bouton en fin de page
+bas() { fermer_clavier; for i in 1 2 3 4 5; do $ADB shell input swipe 360 900 360 300 300; sleep 0.5; done; }
 
 tap() {
   local c essai
@@ -83,9 +92,11 @@ remplacer() {
 
 visible() { centre "$1" >/dev/null 2>&1; }
 
+# captures : par défaut dans docs/rapport/captures (celles du rapport technique) ; DOSSIER_CAPTURES pour changer
 capture() {
-  mkdir -p "$DOSSIER_PROJET/docs/captures"
-  $ADB exec-out screencap -p > "$DOSSIER_PROJET/docs/captures/$1.png"
+  local dossier="${DOSSIER_CAPTURES:-$DOSSIER_PROJET/docs/rapport/captures}"
+  mkdir -p "$dossier"
+  $ADB exec-out screencap -p > "$dossier/$1.png"
   echo "capture $1"
 }
 

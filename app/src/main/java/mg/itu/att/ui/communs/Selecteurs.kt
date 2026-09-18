@@ -19,6 +19,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import mg.itu.att.data.Region
 
@@ -64,7 +68,14 @@ fun SelecteurChoix(
             modifier = Modifier.fillMaxWidth(),
         )
         if (!verrouille) {
-            Box(Modifier.matchParentSize().clickable { ouvert = true })
+            // La zone cliquable porte le nom du champ et son choix : un lecteur d'écran (et l'automate de test)
+            // y voient un bouton « Région : Analamanga » au lieu d'une surface muette.
+            Box(
+                Modifier
+                    .matchParentSize()
+                    .semantics { contentDescription = if (libelle.isBlank()) prefixe else "$prefixe : $libelle"; role = Role.Button }
+                    .clickable { ouvert = true },
+            )
         }
         DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
             if (avecTous) {

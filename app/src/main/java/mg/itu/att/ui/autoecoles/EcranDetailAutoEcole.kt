@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import mg.itu.att.ui.communs.CarteFiche
 import mg.itu.att.ui.communs.EcranStandard
 import mg.itu.att.ui.communs.LigneInfo
+import mg.itu.att.ui.communs.HistoriqueVide
 import mg.itu.att.ui.communs.LigneHistorique
 import mg.itu.att.ui.communs.TitreSection
 import mg.itu.att.ui.communs.ouTiret
@@ -73,6 +74,7 @@ fun EcranDetailAutoEcole(
                 Spacer(Modifier.height(8.dp))
                 Button(onClick = onCreerCompte, enabled = a.actif) { Text("Créer un compte") }
                 TitreSection("Historique")
+                if (etat.historique.isEmpty()) HistoriqueVide()
             }
             items(etat.historique) { LigneHistorique(it) }
         }

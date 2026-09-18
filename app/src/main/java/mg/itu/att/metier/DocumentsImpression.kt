@@ -21,7 +21,7 @@ object DocumentsImpression {
     /** Squelette commun : titre, styles simples, pied de page avec la mention et la date d'édition. */
     fun page(titre: String, corps: String, dateEdition: String): String = """
         <!DOCTYPE html>
-        <html lang="fr"><head><meta charset="utf-8"><title>${echapper(titre)}</title>
+        <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=640"><title>${echapper(titre)}</title>
         <style>
           body { font-family: sans-serif; font-size: 12pt; margin: 24px; color: #000; }
           h1 { font-size: 16pt; margin: 0 0 4px; }

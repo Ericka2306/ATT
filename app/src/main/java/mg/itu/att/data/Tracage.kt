@@ -69,6 +69,9 @@ suspend fun AppDatabase.tracer(
     )
 }
 
+/** "20.0" → "20", "12.5" → "12,5" : les nombres des résumés se lisent comme à l'écran. */
+private fun nombreLisible(x: Double): String = if (x == x.toLong().toDouble()) x.toLong().toString() else x.toString().replace('.', ',')
+
 /** Résumés texte pour l'historique (jamais l'objet complet). */
 fun AutoEcole.resume(): String = "$nom (région $regionId, agrément ${numeroAgrement ?: "—"}, ${if (actif) "active" else "inactive"})"
 
@@ -102,6 +105,6 @@ fun Inscription.resume(): String = "inscription n° $id, candidat $candidatId, s
 
 fun Session.resume(): String = "session n° $id du $date à $heureConvocation, centre $centreId, catégorie $categorieId, épreuve $typeEpreuveId, capacité $capacite, statut $statut"
 
-fun Resultat.resume(): String = "résultat n° $id de la tentative $tentativeId : ${noteObtenue}/${noteMax} (seuil $seuil), ${if (reussi) "réussi" else "échec"}, $statut${remplaceResultatId?.let { ", remplace le n° $it" } ?: ""}"
+fun Resultat.resume(): String = "résultat n° $id de la tentative $tentativeId : ${nombreLisible(noteObtenue)}/${nombreLisible(noteMax)} (seuil ${nombreLisible(seuil)}), ${if (reussi) "réussi" else "échec"}, $statut${remplaceResultatId?.let { ", remplace le n° $it" } ?: ""}"
 
 fun Centre.resume(): String = "$nom (région $regionId, $adresse, capacité ${capaciteParDefaut ?: "—"}, ${if (actif) "actif" else "inactif"})"
