@@ -71,10 +71,12 @@ data class EtatDetailSession(
     val creneaux: List<CreneauLigne> = emptyList(),
     val inscriptions: List<Inscription> = emptyList(),
     val historique: List<Historique> = emptyList(),
-    val motif: String = "",
     val erreur: String? = null,
     val peutGerer: Boolean = false,
 )
+
+/** Le motif d'annulation, exposé à part : la frappe ne doit pas traverser le flux du détail (défaut vu en D1). */
+data class SaisieSession(val motif: String = "", val erreur: String? = null)
 
 // ---------- LE VIEWMODEL ----------
 
@@ -218,25 +220,27 @@ class SessionsViewModel(application: Application) : AndroidViewModel(application
     // ----- Détail -----
 
     private val idDetail = MutableStateFlow(0)
-    private val motif = MutableStateFlow("")
     private val erreurDetail = MutableStateFlow<String?>(null)
 
+    private val _saisieSession = MutableStateFlow(SaisieSession())
+    val saisieSession: StateFlow<SaisieSession> = _saisieSession
+
     fun afficherDetail(sessionId: Int) {
-        if (idDetail.value != sessionId) { idDetail.value = sessionId; motif.value = ""; erreurDetail.value = null }
+        if (idDetail.value != sessionId) { idDetail.value = sessionId; _saisieSession.value = SaisieSession(); erreurDetail.value = null }
     }
 
-    fun changerMotif(texte: String) { motif.value = texte; erreurDetail.value = null }
+    fun changerMotif(texte: String) = _saisieSession.update { it.copy(motif = texte, erreur = null) }
 
     val detail: StateFlow<EtatDetailSession> =
         idDetail.flatMapLatest { id ->
             combine(
                 lignes, db.creneauDao().parSession(id), db.inscriptionDao().parSession(id), db.historiqueDao().pourObjet(EntitesHistorique.SESSION, id),
-                combine(motif, erreurDetail, session) { m, e, s -> Triple(m, e, s) },
-            ) { lignes, creneaux, inscriptions, historique, (m, e, s) ->
+                combine(erreurDetail, session) { e, s -> e to s },
+            ) { lignes, creneaux, inscriptions, historique, (e, s) ->
                 EtatDetailSession(
                     ligne = lignes.find { it.session.id == id },
                     creneaux = creneaux.map { c -> CreneauLigne(c, inscriptions.count { it.creneauId == c.id && it.statut != StatutInscription.ANNULE }) },
-                    inscriptions = inscriptions, historique = historique, motif = m, erreur = e, peutGerer = estAtt(s),
+                    inscriptions = inscriptions, historique = historique, erreur = e, peutGerer = estAtt(s),
                 )
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EtatDetailSession())
@@ -248,7 +252,7 @@ class SessionsViewModel(application: Application) : AndroidViewModel(application
     fun changerStatut(sessionId: Int, nouveau: StatutSession) {
         val utilisateur = session.value ?: return
         if (!estAtt(utilisateur)) return
-        val texteMotif = motif.value.trim()
+        val texteMotif = _saisieSession.value.motif.trim()
         if (nouveau == StatutSession.ANNULEE && texteMotif.isBlank()) return run { erreurDetail.value = "Indiquez le motif de l'annulation." }
         viewModelScope.launch {
             db.withTransaction {
@@ -264,7 +268,7 @@ class SessionsViewModel(application: Application) : AndroidViewModel(application
                     }
                 }
             }
-            motif.value = ""
+            _saisieSession.value = SaisieSession()
         }
     }
 }

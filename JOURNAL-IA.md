@@ -256,7 +256,20 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 18 — <date> — <tâche>
+## Entrée 18 — 18/09/2026 — Étape D1, tests et cas particuliers (dev 2)
+
+- Code soumis : `metier/ContraintesCadrageTest.kt`, `metier/PointsTest.kt`, et la correction des motifs dans trois ViewModels.
+- Remarque principale de l'IA : écrire **un test nommé d'après chaque contrainte du cadrage §11** rend le tableau de D1 vérifiable par `./gradlew :app:testDebugUnitTest`, au lieu de reposer seulement sur des captures. Les contraintes qui ne sont pas des calculs (sans smartphone, panne, examinateur indisponible) restent des scénarios sur émulateur, mais elles ont aussi un test qui prouve l'absence de verrou (par exemple : aucun contrôle d'inscription ne dépend d'un compte candidat).
+
+⚠️ Défaut trouvé en rejouant les scénarios, que ni les tests ni les captures précédentes n'avaient vu : les **motifs** (décision de dossier, report, annulation) perdaient des caractères, et un motif faux partait dans l'historique. C'est le troisième écran touché par le même défaut, après C9 et C11 : à chaque fois, une frappe qui traverse un `combine` interrogeant la base. La leçon vaut pour tout nouveau champ de saisie.
+
+⚠️ L'IA n'a pas touché au champ « Rechercher un candidat », qui traverse encore le flux : il doit filtrer la liste, donc la correction serait différente. Noté comme décision restante.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 2>.
+
+---
+
+## Entrée 19 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :

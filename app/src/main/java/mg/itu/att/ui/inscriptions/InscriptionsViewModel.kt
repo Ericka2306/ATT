@@ -51,9 +51,6 @@ data class EtatInscriptions(
     val candidatsEligibles: List<CandidatEligible> = emptyList(),
     val recherche: String = "",
     val creneauChoisiId: Int? = null,
-    val motif: String = "",
-    val message: String? = null,
-    val erreur: String? = null,
     /** ATT : inscrit, confirme, annule. Auto-école : demande seulement si la règle l'autorise. */
     val peutInscrire: Boolean = false,
     val peutDemander: Boolean = false,
@@ -61,6 +58,13 @@ data class EtatInscriptions(
     /** Vrai pour l'ATT : les noms sont visibles ; l'examinateur ne verra que les numéros (C7). */
     val nomsVisibles: Boolean = true,
 )
+
+/**
+ * Le motif d'un report ou d'une annulation, et les messages, exposés à part : passer la frappe par le flux
+ * ci-dessus (qui recalcule listes et jointures à chaque émission) fait perdre des caractères — défaut
+ * constaté en C9, C11 puis D1.
+ */
+data class SaisieInscription(val motif: String = "", val message: String? = null, val erreur: String? = null)
 
 // ---------- LE VIEWMODEL ----------
 
@@ -77,9 +81,9 @@ class InscriptionsViewModel(application: Application) : AndroidViewModel(applica
     private val idSession = MutableStateFlow(0)
     private val recherche = MutableStateFlow("")
     private val creneauChoisi = MutableStateFlow<Int?>(null)
-    private val motif = MutableStateFlow("")
-    private val message = MutableStateFlow<String?>(null)
-    private val erreur = MutableStateFlow<String?>(null)
+    private val _saisie = MutableStateFlow(SaisieInscription())
+    /** Duo `_uiState` / `uiState` du cours : la frappe reste locale. */
+    val saisie: StateFlow<SaisieInscription> = _saisie
     private val autoEcolePeutInscrire = MutableStateFlow(false)
 
     override fun definirSession(session: SessionUtilisateur) {
@@ -92,9 +96,9 @@ class InscriptionsViewModel(application: Application) : AndroidViewModel(applica
         viewModelScope.launch { autoEcolePeutInscrire.value = db.regleBooleen(ClesRegles.AUTO_ECOLE_PEUT_INSCRIRE) }
     }
 
-    fun rechercher(texte: String) { recherche.value = texte; erreur.value = null }
-    fun choisirCreneau(id: Int?) { creneauChoisi.value = id; erreur.value = null }
-    fun changerMotif(texte: String) { motif.value = texte; erreur.value = null }
+    fun rechercher(texte: String) { recherche.value = texte; _saisie.update { it.copy(erreur = null) } }
+    fun choisirCreneau(id: Int?) { creneauChoisi.value = id; _saisie.update { it.copy(erreur = null) } }
+    fun changerMotif(texte: String) = _saisie.update { it.copy(motif = texte, erreur = null) }
 
     private fun estAtt(s: SessionUtilisateur?) = s?.role == Role.ADMIN_ATT || s?.role == Role.SUPER_ADMIN
 
@@ -104,11 +108,9 @@ class InscriptionsViewModel(application: Application) : AndroidViewModel(applica
                 combine(db.sessionDao().parIdEnDirect(id), db.creneauDao().parSession(id), db.inscriptionDao().parSession(id)) { s, c, i -> Triple(s, c, i) },
                 combine(db.candidatDao().tous(), db.autoEcoleDao().toutes(), db.dossierDao().tous()) { c, a, d -> Triple(c, a, d) },
                 combine(db.categoriePermisDao().toutes(), db.typeEpreuveDao().toutes(), db.centreDao().tous()) { c, e, ce -> Triple(c, e, ce) },
-                combine(recherche, creneauChoisi, motif) { r, c, m -> Triple(r, c, m) },
-                combine(message, erreur, session, autoEcolePeutInscrire) { me, er, s, regle -> listOf(me, er, s, regle) },
-            ) { (se, creneaux, inscriptions), (candidats, autoEcoles, dossiers), (categories, epreuves, centres), (texte, creneauId, m), divers ->
-                val s = divers[2] as SessionUtilisateur?
-                val regleAutoEcole = divers[3] as Boolean
+                combine(recherche, creneauChoisi) { r, c -> r to c },
+                combine(session, autoEcolePeutInscrire) { s, regle -> s to regle },
+            ) { (se, creneaux, inscriptions), (candidats, autoEcoles, dossiers), (categories, epreuves, centres), (texte, creneauId), (s, regleAutoEcole) ->
                 if (se == null) return@combine EtatInscriptions()
                 val nomsAutoEcoles = autoEcoles.associate { it.id to it.nom }
                 val actives = ReglesInscription.actives(inscriptions)
@@ -132,8 +134,7 @@ class InscriptionsViewModel(application: Application) : AndroidViewModel(applica
                         },
                     placesRestantes = se.capacite - actives.size,
                     candidatsEligibles = eligibles,
-                    recherche = texte, creneauChoisiId = creneauId, motif = m,
-                    message = divers[0] as String?, erreur = divers[1] as String?,
+                    recherche = texte, creneauChoisiId = creneauId,
                     peutInscrire = estAtt(s), peutDemander = s?.role == Role.AUTO_ECOLE && regleAutoEcole, estAtt = estAtt(s),
                 )
             }
@@ -165,11 +166,11 @@ class InscriptionsViewModel(application: Application) : AndroidViewModel(applica
                 theorieReussie = theorie != null && db.resultatDao().dernierReussi(candidatId, theorie.id) != null,
             )
             val refus = ReglesInscription.verifier(contexte)
-            if (refus != null) return@launch run { erreur.value = refus; message.value = null }
+            if (refus != null) return@launch run { _saisie.update { it.copy(erreur = refus, message = null) } }
             val creneaux = db.creneauDao().listePourSession(sessionId)
             val creneau = creneauChoisi.value?.let { id -> creneaux.find { it.id == id } }?.takeIf { c -> ReglesInscription.actives(inscriptionsSession).count { it.creneauId == c.id } < c.capacite }
                 ?: ReglesInscription.choisirCreneau(creneaux, inscriptionsSession)
-            if (creneau == null) return@launch run { erreur.value = "Aucun créneau disponible." }
+            if (creneau == null) return@launch run { _saisie.update { it.copy(erreur = "Aucun créneau disponible.") } }
             val statut = if (estAtt(utilisateur)) StatutInscription.INSCRIT else StatutInscription.DEMANDE
             val inscription = Inscription(
                 candidatId = candidatId, dossierId = dossier?.id ?: 0, sessionId = sessionId, creneauId = creneau.id, statut = statut,
@@ -185,8 +186,9 @@ class InscriptionsViewModel(application: Application) : AndroidViewModel(applica
                     db.tracer(EntitesHistorique.SESSION, se.id, ActionsHistorique.MODIFICATION, utilisateur.id, nouvelleValeur = "COMPLETE (dernière place prise)")
                 }
             }
-            erreur.value = null
-            message.value = "${candidat.nom} ${candidat.prenom} : ${if (statut == StatutInscription.DEMANDE) "demande enregistrée" else "inscrit(e)"}, n° ${inscription.numeroAnonymat}, créneau ${creneau.heureDebut}."
+            _saisie.value = SaisieInscription(
+                message = "${candidat.nom} ${candidat.prenom} : ${if (statut == StatutInscription.DEMANDE) "demande enregistrée" else "inscrit(e)"}, n° ${inscription.numeroAnonymat}, créneau ${creneau.heureDebut}.",
+            )
         }
     }
 
@@ -200,8 +202,8 @@ class InscriptionsViewModel(application: Application) : AndroidViewModel(applica
     private fun changerStatut(inscriptionId: Int, nouveau: StatutInscription, action: String, motifObligatoire: Boolean) {
         val utilisateur = session.value ?: return
         if (!estAtt(utilisateur)) return
-        val texteMotif = motif.value.trim()
-        if (motifObligatoire && texteMotif.isBlank()) return run { erreur.value = "Indiquez le motif." }
+        val texteMotif = _saisie.value.motif.trim()
+        if (motifObligatoire && texteMotif.isBlank()) return run { _saisie.update { it.copy(erreur = "Indiquez le motif.") } }
         viewModelScope.launch {
             db.withTransaction {
                 val actuelle = db.inscriptionDao().parId(inscriptionId) ?: return@withTransaction
@@ -214,9 +216,7 @@ class InscriptionsViewModel(application: Application) : AndroidViewModel(applica
                     db.tracer(EntitesHistorique.SESSION, se.id, ActionsHistorique.MODIFICATION, utilisateur.id, nouvelleValeur = "OUVERTE (place libérée)")
                 }
             }
-            motif.value = ""
-            erreur.value = null
-            message.value = null
+            _saisie.value = SaisieInscription()
         }
     }
 }

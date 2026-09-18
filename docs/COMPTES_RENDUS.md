@@ -586,3 +586,48 @@ Réassignée au dev 1 le 16/09 (le dev 2 n'avait pas commencé) ; le dev 2 repre
 - `app/src/main/java/mg/itu/att/Navigation.kt` — `graphImpression` et les boutons passés aux écrans.
 - `app/src/main/java/mg/itu/att/ui/sessions/EcranDetailSession.kt` — boutons répartis sur plusieurs lignes (défaut d'affichage corrigé) ; `ui/inscriptions/EcranInscriptions.kt`, `EcranMesInscriptions.kt`, `ui/resultats/EcranDetailResultat.kt` — un bouton d'impression chacun.
 - `docs/HORS_COURS.md` (n° 24), `docs/02_PLAN_DE_TRAVAIL.md`, `docs/captures/C13_*.png` — 5 captures de l'émulateur.
+
+---
+
+## Étape D1 — Tests et cas particuliers — 18/09/2026
+
+> Dernière étape de développement du dev 2 : compléter les tests unitaires, puis rejouer une par une les dix contraintes du cahier de cadrage §11 sur l'émulateur. Trois défauts de saisie ont été trouvés et corrigés à cette occasion.
+
+**Créé** (`app/src/test/java/mg/itu/att/`)
+- `metier/ContraintesCadrageTest.kt` — **un test par contrainte §11** : dossier incomplet ou refusé, candidat non éligible, session complète, absence / retard / report / annulation, correction traçable, échec et nouvelle tentative, examinateur indisponible, conflit de créneaux, faute éliminatoire, candidat sans smartphone, panne (liste d'appel imprimée). 11 tests.
+- `metier/PointsTest.kt` — les points saisis par l'examinateur : bornes, virgule décimale, saisie vide ou non numérique. 3 tests.
+
+**Modifié — défauts de saisie corrigés**
+- `ui/candidats/CandidatsViewModel.kt` + `EcranDossier.kt`, `ui/inscriptions/InscriptionsViewModel.kt` + `EcranInscriptions.kt`, `ui/sessions/SessionsViewModel.kt` + `EcranDetailSession.kt` : le **motif** (décision sur un dossier, report ou annulation d'une inscription, annulation d'une session) passait par l'état construit par `combine`, qui relit la base ou recalcule les listes à chaque émission. Résultat : des caractères disparaissaient (« Adisoi » au lieu de « Acte de naissance non fourni »), et le motif enregistré dans l'historique était faux. Chaque motif est désormais un `StateFlow` séparé (`SaisieDossier`, `SaisieInscription`, `SaisieSession`), comme la feuille d'examen en C9 et le motif de correction en C11.
+
+**Tableau des contraintes du cadrage §11**
+
+| # | Contrainte | Comment c'est vérifié | Résultat |
+|---|---|---|---|
+| 1 | Dossier incomplet / refusé | Émulateur : dossier de RASOA soumis → refus **sans motif bloqué** (« Indiquez le motif »), puis « Incomplet » avec motif, resoumission, puis « Refusé » avec motif ; historique complet. Test `contrainte - un dossier incomplet ou refuse peut etre repris…` | ✅ `D1_dossier_incomplet.png`, `D1_dossier_refuse.png` |
+| 2 | Candidat non éligible | Émulateur : candidat né en 2012, soumission du dossier B refusée (« Âge insuffisant pour la catégorie B : 14 ans, minimum 18 ans (valeur à confirmer) »). Test `contrainte - candidat non eligible…` | ✅ `D1_candidat_non_eligible.png` |
+| 3 | Session complète | Émulateur : session à **1 place**, RABE inscrit, seconde inscription refusée (« Session complète (1 places). »). Test `contrainte - session complete refusee` | ✅ `D1_session_complete.png` |
+| 4 | Absence, retard, report, annulation | Émulateur : retard de RAKOTO accepté (C11), report puis annulation de l'inscription de RABE, **motif obligatoire** et place libérée. Test `contrainte - retard dans la tolerance…` | ✅ `D1_report_motif.png`, `D1_annulation_motif.png` |
+| 5 | Erreur de notation, correction traçable | Émulateur (C11) : correction avec motif → nouvelle ligne, l'ancienne passe en « Remplacé » et reste lisible. Test `contrainte - une correction exige un motif…` | ✅ `C11_correction.png` |
+| 6 | Échec et nouvelle tentative | Tests : numéro de passage jamais réutilisé, délai de repassage qui bloque puis laisse passer, épreuve à repasser avec sa date de réinscription (`contrainte - apres un echec…`) | ✅ |
+| 7 | Examinateur indisponible | Test : aucune affectation préalable n'est exigée, seule la présence du candidat compte (`contrainte - aucune affectation examinateur…`). Émulateur en C8 : passage ouvert par l'ATT, examinateur enregistré à la saisie | ✅ |
+| 8 | Conflit de créneaux | Émulateur : seconde session le même jour dans le même centre → **avertissement** à la création ; inscription du même candidat le même jour → refus (« conflit de créneaux »). Test `contrainte - conflit de creneaux…` | ✅ `D1_conflit_creneaux_creation.png`, `D1_conflit_creneaux.png` |
+| 9 | Candidat sans smartphone | Tout le parcours est fait par l'ATT et l'auto-école (C12) ; le compte candidat est facultatif. Test `contrainte - le parcours reste faisable sans compte candidat` | ✅ `C12_mon_parcours.png` (compte facultatif) |
+| 10 | Panne réseau / électricité | Liste d'appel imprimée avec ses colonnes à cocher, mention « secours en cas de panne » ; application entièrement locale. Test `contrainte - la liste d appel imprimee…` | ✅ `C13_liste_appel.png` |
+
+**Tests**
+- `assembleDebug` vert ; `testDebugUnitTest` : **119 tests verts** (105 + 14).
+- Émulateur : scénarios ci-dessus rejoués avec le pilote par texte, captures à l'appui, sur la base des données des étapes précédentes.
+
+**Décisions restantes**
+1. Le champ « Rechercher un candidat » de l'écran d'inscriptions traverse encore le flux qui recalcule la liste : c'est voulu (la recherche filtre la liste), mais si la frappe y saute sur un appareil lent, il faudra le traiter comme les motifs.
+2. Un dossier **refusé** ne peut pas être resoumis (seuls BROUILLON et INCOMPLET le peuvent) : à confirmer avec l'ATT, l'auto-école doit sinon ouvrir un nouveau dossier.
+3. Étape suivante : D2 et D3 avec le dev 1 (relecture croisée, schéma Room figé, `LISEZMOI`, démo de soutenance).
+
+**À relire**
+- `app/src/test/java/mg/itu/att/metier/ContraintesCadrageTest.kt` — nouveau : un test par contrainte du cadrage §11.
+- `app/src/test/java/mg/itu/att/metier/PointsTest.kt` — nouveau : 3 tests sur les points saisis.
+- `app/src/main/java/mg/itu/att/ui/candidats/CandidatsViewModel.kt`, `ui/candidats/EcranDossier.kt` — motif du dossier sorti du flux.
+- `app/src/main/java/mg/itu/att/ui/inscriptions/InscriptionsViewModel.kt`, `EcranInscriptions.kt` — motif, message et erreur sortis du flux.
+- `app/src/main/java/mg/itu/att/ui/sessions/SessionsViewModel.kt`, `EcranDetailSession.kt` — motif d'annulation sorti du flux.
+- `docs/02_PLAN_DE_TRAVAIL.md`, `docs/captures/D1_*.png` — 6 captures de l'émulateur.
