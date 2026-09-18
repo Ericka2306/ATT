@@ -3,7 +3,7 @@
  * présentées comme dans l'éditeur d'Android Studio (thème clair, gouttière avec numéros de ligne,
  * onglet du fichier). Rendu par Google Chrome en mode sans fenêtre.
  *
- *   node capturer_code.js        → captures/code_A1.png … code_A4.png
+ *   node capturer_code.js        → captures/code_S1a.png … code_S7d.png (une série par séance du cours)
  */
 const fs = require("fs");
 const path = require("path");
@@ -15,11 +15,27 @@ const SORTIE = path.join(__dirname, "captures");
 
 /** Les extraits : fichier du projet et plages de lignes (une coupure entre deux plages = région repliée). */
 const EXTRAITS = [
-  { nom: "code_A1", fichier: "app/src/main/java/mg/itu/att/ui/appel/AppelViewModel.kt", plages: [[157, 168]] },
-  { nom: "code_A2a", fichier: "app/src/main/java/mg/itu/att/metier/ReglesTentatives.kt", plages: [[16, 30]] },
-  { nom: "code_A2b", fichier: "app/src/test/java/mg/itu/att/metier/ReglesTentativesTest.kt", plages: [[23, 29]] },
-  { nom: "code_A3", fichier: "app/src/main/java/mg/itu/att/ui/evaluation/TentativesViewModel.kt", plages: [[121, 131], [153, 155]] },
-  { nom: "code_A4", fichier: "app/src/main/java/mg/itu/att/metier/ReglesTheorie.kt", plages: [[29, 45]] },
+  // Séance 1 — Kotlin : val/var, filter, shuffled, when sans if, String? sans !!, test JUnit
+  { nom: "code_S1a", fichier: "app/src/main/java/mg/itu/att/metier/ReglesTheorie.kt", plages: [[29, 45]] },
+  { nom: "code_S1b", fichier: "app/src/main/java/mg/itu/att/metier/ReglesTentatives.kt", plages: [[16, 30]] },
+  { nom: "code_S1c", fichier: "app/src/test/java/mg/itu/att/metier/ReglesTentativesTest.kt", plages: [[23, 29]] },
+  // Séance 2 — Coroutines : suspend + delay, viewModelScope.launch
+  { nom: "code_S2a", fichier: "app/src/main/java/mg/itu/att/data/FauxServeurATT.kt", plages: [[29, 42]] },
+  { nom: "code_S2b", fichier: "app/src/main/java/mg/itu/att/ui/inscriptions/InscriptionsViewModel.kt", plages: [[158, 164], [183, 184]] },
+  // Séance 3 — Anatomie Android : une seule Activity
+  { nom: "code_S3", fichier: "app/src/main/java/mg/itu/att/MainActivity.kt", plages: [[12, 30]] },
+  // Séance 4 — Compose : composable réutilisable, remember pour l'état local, le choix remonte par lambda
+  { nom: "code_S4", fichier: "app/src/main/java/mg/itu/att/ui/communs/Selecteurs.kt", plages: [[41, 53], [70, 80], [88, 90]] },
+  // Séance 5 — Navigation : routes en chaînes avec identifiant, idArgument, lambdas
+  { nom: "code_S5a", fichier: "app/src/main/java/mg/itu/att/Navigation.kt", plages: [[304, 310]] },
+  { nom: "code_S5b", fichier: "app/src/main/java/mg/itu/att/Navigation.kt", plages: [[167, 184]] },
+  // Séance 6 — MVVM : MutableStateFlow privés, StateFlow exposé par combine + stateIn
+  { nom: "code_S6", fichier: "app/src/main/java/mg/itu/att/ui/synchronisation/SynchronisationViewModel.kt", plages: [[39, 46], [54, 73]] },
+  // Séance 7 — Room et hors ligne d'abord : entité, DAO, file d'attente, transaction tracée
+  { nom: "code_S7a", fichier: "app/src/main/java/mg/itu/att/data/EntitesExamens.kt", plages: [[108, 122], [133, 137]] },
+  { nom: "code_S7b", fichier: "app/src/main/java/mg/itu/att/data/ExamensDao.kt", plages: [[148, 158]] },
+  { nom: "code_S7c", fichier: "app/src/main/java/mg/itu/att/data/Synchronisation.kt", plages: [[19, 32]] },
+  { nom: "code_S7d", fichier: "app/src/main/java/mg/itu/att/ui/appel/AppelViewModel.kt", plages: [[157, 168]] },
 ];
 
 const MOTS_CLES = new Set(("package import class data object fun val var if else when for while do return break continue " +

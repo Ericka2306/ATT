@@ -10,6 +10,6 @@ node generer_rapport.js
 
 - Le texte des sections est dans `generer_rapport.js`, une fonction par chapitre.
 - Les captures d'écran vont dans `captures/` avec le nom attendu par chaque figure (par exemple `06_09_inscription.png`) ; tant qu'un fichier manque, un cadre « capture à insérer » prend sa place.
-- Les images de code de l'annexe A (`captures/code_A1.png` à `code_A4.png`) sont fabriquées par `node capturer_code.js` à partir des vrais fichiers du projet, avec le rendu de l'éditeur d'Android Studio (Google Chrome en mode sans fenêtre). Une vraie capture d'Android Studio enregistrée sous le même nom est utilisée telle quelle.
+- Les images de code de l'annexe A (`captures/code_S1a.png` à `code_S7d.png`, une série par séance du cours) sont fabriquées par `node capturer_code.js` à partir des vrais fichiers du projet, avec le rendu de l'éditeur d'Android Studio (Google Chrome en mode sans fenêtre). Une vraie capture d'Android Studio enregistrée sous le même nom est utilisée telle quelle.
 - Les passages surlignés en jaune (« À compléter — … ») sont à rédiger pendant le rejeu de A à Z ; les consignes grises en italique sont à supprimer une fois la section écrite.
 - Ouvrir le document dans Word et accepter la mise à jour des champs pour remplir le sommaire ; exporter en PDF depuis Word pour la version finale.
