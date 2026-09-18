@@ -49,7 +49,7 @@ Ecran*  (Compose)  →  *ViewModel  (StateFlow)  →  *Dao  (Room)  →  base at
 | `CalculEnBase.kt` | rassemble la saisie et le barème, appelle `CalculResultat`, enregistre le résultat sans rien écraser |
 | `DonneesInitiales.kt` | ce qui est inséré au premier lancement : 24 régions, 2 comptes, valeurs d'exemple « à confirmer » |
 
-### `metier/` — les décisions, en fonctions pures (18 fichiers)
+### `metier/` — les décisions, en fonctions pures (19 fichiers)
 
 Aucun import Android. Chaque fichier a ses tests dans `app/src/test/`.
 
@@ -64,7 +64,8 @@ Aucun import Android. Chaque fichier a ses tests dans `app/src/test/`.
 | `Points.kt` | ce que l'examinateur a tapé est-il un nombre valable ? |
 | `CalculResultat.kt` | la note, rapportée au barème, et réussi ou non |
 | `ReglesRepassage.kt` | après un échec : quelles épreuves, à partir de quelle date |
-| `ReglesConsultation.kt` | qui a le droit de voir ou de gérer ce candidat |
+| `ReglesConsultation.kt` | qui a le droit de voir ou de gérer ce candidat ; le candidat ne voit pas un dossier en brouillon |
+| `PiecesJointes.kt` | une pièce se vérifie-t-elle par son fichier joint ou sur papier ? qui peut joindre, quels fichiers |
 | `FiltresHistorique.kt` | qui lit l'historique, et comment on le filtre |
 | `DocumentsImpression.kt` | le HTML des quatre documents imprimables |
 | `ValidationCandidat.kt`, `ValidationAutoEcole.kt`, `ValidationCompte.kt`, `ValidationConfiguration.kt` | la saisie des formulaires est-elle complète et bien formée |
@@ -80,7 +81,7 @@ Dans chaque dossier : un `*ViewModel.kt` et un ou plusieurs `Ecran*.kt`. Un fich
 | `accueil/` | `EcranAccueil`, `MenuParRole` | le menu dépend du rôle connecté (fonction pure, testée) |
 | `configuration/` | catégories, centres, épreuve, règles | UC02 — le Super Admin configure, rien n'est codé en dur |
 | `autoecoles/` | liste, fiche, formulaire, compte | UC03 |
-| `candidats/` | liste, fiche, dossier, dossiers à traiter, parcours | UC04, UC05, UC12 |
+| `candidats/` | liste, fiche, dossier (avec pièces jointes), ouverture d'une pièce, dossiers à traiter, parcours ; `FichiersPieces.kt` copie et relit les fichiers | UC04, UC05, UC12 |
 | `sessions/` | liste, fiche, formulaire | UC06 |
 | `inscriptions/` | `EcranInscriptions`, `EcranMesInscriptions` | UC07, UC12 |
 | `appel/` | `EcranAppel` | UC08 — présent, en retard, absent |

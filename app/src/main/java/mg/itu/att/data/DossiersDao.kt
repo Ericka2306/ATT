@@ -48,6 +48,9 @@ interface PieceDossierDao {
     @Query("SELECT * FROM pieces_dossier WHERE dossierId = :dossierId ORDER BY id ASC")
     suspend fun listePourDossier(dossierId: Int): List<PieceDossier>
 
+    @Query("SELECT * FROM pieces_dossier WHERE id = :id")
+    suspend fun parId(id: Int): PieceDossier?
+
     @Insert
     suspend fun insererToutes(pieces: List<PieceDossier>)
 
