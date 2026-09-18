@@ -25,6 +25,7 @@ import mg.itu.att.ui.communs.CarteFiche
 import mg.itu.att.ui.communs.CaseACocher
 import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.EncartInfo
 import mg.itu.att.ui.communs.LigneInfo
 import mg.itu.att.ui.communs.Option
 import mg.itu.att.ui.communs.SelecteurChoix
@@ -103,7 +104,7 @@ fun EcranEpreuve(
 fun EcranFormulaireBareme(viewModel: ConfigurationViewModel, epreuveId: Int, onCree: () -> Unit, onRetour: () -> Unit) {
     val f by viewModel.formulaireBareme.collectAsState()
     EcranStandard(titre = "Nouvelle version du barème", onRetour = onRetour, defilant = true) {
-        Text("Les résultats déjà calculés gardent leur version de barème. La nouvelle version s'applique aux évaluations à venir.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        EncartInfo("Les résultats déjà calculés gardent leur version de barème. La nouvelle version s'applique aux évaluations à venir.")
         Spacer(Modifier.height(12.dp))
         ChampTexte(f.noteMax, { v -> viewModel.modifierBareme { it.copy(noteMax = v) } }, "Note maximale *", clavier = KeyboardType.Decimal)
         ChampTexte(f.seuil, { v -> viewModel.modifierBareme { it.copy(seuil = v) } }, "Seuil de réussite *", clavier = KeyboardType.Decimal)

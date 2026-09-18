@@ -27,6 +27,9 @@ interface RegionDao {
     @Query("SELECT * FROM regions WHERE id = :id")
     suspend fun parId(id: Int): Region?
 
+    @Query("SELECT * FROM regions WHERE code = :code")
+    suspend fun parCode(code: String): Region?
+
     @Query("SELECT COUNT(*) FROM regions")
     suspend fun nombre(): Int
 

@@ -16,6 +16,7 @@ import mg.itu.att.ui.communs.CarteIcone
 import mg.itu.att.ui.communs.CaseACocher
 import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.EncartInfo
 import mg.itu.att.ui.communs.LigneInfo
 import mg.itu.att.ui.communs.TexteErreur
 
@@ -24,7 +25,7 @@ import mg.itu.att.ui.communs.TexteErreur
 fun EcranRegles(viewModel: ConfigurationViewModel, onOuvrir: (Int) -> Unit, onRetour: () -> Unit) {
     val regles by viewModel.regles.collectAsState()
     EcranStandard(titre = "Règles configurables", onRetour = onRetour) {
-        Text("Le code lit ces valeurs au moment du calcul ; rien n'est codé en dur.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        EncartInfo("Le code lit ces valeurs au moment du calcul ; rien n'est codé en dur.")
         LazyColumn {
             items(regles) { l ->
                 val r = l.regle

@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -23,8 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import mg.itu.att.data.StatutInscription
+import mg.itu.att.ui.communs.LigneActions
 import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.EncartInfo
 import mg.itu.att.ui.communs.Option
 import mg.itu.att.ui.communs.PastilleStatut
 import mg.itu.att.ui.communs.SelecteurChoix
@@ -75,12 +79,12 @@ fun EcranInscriptions(viewModel: InscriptionsViewModel, sessionId: Int, onImprim
                 Card(Modifier.fillMaxWidth().padding(vertical = 4.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                     Column(Modifier.padding(12.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                            Text("n° ${i.numeroAnonymat} — ${l.nomCandidat}", style = MaterialTheme.typography.titleMedium)
+                            Text("n° ${i.numeroAnonymat} — ${l.nomCandidat}", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                             PastilleInscription(i.statut)
                         }
                         Text("${l.nomAutoEcole} · créneau ${l.creneau?.heureDebut ?: "—"}" + (i.motif?.let { " · $it" } ?: ""), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         if (e.estAtt && (i.statut == StatutInscription.DEMANDE || i.statut == StatutInscription.INSCRIT || i.statut == StatutInscription.CONFIRME)) {
-                            Row {
+                            LigneActions {
                                 if (i.statut == StatutInscription.DEMANDE) TextButton(onClick = { viewModel.confirmer(i.id) }) { Text("Confirmer") }
                                 TextButton(onClick = { viewModel.reporter(i.id) }) { Text("Reporter") }
                                 TextButton(onClick = { viewModel.annuler(i.id) }) { Text("Annuler") }
@@ -91,14 +95,13 @@ fun EcranInscriptions(viewModel: InscriptionsViewModel, sessionId: Int, onImprim
                 }
             }
             if (e.estAtt && e.inscrits.any { it.inscription.statut != StatutInscription.ANNULE && it.inscription.statut != StatutInscription.REPORTE }) {
-                item { ChampTexte(saisie.motif, viewModel::changerMotif, "Motif (obligatoire pour reporter ou annuler)") }
+                item { ChampTexte(saisie.motif, viewModel::changerMotif, "Motif", aide = "obligatoire pour reporter ou annuler") }
             }
             if (e.peutInscrire || e.peutDemander) {
                 item {
                     TitreSection(if (e.peutInscrire) "Inscrire un candidat" else "Demander une inscription")
-                    Text("Seuls les candidats ayant un dossier validé pour cette catégorie sont proposés.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Spacer(Modifier.height(8.dp))
-                    ChampTexte(e.recherche, viewModel::rechercher, "Rechercher un candidat")
+                    EncartInfo("Seuls les candidats ayant un dossier validé pour cette catégorie sont proposés.")
+                    ChampTexte(e.recherche, viewModel::rechercher, "Rechercher un candidat", icone = Icons.Filled.Search)
                     SelecteurChoix("Créneau", e.creneaux.map { Option(it.id, "${it.heureDebut} – ${it.heureFinEstimee} (${it.capacite} pl.)") }, e.creneauChoisiId, viewModel::choisirCreneau, avecTous = true, libelleTous = "premier disponible")
                     saisie.message?.let { Text(it, color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.bodyMedium) }
                     TexteErreur(saisie.erreur)

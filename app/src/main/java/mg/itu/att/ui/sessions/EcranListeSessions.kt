@@ -2,6 +2,8 @@ package mg.itu.att.ui.sessions
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,7 +32,7 @@ fun EcranListeSessions(viewModel: SessionsViewModel, onNouvelle: () -> Unit, onO
         titre = "Sessions d'examen", onRetour = onRetour,
         iconeAction = if (etat.peutGerer) Icons.Filled.Add else null, descriptionAction = "Nouvelle session", onAction = if (etat.peutGerer) onNouvelle else null,
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FiltreSessions.entries.forEach { f ->
                 FilterChip(
                     selected = etat.filtre == f, onClick = { viewModel.filtrer(f) },

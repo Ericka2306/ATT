@@ -1,12 +1,17 @@
 package mg.itu.att.ui.communs
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,7 +26,8 @@ import mg.itu.att.data.Region
 data class Option(val id: Int, val libelle: String)
 
 /**
- * Sélecteur générique : un bouton qui ouvre une liste déroulante (`DropdownMenu`, docs/HORS_COURS.md n° 17).
+ * Sélecteur générique : un champ qui ressemble aux autres champs du formulaire (libellé, valeur, flèche)
+ * et qui ouvre une liste déroulante (`DropdownMenu`, docs/HORS_COURS.md n° 17).
  * L'ouverture/fermeture est un état purement local au composable (`remember`, cours S4) ;
  * le choix lui-même remonte au ViewModel par [onChoix].
  *
@@ -40,11 +46,25 @@ fun SelecteurChoix(
     verrouille: Boolean = false,
 ) {
     var ouvert by remember { mutableStateOf(false) }
-    val libelle = options.find { it.id == choixId }?.libelle ?: if (avecTous) libelleTous else libelleVide
+    val libelle = options.find { it.id == choixId }?.libelle ?: if (avecTous) libelleTous else ""
 
     Box(Modifier.fillMaxWidth()) {
-        OutlinedButton(onClick = { ouvert = true }, enabled = !verrouille, modifier = Modifier.fillMaxWidth()) {
-            Text("$prefixe : $libelle")
+        // Le champ n'est pas éditable : il affiche le choix ; le `Box` transparent par-dessus reçoit le clic.
+        OutlinedTextField(
+            value = libelle,
+            onValueChange = {},
+            readOnly = true,
+            enabled = !verrouille,
+            label = { Text(prefixe) },
+            placeholder = { Text(libelleVide) },
+            trailingIcon = { Icon(Icons.Filled.ArrowDropDown, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
+            singleLine = true,
+            shape = MaterialTheme.shapes.extraSmall,
+            colors = couleursChamp(),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        if (!verrouille) {
+            Box(Modifier.matchParentSize().clickable { ouvert = true })
         }
         DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
             if (avecTous) {
@@ -55,7 +75,7 @@ fun SelecteurChoix(
             }
         }
     }
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(14.dp))
 }
 
 /** Sélecteur de région, cas particulier du sélecteur générique. */

@@ -17,9 +17,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mg.itu.att.metier.formatDate
+import mg.itu.att.ui.communs.LigneActions
 import mg.itu.att.ui.communs.CarteFiche
 import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.EncartInfo
+import mg.itu.att.ui.communs.TonEncart
 import mg.itu.att.ui.communs.LigneHistorique
 import mg.itu.att.ui.communs.LigneInfo
 import mg.itu.att.ui.communs.TexteErreur
@@ -52,7 +55,7 @@ fun EcranDetailResultat(
             item {
                 CarteFiche {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(ligne.nomCandidat, style = MaterialTheme.typography.titleMedium)
+                        Text(ligne.nomCandidat, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                         PastilleReussite(r.reussi)
                     }
                     Spacer(Modifier.height(8.dp))
@@ -92,11 +95,7 @@ fun EcranDetailResultat(
                         etat.epreuvesARepasser.forEach { e ->
                             LigneInfo(e.libelle, e.raison + (e.inscriptibleLe?.let { " · réinscription à partir du ${formatDate(it)}" } ?: ""))
                         }
-                        Text(
-                            "Délais et conservation viennent de la configuration (valeurs à confirmer par l'ATT).",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                        EncartInfo("Délais et conservation viennent de la configuration (valeurs à confirmer par l'ATT).", TonEncart.AVERTISSEMENT)
                     }
                 }
 
@@ -104,18 +103,14 @@ fun EcranDetailResultat(
                     TitreSection("Décision de l'ATT")
                     saisie.message?.let { Text(it, color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.bodyMedium) }
                     if (etat.peutCorriger) {
-                        ChampTexte(saisie.motif, viewModel::changerMotif, "Motif de la correction (obligatoire)", uneLigne = false)
+                        ChampTexte(saisie.motif, viewModel::changerMotif, "Motif de la correction *", uneLigne = false)
                     }
                     TexteErreur(saisie.erreur)
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    LigneActions {
                         if (etat.peutValider) Button(onClick = { viewModel.valider(r.id) }) { Text("Valider le résultat") }
                         if (etat.peutCorriger) OutlinedButton(onClick = { viewModel.corriger(r.id, onCorrige) }) { Text("Corriger (recalculer)") }
                     }
-                    Text(
-                        "Une correction ne modifie jamais ce résultat : elle en crée un nouveau, et celui-ci reste consultable.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    EncartInfo("Une correction ne modifie jamais ce résultat : elle en crée un nouveau, et celui-ci reste consultable.")
                 }
 
                 if (etat.versions.size > 1) {

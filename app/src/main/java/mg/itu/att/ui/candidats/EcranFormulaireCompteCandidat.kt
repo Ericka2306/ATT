@@ -13,6 +13,7 @@ import mg.itu.att.metier.ValidationCompte
 import mg.itu.att.ui.communs.BoutonPrincipal
 import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.EncartInfo
 import mg.itu.att.ui.communs.TexteErreur
 
 /**
@@ -29,15 +30,13 @@ fun EcranFormulaireCompteCandidat(
     val c by viewModel.compte.collectAsState()
 
     EcranStandard(titre = "Compte du candidat", onRetour = onRetour, defilant = true) {
-        Text(
+        EncartInfo(
             "Ce compte permettra au candidat de consulter son parcours (dossier, convocations, passages) depuis l'application. " +
                 "Il est facultatif : sans compte, l'auto-école et l'ATT lui communiquent les informations. Communiquez-lui l'identifiant et le mot de passe initial.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(Modifier.height(16.dp))
-        ChampTexte(c.identifiant, { v -> viewModel.modifierCompte { it.copy(identifiant = v) } }, "Identifiant (${ValidationCompte.LONGUEUR_MIN_IDENTIFIANT} caractères min.)")
-        ChampTexte(c.motDePasse, { v -> viewModel.modifierCompte { it.copy(motDePasse = v) } }, "Mot de passe initial (${ValidationCompte.LONGUEUR_MIN_MOT_DE_PASSE} caractères min.)", motDePasse = true)
+        Spacer(Modifier.height(10.dp))
+        ChampTexte(c.identifiant, { v -> viewModel.modifierCompte { it.copy(identifiant = v) } }, "Identifiant *", aide = "${ValidationCompte.LONGUEUR_MIN_IDENTIFIANT} caractères minimum")
+        ChampTexte(c.motDePasse, { v -> viewModel.modifierCompte { it.copy(motDePasse = v) } }, "Mot de passe initial *", motDePasse = true, aide = "${ValidationCompte.LONGUEUR_MIN_MOT_DE_PASSE} caractères minimum")
         TexteErreur(c.erreur)
         BoutonPrincipal("Créer le compte", { viewModel.creerCompte(candidatId, onSucces = onCree) }, actif = !c.enCours)
     }

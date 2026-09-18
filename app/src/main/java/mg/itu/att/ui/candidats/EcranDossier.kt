@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import mg.itu.att.data.StatutDossier
 import mg.itu.att.metier.ReglesDossier
 import mg.itu.att.metier.formatDate
+import mg.itu.att.ui.communs.LigneActions
 import mg.itu.att.ui.communs.BoutonPrincipal
 import mg.itu.att.ui.communs.CarteFiche
 import mg.itu.att.ui.communs.CaseACocher
@@ -73,12 +74,10 @@ fun EcranDossier(viewModel: CandidatsViewModel, dossierId: Int, onRetour: () -> 
                 }
                 if (etat.peutDecider) {
                     TitreSection("Décision de l'ATT")
-                    ChampTexte(saisie.motif, viewModel::changerMotif, "Motif (obligatoire si incomplet ou refusé)", uneLigne = false)
-                    Row {
+                    ChampTexte(saisie.motif, viewModel::changerMotif, "Motif", uneLigne = false, aide = "obligatoire si incomplet ou refusé")
+                    LigneActions {
                         Button(onClick = { viewModel.decider(d.id, StatutDossier.VALIDE) }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) { Text("Valider") }
-                        Spacer(Modifier.width(8.dp))
                         OutlinedButton(onClick = { viewModel.decider(d.id, StatutDossier.INCOMPLET) }) { Text("Incomplet") }
-                        Spacer(Modifier.width(8.dp))
                         OutlinedButton(onClick = { viewModel.decider(d.id, StatutDossier.REFUSE) }, colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text("Refuser") }
                     }
                 }

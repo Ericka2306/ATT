@@ -2,6 +2,8 @@ package mg.itu.att.ui.inscriptions
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -36,7 +38,7 @@ fun EcranMesInscriptions(
     val etat by viewModel.uiState.collectAsState()
 
     EcranStandard(titre = "Mes inscriptions", onRetour = onRetour) {
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FiltreMesInscriptions.entries.forEach { f ->
                 FilterChip(
                     selected = etat.filtre == f, onClick = { viewModel.filtrer(f) },

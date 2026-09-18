@@ -10,6 +10,10 @@ import mg.itu.att.securite.MotDePasse
  * pour les catégories, épreuves, barèmes et règles, toutes marquées `aConfirmer = true`.
  * Aucune d'elles n'est une règle officielle de l'ATT (docs/04_QUESTIONS_A_VALIDER.md).
  * Aucun candidat, aucune session, aucun résultat, aucune question, aucun critère de conduite.
+ *
+ * En version de développement seulement (`avecDemo = BuildConfig.DEBUG`), trois comptes de démonstration sont ajoutés
+ * pour tester chaque rôle sans passer par les écrans de création : une auto-école, un examinateur et un candidat.
+ * Ils n'existent pas dans la version livrée.
  */
 object DonneesInitiales {
 
@@ -18,6 +22,14 @@ object DonneesInitiales {
     const val MOT_DE_PASSE_INITIAL_SUPER_ADMIN = "ChangezMoi2026"
     const val IDENTIFIANT_ADMIN_DEMO = "admin"
     const val MOT_DE_PASSE_INITIAL_ADMIN_DEMO = "admin2026"
+
+    /** Comptes de démonstration (version de développement uniquement). */
+    const val IDENTIFIANT_AUTO_ECOLE_DEMO = "autoecole"
+    const val MOT_DE_PASSE_AUTO_ECOLE_DEMO = "autoecole2026"
+    const val IDENTIFIANT_EXAMINATEUR_DEMO = "examinateur"
+    const val MOT_DE_PASSE_EXAMINATEUR_DEMO = "examinateur2026"
+    const val IDENTIFIANT_CANDIDAT_DEMO = "candidat"
+    const val MOT_DE_PASSE_CANDIDAT_DEMO = "candidat2026"
 
     // ---------- RÉGIONS (24, loi 2004-001 + créations 2021 et 2023) ----------
 
@@ -108,9 +120,10 @@ object DonneesInitiales {
 
     /**
      * Insère le jeu de données si la base est vide. Appelé au démarrage dans un `viewModelScope.launch`.
+     * @param avecDemo vrai en version de développement : ajoute l'auto-école, l'examinateur et le candidat de démonstration.
      * @return true si l'insertion a eu lieu.
      */
-    suspend fun insererSiVide(db: AppDatabase): Boolean {
+    suspend fun insererSiVide(db: AppDatabase, avecDemo: Boolean = false): Boolean {
         if (db.regionDao().nombre() > 0) return false
 
         db.regionDao().insererToutes(regions)
@@ -160,7 +173,36 @@ object DonneesInitiales {
                 role = Role.ADMIN_ATT,
             ),
         )
+        if (avecDemo) insererDemo(db)
         return true
+    }
+
+    /** Une auto-école, un examinateur et un candidat de démonstration, chacun avec son compte (développement seulement). */
+    private suspend fun insererDemo(db: AppDatabase) {
+        val analamanga = db.regionDao().parCode("ANA") ?: return
+        val autoEcoleId = db.autoEcoleDao().inserer(
+            AutoEcole(regionId = analamanga.id, nom = "Auto-école de démonstration", adresse = "Soarano, Antananarivo", numeroAgrement = "DEMO-001"),
+        ).toInt()
+        db.utilisateurDao().inserer(
+            Utilisateur(
+                identifiant = IDENTIFIANT_AUTO_ECOLE_DEMO, motDePasseHash = MotDePasse.hacher(MOT_DE_PASSE_AUTO_ECOLE_DEMO),
+                nom = "Auto-école de démonstration", role = Role.AUTO_ECOLE, regionId = analamanga.id, autoEcoleId = autoEcoleId,
+            ),
+        )
+        val examinateurId = db.examinateurDao().inserer(Examinateur(nom = "RABE Jean (démonstration)", matricule = "EX-DEMO", regionId = analamanga.id)).toInt()
+        db.utilisateurDao().inserer(
+            Utilisateur(
+                identifiant = IDENTIFIANT_EXAMINATEUR_DEMO, motDePasseHash = MotDePasse.hacher(MOT_DE_PASSE_EXAMINATEUR_DEMO),
+                nom = "RABE Jean (démonstration)", role = Role.EXAMINATEUR, regionId = analamanga.id, examinateurId = examinateurId,
+            ),
+        )
+        val candidatId = db.candidatDao().inserer(Candidat(autoEcoleId = autoEcoleId, nom = "RAKOTO", prenom = "Hery", dateNaissance = "2000-01-15")).toInt()
+        db.utilisateurDao().inserer(
+            Utilisateur(
+                identifiant = IDENTIFIANT_CANDIDAT_DEMO, motDePasseHash = MotDePasse.hacher(MOT_DE_PASSE_CANDIDAT_DEMO),
+                nom = "RAKOTO Hery (démonstration)", role = Role.CANDIDAT, candidatId = candidatId,
+            ),
+        )
     }
 
     private const val DATE_INITIALE = "2026-09-15"

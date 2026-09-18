@@ -63,10 +63,10 @@ fun EcranFormulaireEpreuve(viewModel: ConfigurationViewModel, categorieId: Int, 
     val f by viewModel.formulaireEpreuve.collectAsState()
 
     EcranStandard(titre = if (epreuveId == null) "Nouvelle épreuve" else "Modifier l'épreuve", onRetour = onRetour, defilant = true) {
-        ChampTexte(f.code, { v -> viewModel.modifierEpreuve { it.copy(code = v) } }, "Code * (THEORIE, CONDUITE, MANOEUVRES…)")
+        ChampTexte(f.code, { v -> viewModel.modifierEpreuve { it.copy(code = v) } }, "Code *", aide = "THEORIE, CONDUITE, MANOEUVRES…")
         ChampTexte(f.libelle, { v -> viewModel.modifierEpreuve { it.copy(libelle = v) } }, "Libellé *")
         ChampTexte(f.ordre, { v -> viewModel.modifierEpreuve { it.copy(ordre = v) } }, "Ordre de passage *", clavier = KeyboardType.Number)
-        ChampTexte(f.duree, { v -> viewModel.modifierEpreuve { it.copy(duree = v) } }, "Durée d'un passage en minutes (à confirmer)", clavier = KeyboardType.Number)
+        ChampTexte(f.duree, { v -> viewModel.modifierEpreuve { it.copy(duree = v) } }, "Durée d'un passage (min)", clavier = KeyboardType.Number, aide = "à confirmer par l'ATT")
         CaseACocher(f.obligatoire, { v -> viewModel.modifierEpreuve { it.copy(obligatoire = v) } }, "Épreuve obligatoire")
         CaseACocher(f.aConfirmer, { v -> viewModel.modifierEpreuve { it.copy(aConfirmer = v) } }, "Valeur à confirmer par l'ATT")
         CaseACocher(f.actif, { v -> viewModel.modifierEpreuve { it.copy(actif = v) } }, "Épreuve active")

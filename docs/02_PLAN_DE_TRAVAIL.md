@@ -8,7 +8,7 @@
 | | |
 |---|---|
 | **Dernière étape terminée** | D1 (tests et cas particuliers : les 10 contraintes du cadrage §11) — 18/09/2026, en attente de relecture (branche `etape-D1-scenarios`) ; C13 fusionnée (PR #18) |
-| **Étape en cours** | aucune |
+| **Étape en cours** | D2a (design de l'interface) — dev 1 + Claude, branche `etape-D2a-design` depuis `main` (18/09/2026) ; le dev 2 continue D2/D3 côté qualité |
 | **Prochaine étape** | D2 (qualité, relecture croisée, schéma Room figé, LISEZMOI) — **les deux devs ensemble** |
 | **Qui fait quoi** | depuis le 17/09/2026, le dev 1 a livré jusqu'à C10 ; le dev 2 reprend C11, C12, C13 et D1, une pull request par étape du plan (comme les précédentes) |
 | **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape D1 » |
@@ -59,6 +59,8 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 | Étape | Contenu | Critère de fin | Statut |
 |---|---|---|---|
 | D1 Tests et cas particuliers | JUnit sur `metier/` ; scénarios manuels des contraintes §11 (dossier refusé, non éligible, session complète, absence/retard/report/annulation, erreur de notation corrigée, échec + nouvelle tentative, examinateur indisponible, conflit de créneaux, candidat sans smartphone, procédure de secours = listes imprimées) | tableau de scénarios coché dans `docs/COMPTES_RENDUS.md` | 🟢 18/09/2026 (dev 2 ; 10 contraintes cochées, 119 tests verts, 3 défauts de saisie corrigés) |
+| D2a Design de l'interface | refonte visuelle pour mobile : thème (formes, typographie), composants communs (barre claire, champs, sélecteurs, cartes, pastilles, états vides), accueil en grille, connexion ; puis retouches écran par écran | l'application « donne envie » : captures avant/après validées par le dev 1 | 🟡 depuis le 18/09/2026 (dev 1 + Claude, branche `etape-D2a-design`) |
+| D2b Dossiers : pièces jointes numériques (dev 2) | l'auto-école soumet déjà le dossier dans l'application (C3) ; **à ajouter** : pour chaque pièce, l'auto-école peut **joindre un fichier** (photo ou PDF pris dans le téléphone : appareil photo, galerie ou fichiers) ; le fichier est copié dans le stockage privé de l'application (pas de serveur), son chemin dans `PieceDossier.fichier` (schéma v4) ; l'Admin ATT l'ouvre depuis l'écran du dossier pour vérifier sans attendre le papier. Joindre est **facultatif** : sans fichier, la vérification se fait sur le dossier papier apporté par l'auto-école, donc plus lentement. À faire aussi : le candidat ne voit pas un dossier encore en brouillon dans son parcours. Notions hors cours à documenter avant usage : sélecteur de fichier (`ActivityResultContracts`), copie dans `filesDir`, affichage d'une image depuis un fichier | scénario : `autoecole` joint une photo à deux pièces et soumet → `admin` ouvre les fichiers et valide ; dossier sans fichier toujours accepté ; test JUnit sur la règle « fichier facultatif » | ⚪ demandé par le dev 1 le 18/09/2026 |
 | D2 Qualité | relecture croisée du binôme, suppression des logs, schéma Room figé (`version` finale), `LISEZMOI.md` (ouverture, déroulé de démo, comptes de test), captures | chaque membre explique chaque fichier sans IA | ⚪ |
 | D3 Soutenance | démo scriptée : parcours complet auto-école → dossier → validation → session → inscription → appel → tentative → évaluation → résultat → impression | démo répétée deux fois sans erreur | ⚪ |
 
@@ -70,6 +72,8 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 |---|---|---|
 | Dev 1 (Ericka) + Claude | A4, B0 à B2, C1, C1b, C2, C3, **puis C4 et C5** (réassignés le 16/09/2026 : le dev 2 n'avait pas commencé), puis C6 à C11 | ne dépend de personne |
 | Dev 2 (Mahery) | C12 (consultation par rôle, parcours candidat), C13 (impression), D1 (scénarios de test des cas particuliers), **puis C11** (reprise le 17/09/2026 : le dev 1 a terminé sa part à C10) | une branche et une pull request par sous-étape, relecture avant merge ; reprend à partir du tableau « Où en est-on ? » |
+| Dev 2 (Mahery), suite | D2b (pièces jointes numériques du dossier), puis D2 côté qualité | demandé par le dev 1 le 18/09/2026 |
+| Dev 1 (Ericka) + Claude | D2a (design de l'interface), puis D3 (démo) | depuis le 18/09/2026 |
 | Ensemble | D2, D3 | relecture croisée, démo |
 
 Règle de passage de relais : le dev 2 reprend toujours à partir de `docs/COMPTES_RENDUS.md` (dernière étape terminée) et de `CLAUDE.md`, sans reprendre ce qui est marqué 🟢.

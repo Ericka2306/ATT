@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import mg.itu.att.ui.communs.BoutonPrincipal
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.EncartInfo
 import mg.itu.att.ui.communs.TexteErreur
 
 /**
@@ -42,12 +43,8 @@ fun EcranImpression(viewModel: ImpressionViewModel, type: TypeDocument, id: Int,
             if (etat.erreur == null) Text("Préparation du document…", style = MaterialTheme.typography.bodyLarge)
             return@EcranStandard
         }
-        Text(
-            "Aperçu du document. « Imprimer » ouvre le service d'impression d'Android : imprimante ou enregistrement en PDF.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Spacer(Modifier.height(8.dp))
+        EncartInfo("Aperçu du document. « Imprimer » ouvre le service d'impression d'Android : imprimante ou enregistrement en PDF.")
+        Spacer(Modifier.height(4.dp))
         // L'aperçu occupe la hauteur disponible sous le bouton (le cadre standard est une colonne).
         AndroidView(
             factory = { vue },

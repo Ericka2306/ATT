@@ -30,6 +30,20 @@ Android Studio → File → Open → dossier `ATT` → attendre la synchronisati
 ./gradlew :app:testDebugUnitTest    # tests unitaires
 ```
 
+## Comptes de test (version de développement)
+
+Insérés au premier lancement d'une version de développement seulement (`BuildConfig.DEBUG`), affichés sur l'écran de connexion avec un bouton par rôle :
+
+| Rôle | Identifiant | Mot de passe |
+|---|---|---|
+| Super administrateur | `superadmin` | `ChangezMoi2026` |
+| Administrateur ATT | `admin` | `admin2026` |
+| Auto-école (Analamanga) | `autoecole` | `autoecole2026` |
+| Examinateur (Analamanga) | `examinateur` | `examinateur2026` |
+| Candidat (RAKOTO Hery, de l'auto-école de démonstration) | `candidat` | `candidat2026` |
+
+Les deux premiers existent aussi en version livrée (à changer dès la première connexion) ; les trois autres n'existent qu'en développement. Pour repartir de zéro : `adb shell pm clear mg.itu.att` ou désinstaller l'application.
+
 ## Glossaire (mots de l'écran ↔ mots du cadrage et du code)
 
 | À l'écran | Dans le code et les documents | Sens |
@@ -54,6 +68,7 @@ tap "Auto-écoles"
 ## Crédits
 
 - Photo de l'écran de connexion : « Madagascar RN44 » par Diorit, Wikimedia Commons, licence CC0 (domaine public), réduite à 1080 px.
+- Police de caractères : « Plus Jakarta Sans » (Tokotype), licence SIL Open Font License 1.1, fichier `app/src/main/res/font/plus_jakarta_sans.ttf`, licence dans `docs/references/OFL_plus_jakarta_sans.txt`.
 - Logo et icône de l'application : dessins vectoriels réalisés pour ce projet. Ce n'est pas le logo officiel de l'ATT.
 
 ## État d'avancement
