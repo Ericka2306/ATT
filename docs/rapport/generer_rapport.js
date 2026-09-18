@@ -139,18 +139,6 @@ function nombreHorsCours() {
   return fs.existsSync(f) ? (fs.readFileSync(f, "utf8").match(/^\| \d+ \|/gm) || []).length : 0;
 }
 /** Une entrée du journal IA, recopiée telle quelle (le journal est la source, le rapport ne le réécrit pas). */
-function entreeJournal(numero) {
-  const f = path.join(RACINE_PROJET, "JOURNAL-IA.md");
-  if (!fs.existsSync(f)) return [];
-  const texteJournal = fs.readFileSync(f, "utf8");
-  const debut = texteJournal.indexOf(`## Entrée ${numero} `);
-  if (debut < 0) return [];
-  const fin = texteJournal.indexOf("\n---", debut);
-  const bloc = texteJournal.slice(debut, fin < 0 ? undefined : fin).split("\n").filter((l) => l.trim() !== "");
-  // Le verdict du binôme s'écrit dans le fichier, à la main ; tant qu'il n'est pas rédigé, la ligne vide reste hors du rapport.
-  const lignes = bloc.filter((l) => !l.includes("<à compléter") && !l.startsWith("- Code soumis") && !l.startsWith("- Document soumis")).map((l) => l.replace(/^## /, "").replace(/`/g, "").replace(/\*\*/g, ""));
-  return [titre3(lignes[0]), ...lignes.slice(1).map((l) => para(texte(l, { size: 20 })))];
-}
 function nombreTests() {
   const dossier = path.join(RACINE_PROJET, "app", "build", "test-results", "testDebugUnitTest");
   if (!fs.existsSync(dossier)) return "plus de cent";
@@ -192,7 +180,7 @@ function introduction() {
       "la solution, module par module, en réponse à chaque difficulté relevée (chapitre 4) ;",
       "les acteurs et le parcours de bout en bout, illustré par des captures d'écran (chapitres 5 et 6) ;",
       "l'architecture, les règles configurables, la qualité, l'usage de l'IA, le déroulement du projet et l'application des cours du module (chapitres 7 à 12) ;",
-      "les limites et perspectives, la conclusion, et les annexes : captures, extraits de code, sources, glossaire, comptes de démonstration, questions à valider, extraits du journal IA.",
+      "les limites et perspectives, la conclusion, et les annexes : extraits de code, sources, glossaire, comptes de démonstration, questions à valider.",
     ),
     titre2("1.2 Cadre du projet"),
     ...paras(
