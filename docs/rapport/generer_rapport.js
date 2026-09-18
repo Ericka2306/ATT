@@ -148,7 +148,7 @@ function entreeJournal(numero) {
   const fin = texteJournal.indexOf("\n---", debut);
   const bloc = texteJournal.slice(debut, fin < 0 ? undefined : fin).split("\n").filter((l) => l.trim() !== "");
   // Le verdict du binôme s'écrit dans le fichier, à la main ; tant qu'il n'est pas rédigé, la ligne vide reste hors du rapport.
-  const lignes = bloc.filter((l) => !l.includes("<à compléter")).map((l) => l.replace(/^## /, "").replace(/`/g, "").replace(/\*\*/g, ""));
+  const lignes = bloc.filter((l) => !l.includes("<à compléter") && !l.startsWith("- Code soumis") && !l.startsWith("- Document soumis")).map((l) => l.replace(/^## /, "").replace(/`/g, "").replace(/\*\*/g, ""));
   return [titre3(lignes[0]), ...lignes.slice(1).map((l) => para(texte(l, { size: 20 })))];
 }
 function nombreTests() {
@@ -412,13 +412,13 @@ function architecture() {
       ["ui/", "Écrans Compose et ViewModels, un dossier par fonctionnalité", "ui/candidats, ui/sessions, ui/evaluation, ui/resultats"],
       ["ui/communs", "Composants partagés : cadre d'écran, champs, sélecteurs, cartes, encarts, pastilles", "EcranStandard, ChampTexte, CarteIcone, EncartInfo"],
       ["metier/", "Règles pures : inscriptions, présence, tentatives, théorie, conduite, calcul du résultat, repassage", "ReglesInscription, CalculResultat, ReglesTheorie"],
-      ["data/", "Entités Room, DAO, base, données initiales, traçage", "Entites*.kt, *Dao.kt, AppDatabase, Tracage"],
+      ["data/", "Entités Room, DAO, base, données initiales, traçage", "Candidat, CandidatDao, AppDatabase, Tracage"],
       ["securite/", "Hachage des mots de passe (PBKDF2 + sel)", "MotDePasse"],
-      ["Navigation.kt", "Un seul NavHost, routes en chaînes, identifiants en argument, écrans recevant des lambdas", "graphSessions, graphResultats"],
+      ["Navigation", "Un seul NavHost, routes en chaînes, identifiants en argument, écrans recevant des lambdas", "graphSessions, graphResultats"],
     ], [18, 44, 38]),
     espace(),
     titre2("7.2 Modèle de données"),
-    ...paras(`${nombreEntites()} entités Room, reliées par des clés étrangères, en six familles. Le schéma complet, avec chaque attribut et chaque statut, est dans le fichier docs/03_MODELE_DE_DONNEES.md du dépôt ; Room l'exporte dans app/schemas à chaque version.`),
+    ...paras(`${nombreEntites()} entités Room, reliées par des clés étrangères, en six familles. Le schéma complet, avec chaque attribut et chaque statut, est décrit dans le document de conception du modèle de données ; Room en exporte une copie JSON à chaque version.`),
     tableau(["Famille", "Entités", "Choix de conception"], [
       ["Référentiels", "Region, CategoriePermis, TypeEpreuve, Bareme, Question, CriterePratique, RegleConfig, Centre", "Tout ce qui est une règle administrative est une ligne de table, jamais une constante ; le barème est versionné (une version se ferme, ne se modifie pas)"],
       ["Acteurs", "Utilisateur, AutoEcole, Examinateur, Candidat", "Un compte porte son rôle et, selon le rôle, l'auto-école, l'examinateur ou le candidat qu'il représente ; le compte candidat est facultatif"],
@@ -509,7 +509,7 @@ function qualite() {
     ...puces(...classesDeTest()),
     ...paras(
       "Trois exemples de ce qu'elles vérifient : CalculResultatTest, la note rapportée au barème, le seuil atteint ou non, la faute éliminatoire ; ReglesInscriptionTest, les refus de la section 6.9 (dossier non validé, session complète, double inscription, même jour, délai de repassage, théorie non réussie) ; ReglesTheorieTest, un sujet tiré avec une graine fixe qui totalise la note maximale sans doublon.",
-      "Ce que ces tests couvrent, et ce qu'ils ne couvrent pas : ils portent sur les règles pures de metier/, sur le hachage des mots de passe et sur le menu par rôle (MenuParRoleTest). Les ViewModels, les DAO et les écrans ne sont pas testés automatiquement : les requêtes des DAO reposent sur la vérification du SQL à la compilation par Room, et les écrans ont été vérifiés à la main sur l'émulateur, avec un script (outils/pilote_emulateur.sh) qui enchaîne les actions par le texte des boutons et rejoue chaque scénario à l'identique ; les dix contraintes du cadrage ont chacune leur scénario dans docs/COMPTES_RENDUS.md. Les tests unitaires ne font pas partie du programme de ce module ; nous les avons introduits parce qu'ils sont le seul moyen de prouver un calcul de barème sans téléphone.",
+      "Ce que ces tests couvrent, et ce qu'ils ne couvrent pas : ils portent sur les règles pures de metier/, sur le hachage des mots de passe et sur le menu par rôle (MenuParRoleTest). Les ViewModels, les DAO et les écrans ne sont pas testés automatiquement : les requêtes des DAO reposent sur la vérification du SQL à la compilation par Room, et les écrans ont été vérifiés à la main sur l'émulateur, avec un script de pilotage qui enchaîne les actions par le texte des boutons et rejoue chaque scénario à l'identique ; les dix contraintes du cadrage ont chacune leur scénario dans les comptes rendus d'étape. Les tests unitaires ne font pas partie du programme de ce module ; nous les avons introduits parce qu'ils sont le seul moyen de prouver un calcul de barème sans téléphone.",
       "Un exemple de défaut trouvé par un test avant l'écran : le tirage du sujet, dans une première version, pouvait dépasser la note maximale quand la dernière question ne tenait plus ; le test « tirage atteint la note max sans la dépasser ni répéter » l'a montré, et la boucle a été corrigée.",
     ),
     titre2("9.2 Cas particuliers du cadrage"),
@@ -539,8 +539,8 @@ function usageIA() {
     titre1("10. Usage de l'IA et jugement porté"),
     ...paras(
       "Le module s'intitule « assistée par IA » : ce chapitre dit ce que nous avons fait avec l'IA, ce qu'elle a fait de bien et de mal, et ce que nous avons refusé.",
-      "L'outil : Claude Code, un agent de développement qui lit et écrit les fichiers du projet, lance la construction et les tests, et pilote l'émulateur. Il a été utilisé au niveau « agent » décrit dans l'état de l'art du module, avec un fichier de règles à la racine du dépôt (CLAUDE.md) qui lui impose les technologies du cours, l'interdiction d'inventer une règle administrative, la traçabilité, et un cycle de fin d'étape : construction et tests verts, vérification sur émulateur, compte rendu, entrée dans le journal, puis relecture humaine avant tout commit.",
-      "La proportion : l'IA a produit la majorité du code de chaque étape à partir de nos documents de cadrage (règles, plan, modèle de données, cas d'utilisation), que nous avons écrits et validés avant la première ligne. Nous avons relu chaque fichier dans la demande de fusion (pull request) de l'étape avant de la fusionner, et rejoué chaque scénario sur l'émulateur. Le journal du dépôt (JOURNAL-IA.md) consigne pour chaque étape ce qui a été soumis, la remarque principale de l'IA, les points d'alerte, et notre verdict.",
+      "L'outil : Claude Code, un agent de développement qui lit et écrit les fichiers du projet, lance la construction et les tests, et pilote l'émulateur. Il a été utilisé au niveau « agent » décrit dans l'état de l'art du module, avec un fichier de règles à la racine du projet qui lui impose les technologies du cours, l'interdiction d'inventer une règle administrative, la traçabilité, et un cycle de fin d'étape : construction et tests verts, vérification sur émulateur, compte rendu, entrée dans le journal, puis relecture humaine avant tout commit.",
+      "La proportion : l'IA a produit la majorité du code de chaque étape à partir de nos documents de cadrage (règles, plan, modèle de données, cas d'utilisation), que nous avons écrits et validés avant la première ligne. Nous avons relu chaque fichier dans la demande de fusion (pull request) de l'étape avant de la fusionner, et rejoué chaque scénario sur l'émulateur. Le journal IA (annexe G) consigne pour chaque étape ce qui a été soumis, la remarque principale de l'IA, les points d'alerte, et notre verdict.",
     ),
     titre2("10.1 Ce que nous avons refusé ou corrigé"),
     ...puces(
@@ -589,7 +589,7 @@ function deroulement() {
     espace(),
     titre2("11.3 Durée réelle et bilan"),
     ...paras(
-      "Le plan prévoyait dix semaines ; le développement s'est fait du 15 au 18 septembre 2026, soit quatre jours effectifs à deux, précédés de la recherche documentaire de l'annexe C. Le cadrage (règles, plan, modèle de données, cas d'utilisation) a été écrit le premier jour, avant la première ligne de code, et n'a presque pas bougé ensuite : c'est ce qui a permis d'enchaîner les étapes sans revenir en arrière. Le socle technique et les premières fonctionnalités ont suivi ; puis les évaluations, les résultats, la consultation et l'impression ; enfin les tests, la relecture croisée, la refonte de l'interface et ce rapport.",
+      "Le plan prévoyait dix semaines ; le développement s'est fait en peu de jours, à deux, précédé de la recherche documentaire de l'annexe C. Le cadrage (règles, plan, modèle de données, cas d'utilisation) a été écrit le premier jour, avant la première ligne de code, et n'a presque pas bougé ensuite : c'est ce qui a permis d'enchaîner les étapes sans revenir en arrière. Le socle technique et les premières fonctionnalités ont suivi ; puis les évaluations, les résultats, la consultation et l'impression ; enfin les tests, la relecture croisée, la refonte de l'interface et ce rapport.",
       "Ce qui a pris plus de temps que prévu : comprendre le vrai déroulement de l'examen. La première version de l'épreuve théorique était un questionnaire à choix multiples, construit d'après la presse ; elle a été refaite le jour même, après le passage de l'examen par l'une de nous, sous la forme d'une feuille d'examen orale. La leçon vaut pour tout le projet : un témoignage de terrain vaut plus qu'un article, et ce que l'on ne sait pas doit rester une configuration marquée « à confirmer », pas une hypothèse gravée dans le code.",
     ),
   ];
@@ -612,13 +612,13 @@ function coursAppliques() {
     espace(),
     titre2("12.1 Une preuve par séance"),
     ...puces(
-      [gras("Séance 1. "), texte("metier/ReglesTheorie.kt : le sujet est tiré avec filter et shuffled ; ReglesInscription.kt rend un message ou null avec un when sans if ; aucune entité n'a de propriété mutable ; le mot-clé !! n'apparaît nulle part dans le projet.")],
+      [gras("Séance 1. "), texte("Règle de tirage du sujet (couche métier) : le sujet est tiré avec filter et shuffled ; la règle d'inscription rend un message ou null avec un when sans if ; aucune entité n'a de propriété mutable ; le mot-clé !! n'apparaît nulle part dans le projet.")],
       [gras("Séance 2. "), texte("Toutes les écritures sont des fonctions suspend appelées dans viewModelScope.launch (par exemple InscriptionsViewModel.inscrire) ; FauxServeurATT.envoyer attend 600 ms par delay, et l'écran reste réactif pendant la synchronisation.")],
-      [gras("Séance 3. "), texte("Une seule Activity (MainActivity.kt) ; nous avons vérifié en tournant l'émulateur pendant une saisie d'inscription que le formulaire reste rempli : l'état est dans InscriptionsViewModel, qui survit à la recréation de l'Activity, comme annoncé en cours.")],
-      [gras("Séance 4. "), texte("ui/communs/Cadre.kt et Champs.kt : le cadre d'écran, les champs et les cartes sont des composables réutilisés par tous les écrans ; l'ouverture d'un menu déroulant (remember dans Selecteurs.kt) est le principal état local ; le reste vit dans les ViewModels.")],
-      [gras("Séance 5. "), texte("Navigation.kt : routes comme tentative/{tentativeId}/theorie, identifiant relu par idArgument (toIntOrNull), écrans qui reçoivent des lambdas onRetour et onOuvrir ; aucun écran ne reçoit le navController.")],
+      [gras("Séance 3. "), texte("Une seule Activity ; nous avons vérifié en tournant l'émulateur pendant une saisie d'inscription que le formulaire reste rempli : l'état est dans InscriptionsViewModel, qui survit à la recréation de l'Activity, comme annoncé en cours.")],
+      [gras("Séance 4. "), texte("Composants communs : le cadre d'écran, les champs et les cartes sont des composables réutilisés par tous les écrans ; l'ouverture d'un menu déroulant (remember dans le sélecteur) est le principal état local ; le reste vit dans les ViewModels.")],
+      [gras("Séance 5. "), texte("Navigation : routes comme tentative/{tentativeId}/theorie, identifiant relu par idArgument (toIntOrNull), écrans qui reçoivent des lambdas onRetour et onOuvrir ; aucun écran ne reçoit le navController.")],
       [gras("Séance 6. "), texte("Chaque ViewModel expose un StateFlow<EtatXxx> construit par combine(...).stateIn(...) sur les flux Room, et garde ses MutableStateFlow privés ; le ViewModel de connexion est créé au-dessus du NavHost et partagé par tous les écrans.")],
-      [gras("Séance 7. "), texte("data/ExamensDao.kt : requêtes Flow pour ce qui s'affiche, suspend pour les écritures, SQL vérifié à la compilation ; Synchronisation.kt reprend la file d'attente à drapeau de la démonstration demosync, avec les deux différences expliquées en 7.5.")],
+      [gras("Séance 7. "), texte("DAO des examens : requêtes Flow pour ce qui s'affiche, suspend pour les écritures, SQL vérifié à la compilation ; la synchronisation reprend la file d'attente à drapeau de la démonstration demosync, avec les deux différences expliquées en 7.5.")],
       [gras("Séance 8. "), texte("La synthèse du cours demandait sur quelle tâche nous aurions appris moins avec l'IA : la réponse est au chapitre 10.")],
     ),
     titre2("12.2 Ce qui dépasse le cours, et pourquoi"),
@@ -630,7 +630,7 @@ function coursAppliques() {
       "affichage d'une page HTML pour l'impression et service d'impression d'Android ;",
       "fonctions pures testées par JUnit, avec le hasard injecté pour rendre le tirage reproductible.",
     ),
-    ...paras(`Le tableau complet, avec pour chaque notion l'étape où elle est apparue, l'équivalent vu en cours et la décision du binôme, est le fichier docs/HORS_COURS.md du dépôt (${nombreHorsCours()} entrées). Deux exemples de ce que nous avons refusé ou remplacé : le patron Repository (couche intermédiaire entre ViewModel et DAO), proposé au départ pour « faire propre », a été écarté parce que le cours n'en a jamais écrit et que les ViewModels appellent les DAO directement sans perdre en clarté ; les boutons radio de la première épreuve théorique ont disparu avec le questionnaire à choix multiples, remplacés par les champs de texte du cours.`),
+    ...paras(`Le tableau complet, avec pour chaque notion l'étape où elle est apparue, l'équivalent vu en cours et la décision du binôme, est tenu dans un document du projet (${nombreHorsCours()} entrées). Deux exemples de ce que nous avons refusé ou remplacé : le patron Repository (couche intermédiaire entre ViewModel et DAO), proposé au départ pour « faire propre », a été écarté parce que le cours n'en a jamais écrit et que les ViewModels appellent les DAO directement sans perdre en clarté ; les boutons radio de la première épreuve théorique ont disparu avec le questionnaire à choix multiples, remplacés par les champs de texte du cours.`),
   ];
 }
 
@@ -668,7 +668,7 @@ function limites() {
     ...paras(
       "Nous étions partis d'un cahier de cadrage et d'une question simple : pourquoi passer l'examen du permis reste-t-il si long et si opaque, pour le candidat comme pour l'administration ? En suivant un candidat de son dossier à son résultat, nous avons construit une application qui couvre toute la chaîne de l'ATT : dossiers vérifiés avant la convocation, sessions découpées en créneaux, appel par numéro, feuille d'examen à l'écran, résultat calculé selon un barème configurable, validé, corrigeable sans rien effacer, imprimable, et remonté à un serveur central quand le réseau le permet.",
       "Ce projet nous a beaucoup intéressés, et d'abord parce qu'il est vrai. Ce que nous avons observé nous-mêmes le jour de l'examen, un candidat renvoyé pour une pièce manquante, un « présent » que personne n'entend dans la foule, trouve une réponse concrète dans ce que nous avons construit. Nous avons aussi appris, au passage, à ne pas inventer une règle administrative que nous ne connaissions pas : tout ce qui reste incertain est marqué « à confirmer » et attend l'ATT.",
-      "Il faut aussi être honnêtes : ce que nous livrons est le minimum qu'un projet universitaire, mené en quatre jours à deux, pouvait atteindre. Il peut être largement amélioré. Les barèmes et la grille de conduite sont des exemples ; le serveur est simulé et tout tient sur un seul appareil ; les photos des pièces ne sont pas chiffrées ; l'interface mériterait d'être testée avec de vrais agents dans un vrai centre. Aucune de ces limites n'est un mur : chacune est nommée au chapitre 13, et l'architecture a été pensée pour les accueillir sans tout reprendre.",
+      "Il faut aussi être honnêtes : ce que nous livrons est le minimum qu'un projet universitaire, mené à deux en peu de jours, pouvait atteindre. Il peut être largement amélioré. Les barèmes et la grille de conduite sont des exemples ; le serveur est simulé et tout tient sur un seul appareil ; les photos des pièces ne sont pas chiffrées ; l'interface mériterait d'être testée avec de vrais agents dans un vrai centre. Aucune de ces limites n'est un mur : chacune est nommée au chapitre 13, et l'architecture a été pensée pour les accueillir sans tout reprendre.",
       "Nous espérons qu'un jour l'État, à travers l'ATT, se saisira d'un outil de ce genre, celui-ci ou un autre, parce que le besoin est là et que les candidats, les auto-écoles et les agents y gagneraient tous. Si ce travail a au moins montré que c'était possible avec des moyens modestes, en respectant les règles et en gardant le candidat sans smartphone au centre, alors il aura servi à quelque chose.",
     ),
   ];
@@ -694,7 +694,7 @@ function annexes() {
     ...paras("La modification et sa trace sont dans le même bloc : Room les écrit ensemble ou n'écrit rien. L'historique ne peut donc jamais raconter autre chose que ce qui s'est passé."),
     titre2("B.2 Une règle pure et son test"),
     ...bloc([
-      "// metier/ReglesTentatives.kt",
+      "// Règle d'ouverture d'une tentative (couche métier)",
       "fun peutOuvrir(statutPresence: StatutPresence?, tentativeDeCetteInscription: Tentative?,",
       "               nombreTentatives: Int, tentativesMax: Int): String? = when {",
       "    tentativeDeCetteInscription != null -> when (tentativeDeCetteInscription.statut) {",
@@ -707,7 +707,7 @@ function annexes() {
       "    else -> null",
       "}",
       "",
-      "// test/ReglesTentativesTest.kt",
+      "// Son test unitaire",
       "@Test fun `ouverture reservee aux presents`() {",
       "    assertNull(ReglesTentatives.peutOuvrir(StatutPresence.PRESENT, null, 0, 0))",
       "    assertNotNull(ReglesTentatives.peutOuvrir(StatutPresence.ABSENT, null, 0, 0))",
@@ -755,7 +755,6 @@ function annexes() {
       "fr.wikipedia.org/wiki/Région_de_Madagascar (liste des 24 régions)",
       "developer.android.com, m3.material.io, kotlinlang.org (documentation technique)",
     ),
-    ...paras("Le détail des sources, avec le niveau de fiabilité et la citation exacte, est dans le fichier docs/references/RECHERCHE_ATT_ET_ANDROID.md du dépôt."),
     titre1("Annexe D — Glossaire"),
     tableau(["Terme", "Sens dans l'application"], [
       ["Passage (tentative)", "Un candidat passe une épreuve une fois ; numéroté, jamais effacé"],
@@ -812,7 +811,7 @@ function annexes() {
     ], [42, 58]),
     espace(),
     titre1("Annexe G — Trois entrées du journal IA, telles quelles"),
-    ...paras("Le journal complet est le fichier JOURNAL-IA.md du dépôt. Les trois entrées ci-dessous sont recopiées sans retouche : la contradiction entre un index SQL et une règle métier (chapitre 10), le passage du QCM à l'épreuve orale sur un témoignage de terrain (chapitres 2 et 10), et la reprise de la démonstration du cours pour la synchronisation (chapitres 7.5 et 12)."),
+    ...paras("Le journal IA compte une entrée par étape. Les trois entrées ci-dessous sont recopiées telles quelles, sans la ligne qui liste les fichiers concernés : la contradiction entre un index SQL et une règle métier (chapitre 10), le passage du QCM à l'épreuve orale sur un témoignage de terrain (chapitres 2 et 10), et la reprise de la démonstration du cours pour la synchronisation (chapitres 7.5 et 12)."),
     ...entreeJournal(10),
     ...entreeJournal(12),
     ...entreeJournal(20),
