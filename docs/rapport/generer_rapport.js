@@ -31,14 +31,14 @@ const DOSSIER_CAPTURES = path.join(__dirname, "captures");
 // ---------- OUTILS D'ÉCRITURE ----------
 
 const texte = (t, opts = {}) => new TextRun({ text: t, font: POLICE, size: 22, ...opts });
-const para = (t, opts = {}) => new Paragraph({ children: [typeof t === "string" ? texte(t) : t].flat(), spacing: { after: 120, line: 300 }, ...opts });
+const para = (t, opts = {}) => new Paragraph({ children: [typeof t === "string" ? texte(t) : t].flat(), spacing: { after: 180, line: 320 }, ...opts });
 const paras = (...ts) => ts.map((t) => para(t));
-const titre1 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_1, children: [texte(t, { bold: true, size: 32, color: NOIR })], spacing: { before: 360, after: 200 }, pageBreakBefore: true });
-const titre2 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_2, children: [texte(t, { bold: true, size: 26, color: NOIR })], spacing: { before: 280, after: 140 } });
-const titre3 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_3, children: [texte(t, { bold: true, size: 23, color: NOIR })], spacing: { before: 200, after: 100 } });
-const puce = (t) => new Paragraph({ children: [typeof t === "string" ? texte(t) : t].flat(), numbering: { reference: "puces", level: 0 }, spacing: { after: 60, line: 300 } });
+const titre1 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_1, children: [texte(t, { bold: true, size: 32, color: NOIR })], spacing: { before: 480, after: 280 }, pageBreakBefore: true });
+const titre2 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_2, children: [texte(t, { bold: true, size: 26, color: NOIR })], spacing: { before: 400, after: 200 } });
+const titre3 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_3, children: [texte(t, { bold: true, size: 23, color: NOIR })], spacing: { before: 300, after: 160 } });
+const puce = (t) => new Paragraph({ children: [typeof t === "string" ? texte(t) : t].flat(), numbering: { reference: "puces", level: 0 }, spacing: { after: 100, line: 320 } });
 const puces = (...ts) => ts.map(puce);
-const numero = (t) => new Paragraph({ children: [typeof t === "string" ? texte(t) : t].flat(), numbering: { reference: "numeros", level: 0 }, spacing: { after: 60, line: 300 } });
+const numero = (t) => new Paragraph({ children: [typeof t === "string" ? texte(t) : t].flat(), numbering: { reference: "numeros", level: 0 }, spacing: { after: 100, line: 320 } });
 const saut = () => new Paragraph({ children: [new PageBreak()] });
 const gras = (t) => texte(t, { bold: true });
 const code = (t) => new Paragraph({
@@ -90,34 +90,34 @@ const figure = (nomFichier, legende, largeurCm = 7) => {
       })] })],
     }));
   }
-  contenu.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 80, after: 240 }, children: [texte(`Figure ${numFigure} — ${legende}`, { italics: true, size: 19, color: NOIR })] }));
+  contenu.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 120, after: 360 }, children: [texte(`Figure ${numFigure} — ${legende}`, { italics: true, size: 19, color: NOIR })] }));
   return contenu;
 };
 
-/** Tableau avec en-tête bleu ; `largeurs` en centièmes de la largeur utile (somme 100). */
+/** Tableau simple : bordures noires fines, aucun fond, en-tête en gras ; `largeurs` en centièmes de la largeur utile (somme 100). */
 const tableau = (entetes, lignes, largeurs) => {
   const total = 9020;
   const dxa = largeurs.map((l) => Math.round(total * l / 100));
   const cellule = (t, i, entete = false) => new TableCell({
     width: { size: dxa[i], type: WidthType.DXA },
-    shading: entete ? { type: ShadingType.CLEAR, fill: GRIS_CLAIR, color: "auto" } : undefined,
-    margins: { top: 80, bottom: 80, left: 100, right: 100 },
+    margins: { top: 100, bottom: 100, left: 120, right: 120 },
     children: [new Paragraph({ children: [texte(String(t), { bold: entete, color: NOIR, size: 20 })], spacing: { after: 0, line: 270 } })],
   });
+  const trait = { style: BorderStyle.SINGLE, size: 4, color: NOIR };
   return new Table({
     width: { size: total, type: WidthType.DXA }, columnWidths: dxa,
+    borders: { top: trait, bottom: trait, left: trait, right: trait, insideHorizontal: trait, insideVertical: trait },
     rows: [
       new TableRow({ tableHeader: true, children: entetes.map((e, i) => cellule(e, i, true)) }),
       ...lignes.map((l, r) => new TableRow({ children: l.map((c, i) => new TableCell({
         width: { size: dxa[i], type: WidthType.DXA },
-        shading: r % 2 === 1 ? { type: ShadingType.CLEAR, fill: "F3F6FA", color: "auto" } : undefined,
-        margins: { top: 80, bottom: 80, left: 100, right: 100 },
+        margins: { top: 100, bottom: 100, left: 120, right: 120 },
         children: [new Paragraph({ children: [texte(String(c), { size: 20 })], spacing: { after: 0, line: 270 } })],
       })) })),
     ],
   });
 };
-const espace = () => new Paragraph({ spacing: { after: 160 }, children: [] });
+const espace = () => new Paragraph({ spacing: { after: 240 }, children: [] });
 
 // ---------- LECTURES DANS LE PROJET (tests) ----------
 
