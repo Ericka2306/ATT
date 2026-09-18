@@ -540,7 +540,7 @@ function usageIA() {
     ...paras(
       "Le module s'intitule « assistée par IA » : ce chapitre dit ce que nous avons fait avec l'IA, ce qu'elle a fait de bien et de mal, et ce que nous avons refusé.",
       "L'outil : Claude Code, un agent de développement qui lit et écrit les fichiers du projet, lance la construction et les tests, et pilote l'émulateur. Il a été utilisé au niveau « agent » décrit dans l'état de l'art du module, avec un fichier de règles à la racine du projet qui lui impose les technologies du cours, l'interdiction d'inventer une règle administrative, la traçabilité, et un cycle de fin d'étape : construction et tests verts, vérification sur émulateur, compte rendu, entrée dans le journal, puis relecture humaine avant tout commit.",
-      "La proportion : l'IA a produit la majorité du code de chaque étape à partir de nos documents de cadrage (règles, plan, modèle de données, cas d'utilisation), que nous avons écrits et validés avant la première ligne. Nous avons relu chaque fichier dans la demande de fusion (pull request) de l'étape avant de la fusionner, et rejoué chaque scénario sur l'émulateur. Le journal IA (annexe F) consigne pour chaque étape ce qui a été soumis, la remarque principale de l'IA, les points d'alerte, et notre verdict.",
+      "La proportion : l'IA a produit la majorité du code de chaque étape à partir de nos documents de cadrage (règles, plan, modèle de données, cas d'utilisation), que nous avons écrits et validés avant la première ligne. Nous avons relu chaque fichier dans la demande de fusion (pull request) de l'étape avant de la fusionner, et rejoué chaque scénario sur l'émulateur. Un journal tenu à chaque étape consigne ce qui a été soumis, la remarque principale de l'IA, les points d'alerte, et notre verdict.",
     ),
     titre2("10.1 Ce que nous avons refusé ou corrigé"),
     ...puces(
@@ -553,7 +553,7 @@ function usageIA() {
     titre2("10.2 Ce que l'IA fait bien, ce qu'elle fait mal"),
     ...paras(
       "Bien : produire vite du code conforme à un patron donné (le duo état et événements d'un ViewModel, un DAO, un écran), écrire les tests d'une règle pure, rédiger les comptes rendus et tenir la trace. Mal : elle ne connaît pas le terrain (le QCM), elle reproduit ses propres défauts d'un écran à l'autre, elle propose volontiers des outils hors programme (Repository, WorkManager, Retrofit) qu'il faut refuser, et elle affirme avec la même assurance ce qui est vérifié et ce qui ne l'est pas.",
-      "La question de la dernière séance, « sur quelle tâche auriez-vous appris moins si l'IA avait été autorisée ? », nous y répondons ainsi : sur l'architecture. Si l'IA avait posé seule le modèle de données et la découpe des ViewModels, nous aurions eu une application qui marche sans savoir pourquoi. C'est parce que nous avons écrit le cadrage et relu chaque étape que nous savons expliquer chaque fichier ; trois entrées du journal sont recopiées en annexe F pour en témoigner.",
+      "La question de la dernière séance, « sur quelle tâche auriez-vous appris moins si l'IA avait été autorisée ? », nous y répondons ainsi : sur l'architecture. Si l'IA avait posé seule le modèle de données et la découpe des ViewModels, nous aurions eu une application qui marche sans savoir pourquoi. C'est parce que nous avons écrit le cadrage et relu chaque étape que nous savons expliquer chaque partie du code.",
     ),
   ];
 }
@@ -806,12 +806,6 @@ function annexes() {
       ["Q13 — Document final et signature", "Relevé de résultat et liste des admis imprimables ; leur forme officielle et le signataire restent à confirmer"],
       ["Q14 — Auto-école qui demande son agrément", "Non dans le MVP : créée par l'ATT"],
     ], [42, 58]),
-    espace(),
-    titre1("Annexe F — Trois entrées du journal IA, telles quelles"),
-    ...paras("Le journal IA compte une entrée par étape. Les trois entrées ci-dessous sont recopiées telles quelles, sans la ligne qui liste les fichiers concernés : la contradiction entre un index SQL et une règle métier (chapitre 10), le passage du QCM à l'épreuve orale sur un témoignage de terrain (chapitres 2 et 10), et la reprise de la démonstration du cours pour la synchronisation (chapitres 7.5 et 12)."),
-    ...entreeJournal(10),
-    ...entreeJournal(12),
-    ...entreeJournal(20),
   ];
 }
 
