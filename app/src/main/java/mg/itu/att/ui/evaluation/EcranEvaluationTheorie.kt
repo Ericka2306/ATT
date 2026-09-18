@@ -24,10 +24,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import mg.itu.att.data.StatutTentative
 import mg.itu.att.metier.formatDate
+import mg.itu.att.ui.communs.LigneActions
 import mg.itu.att.ui.communs.BoutonPrincipal
 import mg.itu.att.ui.communs.CarteFiche
 import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.EncartInfo
 import mg.itu.att.ui.communs.LigneInfo
 import mg.itu.att.ui.communs.Option
 import mg.itu.att.ui.communs.SelecteurChoix
@@ -83,7 +85,7 @@ fun EcranEvaluationTheorie(viewModel: EvaluationTheorieViewModel, tentativeId: I
                         Spacer(Modifier.height(8.dp))
                         val saisie = saisies[q.question.id] ?: q.saisie // la frappe en cours, sinon ce qui est en base
                         ChampTexte(saisie.reponse, { v -> viewModel.saisir(q.question.id) { it.copy(reponse = v) } }, "Réponse du candidat", uneLigne = false, actif = e.enCours)
-                        ChampTexte(saisie.points, { v -> viewModel.saisir(q.question.id) { it.copy(points = v) } }, "Points attribués (0 à ${formatPoints(q.question.points)}) *", clavier = KeyboardType.Decimal, actif = e.enCours)
+                        ChampTexte(saisie.points, { v -> viewModel.saisir(q.question.id) { it.copy(points = v) } }, "Points (0 à ${formatPoints(q.question.points)}) *", clavier = KeyboardType.Decimal, actif = e.enCours)
                     }
                 }
             }
@@ -96,7 +98,8 @@ fun EcranEvaluationTheorie(viewModel: EvaluationTheorieViewModel, tentativeId: I
                         Text("${e.sansNote} question(s) sans points : à noter avant de terminer (0 si la réponse est fausse).", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
                     }
                     BoutonPrincipal("Terminer l'épreuve", { viewModel.terminer(onTerminee) })
-                    Text("Une fois terminée, l'épreuve ne se modifie plus : le résultat sera calculé puis validé par l'ATT.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
+                    Spacer(Modifier.height(8.dp))
+                    EncartInfo("Une fois terminée, l'épreuve ne se modifie plus : le résultat sera calculé puis validé par l'ATT.")
                 } else if (tentative.statut != StatutTentative.EN_COURS) {
                     Text("Épreuve close le ${formatDate(tentative.dateHeure)} : lecture seule.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
@@ -132,9 +135,9 @@ private fun Proposition(viewModel: EvaluationTheorieViewModel, e: EtatTheorie) {
             Text(proposition.enonce, style = MaterialTheme.typography.bodyLarge)
             Text("${formatPoints(proposition.points)} pt", style = MaterialTheme.typography.bodySmall)
             Spacer(Modifier.height(8.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { viewModel.autreProposition() }, modifier = Modifier.weight(1f)) { Text("Une autre") }
-                Button(onClick = { viewModel.poserQuestion(proposition) }, modifier = Modifier.weight(1f)) { Text("Poser cette question") }
+            LigneActions {
+                Button(onClick = { viewModel.poserQuestion(proposition) }) { Text("Poser cette question") }
+                OutlinedButton(onClick = { viewModel.autreProposition() }) { Text("Une autre") }
             }
         }
     }

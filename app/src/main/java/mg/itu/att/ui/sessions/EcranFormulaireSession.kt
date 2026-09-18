@@ -30,9 +30,9 @@ fun EcranFormulaireSession(viewModel: SessionsViewModel, onCree: (Int) -> Unit, 
         ChampTexte(f.date, viewModel::changerDate, "Date * (AAAA-MM-JJ)", clavier = KeyboardType.Number)
         ChampTexte(f.heureConvocation, { v -> viewModel.modifierFormulaire { it.copy(heureConvocation = v) } }, "Heure de convocation * (HH:MM)")
         ChampTexte(f.capacite, { v -> viewModel.modifierFormulaire { it.copy(capacite = v) } }, "Capacité de la session *", clavier = KeyboardType.Number)
-        ChampTexte(f.capaciteCreneau, { v -> viewModel.modifierFormulaire { it.copy(capaciteCreneau = v) } }, "Candidats par créneau * (1 = créneau individuel)", clavier = KeyboardType.Number)
-        ChampTexte(f.dureeMin, { v -> viewModel.modifierFormulaire { it.copy(dureeMin = v) } }, "Durée d'un créneau en minutes *", clavier = KeyboardType.Number)
-        ChampTexte(f.margeMin, { v -> viewModel.modifierFormulaire { it.copy(margeMin = v) } }, "Marge entre créneaux en minutes *", clavier = KeyboardType.Number)
+        ChampTexte(f.capaciteCreneau, { v -> viewModel.modifierFormulaire { it.copy(capaciteCreneau = v) } }, "Candidats par créneau *", clavier = KeyboardType.Number, aide = "1 = créneau individuel")
+        ChampTexte(f.dureeMin, { v -> viewModel.modifierFormulaire { it.copy(dureeMin = v) } }, "Durée d'un créneau (min) *", clavier = KeyboardType.Number)
+        ChampTexte(f.margeMin, { v -> viewModel.modifierFormulaire { it.copy(margeMin = v) } }, "Marge entre créneaux (min) *", clavier = KeyboardType.Number)
         f.avertissement?.let { Text(it, color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.bodyMedium) }
 
         val apercu = f.apercuCreneaux

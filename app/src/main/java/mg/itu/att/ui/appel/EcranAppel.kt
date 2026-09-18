@@ -24,7 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import mg.itu.att.data.StatutPresence
+import mg.itu.att.ui.communs.LigneActions
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.EncartInfo
 import mg.itu.att.ui.communs.PastilleStatut
 import mg.itu.att.ui.communs.TitreSection
 
@@ -60,10 +62,7 @@ fun EcranAppel(viewModel: AppelViewModel, sessionId: Int, onRetour: () -> Unit) 
             item {
                 Text(e.libelleSession, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text("Présents ${e.presents} · Retards ${e.retards} · Absents ${e.absents} · En attente ${e.enAttente}", style = MaterialTheme.typography.titleMedium)
-                Text(
-                    "Tolérance de retard : ${e.toleranceMin} min · absent = ${if (e.regleAbsence.equals("REPORT_AUTO", true)) "report automatique" else "nouvelle inscription"} (règles à confirmer)",
-                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                EncartInfo("Tolérance de retard : ${e.toleranceMin} min · absent = ${if (e.regleAbsence.equals("REPORT_AUTO", true)) "report automatique" else "nouvelle inscription"} (règles à confirmer)")
                 e.message?.let { Spacer(Modifier.height(6.dp)); Text(it, color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.bodyMedium) }
                 TitreSection("Candidats convoqués (${e.lignes.size})")
                 if (e.lignes.isEmpty()) Text("Aucun candidat inscrit.", color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -73,7 +72,7 @@ fun EcranAppel(viewModel: AppelViewModel, sessionId: Int, onRetour: () -> Unit) 
                 Card(Modifier.fillMaxWidth().padding(vertical = 4.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                     Column(Modifier.padding(12.dp)) {
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("n° ${l.inscription.numeroAnonymat}" + if (e.nomsVisibles) " — ${l.nomCandidat}" else "", style = MaterialTheme.typography.titleMedium)
+                            Text("n° ${l.inscription.numeroAnonymat}" + if (e.nomsVisibles) " — ${l.nomCandidat}" else "", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                             PastillePresence(statut)
                         }
                         Text(
@@ -81,16 +80,14 @@ fun EcranAppel(viewModel: AppelViewModel, sessionId: Int, onRetour: () -> Unit) 
                             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         if (e.peutMarquer) {
-                            Row {
+                            LigneActions {
                                 when (statut) {
                                     StatutPresence.EN_ATTENTE -> {
                                         Button(onClick = { viewModel.marquerArrivee(l.inscription.id) }) { Text("Présent") }
-                                        Spacer(Modifier.padding(4.dp))
                                         OutlinedButton(onClick = { viewModel.marquerAbsent(l.inscription.id) }) { Text("Absent") }
                                     }
                                     StatutPresence.EN_RETARD -> {
                                         Button(onClick = { viewModel.accepterRetard(l.inscription.id) }) { Text("Accepter le retard") }
-                                        Spacer(Modifier.padding(4.dp))
                                         OutlinedButton(onClick = { viewModel.marquerAbsent(l.inscription.id) }) { Text("Refuser") }
                                     }
                                     StatutPresence.PRESENT, StatutPresence.ABSENT -> TextButton(onClick = { viewModel.reinitialiser(l.inscription.id) }) { Text("Corriger") }

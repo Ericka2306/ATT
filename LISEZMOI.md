@@ -31,16 +31,19 @@ Android Studio → File → Open → dossier `ATT` → attendre la synchronisati
 ./gradlew :app:testDebugUnitTest    # tests unitaires
 ```
 
-## Comptes
+## Comptes de test (version de développement)
 
-Au premier lancement, la base ne contient que **deux comptes** et les 24 régions ; tout le reste se crée dans l'application.
+Insérés au premier lancement d'une version de développement seulement (`BuildConfig.DEBUG`), affichés sur l'écran de connexion avec un bouton par rôle :
 
-| Identifiant | Mot de passe | Rôle | Ce qu'il peut faire |
-|---|---|---|---|
-| `superadmin` | `ChangezMoi2026` | Super Admin | configuration : catégories, épreuves, barèmes, questions, critères, règles, centres |
-| `admin` | `admin2026` | Admin ATT | auto-écoles, examinateurs, dossiers, sessions, inscriptions, appel, résultats, impression, historique |
+| Rôle | Identifiant | Mot de passe |
+|---|---|---|
+| Super administrateur | `superadmin` | `ChangezMoi2026` |
+| Administrateur ATT | `admin` | `admin2026` |
+| Auto-école (Analamanga) | `autoecole` | `autoecole2026` |
+| Examinateur (Analamanga) | `examinateur` | `examinateur2026` |
+| Candidat (RAKOTO Hery, de l'auto-école de démonstration) | `candidat` | `candidat2026` |
 
-Les comptes auto-école, examinateur et candidat se créent depuis leurs fiches respectives. Sur l'écran de connexion, les deux comptes de départ sont rappelés **en version de développement seulement** (`BuildConfig.DEBUG`).
+Les deux premiers existent aussi en version livrée (à changer dès la première connexion) ; les trois autres n'existent qu'en développement. Pour repartir de zéro : `adb shell pm clear mg.itu.att` ou désinstaller l'application.
 
 Comptes créés pendant la démonstration ci-dessous : `lalana` / `lalana2026` (auto-école) et `naina` / `naina2026` (examinateur).
 
@@ -112,6 +115,7 @@ tap "Auto-écoles"
 ## Crédits
 
 - Photo de l'écran de connexion : « Madagascar RN44 » par Diorit, Wikimedia Commons, licence CC0 (domaine public), réduite à 1080 px.
+- Police de caractères : « Plus Jakarta Sans » (Tokotype), licence SIL Open Font License 1.1, fichier `app/src/main/res/font/plus_jakarta_sans.ttf`, licence dans `docs/references/OFL_plus_jakarta_sans.txt`.
 - Logo et icône de l'application : dessins vectoriels réalisés pour ce projet. Ce n'est pas le logo officiel de l'ATT.
 
 ## État d'avancement

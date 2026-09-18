@@ -50,7 +50,7 @@ fun EcranFormulaireCentre(viewModel: ConfigurationViewModel, centreId: Int?, onE
         ChampTexte(f.nom, { v -> viewModel.modifierCentre { it.copy(nom = v) } }, "Nom *")
         SelecteurRegion(f.regions, f.regionId, { v -> viewModel.modifierCentre { it.copy(regionId = v) } })
         ChampTexte(f.adresse, { v -> viewModel.modifierCentre { it.copy(adresse = v) } }, "Adresse *", uneLigne = false)
-        ChampTexte(f.capacite, { v -> viewModel.modifierCentre { it.copy(capacite = v) } }, "Capacité par défaut d'une session", clavier = KeyboardType.Number)
+        ChampTexte(f.capacite, { v -> viewModel.modifierCentre { it.copy(capacite = v) } }, "Capacité par défaut", clavier = KeyboardType.Number, aide = "candidats par session")
         CaseACocher(f.actif, { v -> viewModel.modifierCentre { it.copy(actif = v) } }, "Centre actif")
         TexteErreur(f.erreur)
         BoutonPrincipal(if (centreId == null) "Créer le centre" else "Enregistrer", { viewModel.enregistrerCentre(onSucces = onEnregistre) })

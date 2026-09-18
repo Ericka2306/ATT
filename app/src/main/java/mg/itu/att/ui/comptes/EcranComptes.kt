@@ -15,6 +15,8 @@ import mg.itu.att.ui.communs.BoutonPrincipal
 import mg.itu.att.ui.communs.CarteIcone
 import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.EncartInfo
+import mg.itu.att.ui.communs.TonEncart
 import mg.itu.att.ui.communs.SelecteurRegion
 import mg.itu.att.ui.communs.TexteErreur
 import mg.itu.att.ui.communs.libelle
@@ -57,7 +59,7 @@ fun EcranFormulaireAdmin(viewModel: ComptesViewModel, onCree: () -> Unit, onReto
         ChampTexte(f.identifiant, { v -> viewModel.modifierAdmin { it.copy(identifiant = v) } }, "Identifiant *")
         ChampTexte(f.motDePasse, { v -> viewModel.modifierAdmin { it.copy(motDePasse = v) } }, "Mot de passe initial *", motDePasse = true)
         SelecteurRegion(f.regions, f.regionId, { v -> viewModel.modifierAdmin { it.copy(regionId = v) } }, avecToutes = true)
-        Text("« Toutes les régions » = administrateur national. Une région = administrateur régional (à confirmer, Q11).", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        EncartInfo("« Toutes les régions » = administrateur national. Une région = administrateur régional (à confirmer, Q11).", TonEncart.AVERTISSEMENT)
         TexteErreur(f.erreur)
         BoutonPrincipal("Créer le compte", { viewModel.creerAdmin(onSucces = onCree) }, actif = !f.enCours)
     }

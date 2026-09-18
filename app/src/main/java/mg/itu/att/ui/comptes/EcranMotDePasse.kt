@@ -18,8 +18,8 @@ fun EcranMotDePasse(viewModel: ComptesViewModel, onRetour: () -> Unit) {
 
     EcranStandard(titre = "Mon mot de passe", onRetour = onRetour, defilant = true) {
         ChampTexte(f.ancien, { v -> viewModel.modifierMotDePasse { it.copy(ancien = v) } }, "Mot de passe actuel", motDePasse = true)
-        ChampTexte(f.nouveau, { v -> viewModel.modifierMotDePasse { it.copy(nouveau = v) } }, "Nouveau mot de passe (${ValidationCompte.LONGUEUR_MIN_MOT_DE_PASSE} caractères min.)", motDePasse = true)
-        ChampTexte(f.confirmation, { v -> viewModel.modifierMotDePasse { it.copy(confirmation = v) } }, "Confirmer le nouveau mot de passe", motDePasse = true)
+        ChampTexte(f.nouveau, { v -> viewModel.modifierMotDePasse { it.copy(nouveau = v) } }, "Nouveau mot de passe *", motDePasse = true, aide = "${ValidationCompte.LONGUEUR_MIN_MOT_DE_PASSE} caractères minimum")
+        ChampTexte(f.confirmation, { v -> viewModel.modifierMotDePasse { it.copy(confirmation = v) } }, "Confirmation *", motDePasse = true)
         TexteErreur(f.erreur)
         if (f.reussi) {
             Text("Mot de passe changé.", color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.bodyLarge)

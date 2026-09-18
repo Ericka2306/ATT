@@ -9,16 +9,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import mg.itu.att.ui.communs.CarteIcone
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.EncartInfo
+import mg.itu.att.ui.communs.TonEncart
 import mg.itu.att.ui.communs.PastilleStatut
 
 /** Menu de la configuration (UC02, Super Admin). Les questions et critères se gèrent depuis chaque épreuve. */
 @Composable
 fun EcranConfiguration(onCategories: () -> Unit, onRegles: () -> Unit, onCentres: () -> Unit, onRetour: () -> Unit) {
     EcranStandard(titre = "Configuration", onRetour = onRetour) {
-        Text(
-            "Les valeurs marquées « à confirmer » sont des exemples : aucune n'est une règle officielle de l'ATT tant qu'elle n'a pas été validée.",
-            style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        EncartInfo("Les valeurs marquées « à confirmer » sont des exemples : aucune n'est une règle officielle de l'ATT tant qu'elle n'a pas été validée.", TonEncart.AVERTISSEMENT)
         CarteIcone(Icons.AutoMirrored.Filled.List, "Catégories et épreuves", "Catégories de permis, épreuves, barèmes, questions, critères", onCategories)
         CarteIcone(Icons.Filled.Settings, "Règles", "Nombre de passages, délais, retards, capacités, pièces du dossier…", onRegles)
         CarteIcone(Icons.Filled.Place, "Centres d'examen", "Centres par région, capacité par défaut", onCentres)

@@ -24,6 +24,7 @@ import mg.itu.att.ui.communs.CarteFiche
 import mg.itu.att.ui.communs.CaseACocher
 import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.EncartInfo
 import mg.itu.att.ui.communs.LigneInfo
 import mg.itu.att.ui.communs.TexteErreur
 import mg.itu.att.ui.communs.TitreSection
@@ -71,7 +72,7 @@ fun EcranEvaluationConduite(viewModel: EvaluationConduiteViewModel, tentativeId:
                             CaseACocher(saisie.faute, { v -> viewModel.saisir(c.critere.id) { it.copy(faute = v) } }, "Faute éliminatoire commise", actif = e.enCours)
                         }
                         if (!saisie.faute) {
-                            ChampTexte(saisie.points, { v -> viewModel.saisir(c.critere.id) { it.copy(points = v) } }, "Points attribués (0 à ${formatPoints(c.critere.points)}) *", clavier = KeyboardType.Decimal, actif = e.enCours)
+                            ChampTexte(saisie.points, { v -> viewModel.saisir(c.critere.id) { it.copy(points = v) } }, "Points (0 à ${formatPoints(c.critere.points)}) *", clavier = KeyboardType.Decimal, actif = e.enCours)
                         }
                         ChampTexte(saisie.observation, { v -> viewModel.saisir(c.critere.id) { it.copy(observation = v) } }, "Observation", uneLigne = false, actif = e.enCours)
                     }
@@ -85,7 +86,8 @@ fun EcranEvaluationConduite(viewModel: EvaluationConduiteViewModel, tentativeId:
                         Text("${e.sansNote} critère(s) sans points : à noter avant de terminer.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
                     }
                     BoutonPrincipal("Terminer l'épreuve", { viewModel.terminer(onTerminee) })
-                    Text("Une fois terminée, l'épreuve ne se modifie plus : le résultat sera calculé puis validé par l'ATT.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
+                    Spacer(Modifier.height(8.dp))
+                    EncartInfo("Une fois terminée, l'épreuve ne se modifie plus : le résultat sera calculé puis validé par l'ATT.")
                 } else if (tentative.statut != StatutTentative.EN_COURS) {
                     Text("Épreuve close le ${formatDate(tentative.dateHeure)} : lecture seule.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }

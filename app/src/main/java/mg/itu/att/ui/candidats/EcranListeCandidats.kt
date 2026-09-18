@@ -3,6 +3,7 @@ package mg.itu.att.ui.candidats
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.MaterialTheme
@@ -35,7 +36,7 @@ fun EcranListeCandidats(
         onAction = onNouveau,
     ) {
         val texteCherche by viewModel.texteRecherche.collectAsState()
-        ChampTexte(texteCherche, viewModel::rechercher, "Rechercher un nom")
+        ChampTexte(texteCherche, viewModel::rechercher, "Rechercher un nom", icone = Icons.Filled.Search)
         if (!etat.autoEcoleVerrouillee) {
             SelecteurChoix("Auto-école", etat.autoEcoles.map { Option(it.id, it.nom) }, etat.autoEcoleFiltreId, viewModel::filtrerParAutoEcole, avecTous = true, libelleTous = "Toutes")
         }

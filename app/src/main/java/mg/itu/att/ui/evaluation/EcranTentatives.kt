@@ -55,7 +55,7 @@ fun EcranTentatives(viewModel: TentativesViewModel, sessionId: Int, onTentative:
                 Card(Modifier.fillMaxWidth().padding(vertical = 4.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                     Column(Modifier.padding(12.dp)) {
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("n° ${l.inscription.numeroAnonymat}" + if (e.nomsVisibles) " — ${l.nomCandidat}" else "", style = MaterialTheme.typography.titleMedium)
+                            Text("n° ${l.inscription.numeroAnonymat}" + if (e.nomsVisibles) " — ${l.nomCandidat}" else "", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                             PastillePresence(statut)
                         }
                         Text(

@@ -50,7 +50,7 @@ fun EcranFormulaireCategorie(viewModel: ConfigurationViewModel, categorieId: Int
         ChampTexte(f.code, { v -> viewModel.modifierCategorie { it.copy(code = v) } }, "Code * (ex. B)")
         ChampTexte(f.libelle, { v -> viewModel.modifierCategorie { it.copy(libelle = v) } }, "Libellé *")
         ChampTexte(f.ageMinimum, { v -> viewModel.modifierCategorie { it.copy(ageMinimum = v) } }, "Âge minimum (à confirmer)", clavier = KeyboardType.Number)
-        ChampTexte(f.prealable, { v -> viewModel.modifierCategorie { it.copy(prealable = v) } }, "Code de la catégorie préalable (ex. B pour C, D, E)")
+        ChampTexte(f.prealable, { v -> viewModel.modifierCategorie { it.copy(prealable = v) } }, "Catégorie préalable (code)", aide = "ex. B pour C, D, E")
         CaseACocher(f.aConfirmer, { v -> viewModel.modifierCategorie { it.copy(aConfirmer = v) } }, "Valeur à confirmer par l'ATT")
         CaseACocher(f.actif, { v -> viewModel.modifierCategorie { it.copy(actif = v) } }, "Catégorie active")
         TexteErreur(f.erreur)

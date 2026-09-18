@@ -2,6 +2,8 @@ package mg.itu.att.ui.resultats
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,7 +31,7 @@ fun EcranResultats(viewModel: ResultatsViewModel, onOuvrir: (Int) -> Unit, onRet
     val etat by viewModel.liste.collectAsState()
 
     EcranStandard(titre = etat.titre, onRetour = onRetour) {
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FiltreResultats.entries.forEach { f ->
                 // La file « à valider » n'a de sens que pour l'ATT.
                 if (f == FiltreResultats.A_VALIDER && !etat.peutValider) return@forEach

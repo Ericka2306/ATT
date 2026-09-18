@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import mg.itu.att.ui.communs.CarteIcone
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.EncartInfo
 import mg.itu.att.ui.sessions.PastilleSession
 
 /** Sessions à évaluer (examinateur, UC09) : du jour et à venir, avec présents et tentatives ouvertes. */
@@ -19,7 +20,7 @@ fun EcranSessionsExaminateur(viewModel: TentativesViewModel, onOuvrir: (Int) -> 
     val sessions by viewModel.sessionsAEvaluer.collectAsState()
 
     EcranStandard(titre = "Sessions à évaluer", onRetour = onRetour) {
-        Text("Aucune affectation préalable : tout examinateur connecté peut évaluer un candidat présent.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        EncartInfo("Aucune affectation préalable : tout examinateur connecté peut évaluer un candidat présent.")
         if (sessions.isEmpty()) Text("Aucune session ouverte aujourd'hui ou à venir.", style = MaterialTheme.typography.bodyLarge)
         LazyColumn {
             items(sessions) { s ->

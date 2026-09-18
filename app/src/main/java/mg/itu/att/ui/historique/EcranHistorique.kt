@@ -2,6 +2,8 @@ package mg.itu.att.ui.historique
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
@@ -42,7 +44,7 @@ fun EcranHistorique(
             Text("L'historique est réservé à l'administration ATT.", style = MaterialTheme.typography.bodyLarge)
             return@EcranStandard
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Periode.entries.forEach { p ->
                 FilterChip(
                     selected = etat.filtres.periode == p, onClick = { viewModel.choisirPeriode(p) },

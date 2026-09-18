@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mg.itu.att.data.StatutSession
 import mg.itu.att.metier.formatDate
+import mg.itu.att.ui.communs.LigneActions
 import mg.itu.att.ui.communs.CarteFiche
 import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.EcranStandard
@@ -59,7 +60,7 @@ fun EcranDetailSession(
                 }
                 Spacer(Modifier.height(12.dp))
                 // Une seule Row déborderait de l'écran : on répartit les actions sur plusieurs lignes.
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                LigneActions {
                     // Les inscriptions sont consultables par tous les rôles autorisés ; les actions de statut restent à l'ATT.
                     if (s.statut != StatutSession.PLANIFIEE) OutlinedButton(onClick = onInscrire) { Text("Inscriptions") }
                     if (s.statut == StatutSession.OUVERTE || s.statut == StatutSession.COMPLETE || s.statut == StatutSession.EN_COURS || s.statut == StatutSession.TERMINEE) {
@@ -69,11 +70,11 @@ fun EcranDetailSession(
                 }
                 if (etat.peutGerer) {
                     // Documents imprimables de la session (UC13) : la liste d'appel avant, les admis après.
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    LigneActions {
                         OutlinedButton(onClick = onImprimerAppel) { Text("Liste d'appel") }
                         OutlinedButton(onClick = onImprimerAdmis) { Text("Liste des admis") }
                     }
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    LigneActions {
                         when (s.statut) {
                             StatutSession.PLANIFIEE -> Button(onClick = { viewModel.changerStatut(s.id, StatutSession.OUVERTE) }) { Text("Ouvrir aux inscriptions") }
                             StatutSession.OUVERTE, StatutSession.COMPLETE -> Button(onClick = { viewModel.changerStatut(s.id, StatutSession.EN_COURS) }) { Text("Démarrer") }
@@ -93,7 +94,7 @@ fun EcranDetailSession(
             if (etat.peutGerer && s.statut != StatutSession.ANNULEE && s.statut != StatutSession.TERMINEE) {
                 item {
                     TitreSection("Annuler la session")
-                    ChampTexte(saisie.motif, viewModel::changerMotif, "Motif de l'annulation (obligatoire)", uneLigne = false)
+                    ChampTexte(saisie.motif, viewModel::changerMotif, "Motif de l'annulation *", uneLigne = false)
                     TexteErreur(etat.erreur ?: saisie.erreur)
                     OutlinedButton(onClick = { viewModel.changerStatut(s.id, StatutSession.ANNULEE) }) { Text("Confirmer l'annulation") }
                 }

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mg.itu.att.BuildConfig
 import mg.itu.att.data.AppDatabase
 import mg.itu.att.data.DonneesInitiales
 import mg.itu.att.data.Role
@@ -51,7 +52,7 @@ class ConnexionViewModel(application: Application) : AndroidViewModel(applicatio
     val session: StateFlow<SessionUtilisateur?> = _session
 
     init {
-        viewModelScope.launch { DonneesInitiales.insererSiVide(db) }
+        viewModelScope.launch { DonneesInitiales.insererSiVide(db, avecDemo = BuildConfig.DEBUG) }
     }
 
     fun changerIdentifiant(valeur: String) = _uiState.update { it.copy(identifiant = valeur, erreur = null) }

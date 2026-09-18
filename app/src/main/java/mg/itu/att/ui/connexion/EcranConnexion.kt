@@ -16,12 +16,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -33,18 +31,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import mg.itu.att.BuildConfig
 import mg.itu.att.R
 import mg.itu.att.data.DonneesInitiales
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
+import mg.itu.att.ui.communs.LigneActions
+import mg.itu.att.ui.communs.BoutonPrincipal
+import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.TexteErreur
+import mg.itu.att.ui.communs.bordCarte
 
 /**
  * Écran de connexion (UC01). En haut, une photo de route malgache (RN44, Wikimedia Commons, CC0)
  * avec le logo et le titre ; en bas, la carte de saisie.
  * L'état de saisie vit dans le ViewModel, pas dans l'écran (règle S6).
- * `OutlinedTextField` = un Text dont la valeur est un état et qui signale `onValueChange` (HORS_COURS n° 6).
+ * Les champs et le bouton sont ceux de `ui/communs` (HORS_COURS n° 6).
  */
 @Composable
 fun EcranConnexion(viewModel: ConnexionViewModel, onConnecte: () -> Unit) {
@@ -119,10 +123,11 @@ fun EcranConnexion(viewModel: ConnexionViewModel, onConnecte: () -> Unit) {
                 .fillMaxWidth()
                 .padding(16.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+            border = bordCarte(),
         ) {
             Column(Modifier.padding(20.dp)) {
-                Text("Connexion", style = MaterialTheme.typography.titleLarge)
+                Text("Connexion", style = MaterialTheme.typography.headlineSmall)
                 Text(
                     "Identifiez-vous avec le compte fourni par l'ATT ou votre auto-école.",
                     style = MaterialTheme.typography.bodyMedium,
@@ -130,37 +135,11 @@ fun EcranConnexion(viewModel: ConnexionViewModel, onConnecte: () -> Unit) {
                 )
                 Spacer(Modifier.height(20.dp))
 
-                OutlinedTextField(
-                    value = etat.identifiant,
-                    onValueChange = viewModel::changerIdentifiant,
-                    label = { Text("Identifiant") },
-                    singleLine = true,
-                    enabled = !etat.enCours,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Spacer(Modifier.height(12.dp))
-                OutlinedTextField(
-                    value = etat.motDePasse,
-                    onValueChange = viewModel::changerMotDePasse,
-                    label = { Text("Mot de passe") },
-                    singleLine = true,
-                    enabled = !etat.enCours,
-                    visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Spacer(Modifier.height(8.dp))
+                ChampTexte(etat.identifiant, viewModel::changerIdentifiant, "Identifiant", actif = !etat.enCours, icone = Icons.Filled.Person)
+                ChampTexte(etat.motDePasse, viewModel::changerMotDePasse, "Mot de passe", motDePasse = true, actif = !etat.enCours, icone = Icons.Filled.Lock)
                 TexteErreur(etat.erreur)
-                Spacer(Modifier.height(16.dp))
-
-                Button(
-                    onClick = { viewModel.seConnecter(onSucces = onConnecte) },
-                    enabled = !etat.enCours,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                ) {
-                    Text(if (etat.enCours) "Vérification…" else "Se connecter")
-                }
+                Spacer(Modifier.height(6.dp))
+                BoutonPrincipal(if (etat.enCours) "Vérification…" else "Se connecter", { viewModel.seConnecter(onSucces = onConnecte) }, actif = !etat.enCours)
             }
         }
 
@@ -180,19 +159,22 @@ fun EcranConnexion(viewModel: ConnexionViewModel, onConnecte: () -> Unit) {
                         color = MaterialTheme.colorScheme.onTertiaryContainer,
                     )
                     Spacer(Modifier.height(8.dp))
-                    Row {
-                        OutlinedButton(
-                            onClick = { viewModel.preremplir(DonneesInitiales.IDENTIFIANT_SUPER_ADMIN, DonneesInitiales.MOT_DE_PASSE_INITIAL_SUPER_ADMIN) },
-                        ) { Text("superadmin") }
-                        Spacer(Modifier.size(8.dp))
-                        OutlinedButton(
-                            onClick = { viewModel.preremplir(DonneesInitiales.IDENTIFIANT_ADMIN_DEMO, DonneesInitiales.MOT_DE_PASSE_INITIAL_ADMIN_DEMO) },
-                        ) { Text("admin") }
+                    // Un bouton par rôle : il préremplit les deux champs, il reste à appuyer sur « Se connecter ».
+                    val comptes = listOf(
+                        "Super admin" to (DonneesInitiales.IDENTIFIANT_SUPER_ADMIN to DonneesInitiales.MOT_DE_PASSE_INITIAL_SUPER_ADMIN),
+                        "Admin ATT" to (DonneesInitiales.IDENTIFIANT_ADMIN_DEMO to DonneesInitiales.MOT_DE_PASSE_INITIAL_ADMIN_DEMO),
+                        "Auto-école" to (DonneesInitiales.IDENTIFIANT_AUTO_ECOLE_DEMO to DonneesInitiales.MOT_DE_PASSE_AUTO_ECOLE_DEMO),
+                        "Examinateur" to (DonneesInitiales.IDENTIFIANT_EXAMINATEUR_DEMO to DonneesInitiales.MOT_DE_PASSE_EXAMINATEUR_DEMO),
+                        "Candidat" to (DonneesInitiales.IDENTIFIANT_CANDIDAT_DEMO to DonneesInitiales.MOT_DE_PASSE_CANDIDAT_DEMO),
+                    )
+                    LigneActions {
+                        comptes.forEach { (libelle, compte) ->
+                            OutlinedButton(onClick = { viewModel.preremplir(compte.first, compte.second) }) { Text(libelle) }
+                        }
                     }
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        "superadmin / ${DonneesInitiales.MOT_DE_PASSE_INITIAL_SUPER_ADMIN}   ·   admin / ${DonneesInitiales.MOT_DE_PASSE_INITIAL_ADMIN_DEMO}\n" +
-                            "Les autres comptes (auto-écoles, examinateurs…) se créent dans l'application.",
+                        comptes.joinToString("\n") { (libelle, compte) -> "$libelle : ${compte.first} / ${compte.second}" },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onTertiaryContainer,
                     )

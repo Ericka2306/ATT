@@ -10,6 +10,7 @@ import mg.itu.att.metier.ValidationCompte
 import mg.itu.att.ui.communs.BoutonPrincipal
 import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.EncartInfo
 import mg.itu.att.ui.communs.SelecteurRegion
 import mg.itu.att.ui.communs.TexteErreur
 import mg.itu.att.ui.communs.TitreSection
@@ -30,9 +31,9 @@ fun EcranFormulaireExaminateur(viewModel: ComptesViewModel, examinateurId: Int?,
         SelecteurRegion(f.regions, f.regionId, { v -> viewModel.modifierExaminateur { it.copy(regionId = v) } }, avecToutes = true, verrouille = f.regionVerrouillee)
         if (creation) {
             TitreSection("Compte de connexion")
-            Text("Communiquez l'identifiant et le mot de passe initial à l'examinateur ; il pourra le changer.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            ChampTexte(f.identifiant, { v -> viewModel.modifierExaminateur { it.copy(identifiant = v) } }, "Identifiant (${ValidationCompte.LONGUEUR_MIN_IDENTIFIANT} caractères min.) *")
-            ChampTexte(f.motDePasse, { v -> viewModel.modifierExaminateur { it.copy(motDePasse = v) } }, "Mot de passe initial (${ValidationCompte.LONGUEUR_MIN_MOT_DE_PASSE} caractères min.) *", motDePasse = true)
+            EncartInfo("Communiquez l'identifiant et le mot de passe initial à l'examinateur ; il pourra le changer.")
+            ChampTexte(f.identifiant, { v -> viewModel.modifierExaminateur { it.copy(identifiant = v) } }, "Identifiant *", aide = "${ValidationCompte.LONGUEUR_MIN_IDENTIFIANT} caractères minimum")
+            ChampTexte(f.motDePasse, { v -> viewModel.modifierExaminateur { it.copy(motDePasse = v) } }, "Mot de passe initial *", motDePasse = true, aide = "${ValidationCompte.LONGUEUR_MIN_MOT_DE_PASSE} caractères minimum")
         }
         TexteErreur(f.erreur)
         BoutonPrincipal(if (creation) "Créer l'examinateur et son compte" else "Enregistrer", { viewModel.enregistrerExaminateur(onSucces = onEnregistre) }, actif = !f.enCours)

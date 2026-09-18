@@ -4,6 +4,8 @@ Format (instructions §10) : ce qui a été créé, les fichiers modifiés, les 
 
 ---
 
+> Les captures `docs/captures/*.png` citées dans les comptes rendus ont été supprimées le 18/09/2026 (décision du dev 1) : la démonstration finale se rejoue de A à Z sur l'interface refondue (D2a).
+
 ## Étape A1 — Analyse des exigences et règles — 15/09/2026
 
 **Créé**
