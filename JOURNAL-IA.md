@@ -325,7 +325,20 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 23 — <date> — <tâche>
+## Entrée 23 — 18/09/2026 — Audit du rapport technique par des agents juges
+
+- Document soumis : `docs/rapport/generer_rapport.js` (le rapport entier), relu par trois agents indépendants : un « jury académique », un « métier ATT » et un relecteur de forme, chacun avec la seule consigne de noter et de lister ce qui manque.
+- Remarque principale de l'IA : les juges ont surtout attrapé des chiffres écrits à la main et devenus faux (nombre d'entités, de notions hors cours, de figures) et des contradictions entre chapitres (périmètre annoncé en 3.2 contre fonctionnalités décrites en 6, conclusion contredite par les pièces jointes). Réponse : tout chiffre qui décrit le projet est désormais calculé à la génération, et le texte s'aligne sur le code, pas l'inverse. Deux classes d'exemple créées par Android Studio comptaient parmi les « tests » : supprimées.
+
+⚠️ Le juge métier a relevé que le rapport laissait croire à un usage multi-appareils alors que l'application tourne sur un seul téléphone : le mode mono-appareil est maintenant assumé noir sur blanc, avec ses conséquences (une base par appareil, synchronisation simulée). Un rapport ne doit pas promettre plus que l'application.
+
+⚠️ La note des juges (13/20 puis 12/20) n'est pas celle du vrai jury ; elle a servi de liste de tâches. Les points « à confirmer par l'ATT » ne sont pas des défauts de l'application mais des règles inconnues, et le rapport le dit explicitement.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 1>.
+
+---
+
+## Entrée 24 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :

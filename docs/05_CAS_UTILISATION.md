@@ -205,7 +205,7 @@ Une seule `MainActivity`, un `NavHost`, routes en chaînes ; l'argument est touj
 | `config/categories`, `config/categorie/nouvelle`, `config/categorie/{id}`, `config/categorie/{id}/modifier` | `EcranCategories`, `EcranFormulaireCategorie`, `EcranDetailCategorie` (épreuves de la catégorie) | UC02 |
 | `config/categorie/{id}/epreuve/nouvelle`, `config/epreuve/{id}/modifier/{categorieId}` | `EcranFormulaireEpreuve` | UC02 |
 | `config/epreuve/{id}` | `EcranEpreuve` (versions du barème, questions, critères) | UC02 |
-| `config/epreuve/{id}/bareme`, `…/question`, `…/critere` | `EcranFormulaireBareme` (nouvelle version), `EcranFormulaireQuestion` (4 réponses, une bonne), `EcranFormulaireCritere` | UC02 |
+| `config/epreuve/{id}/bareme`, `…/question`, `…/critere` | `EcranFormulaireBareme` (nouvelle version), `EcranFormulaireQuestion` (question orale : énoncé, points, réponse attendue), `EcranFormulaireCritere` | UC02 |
 | `config/regles`, `config/regle/{id}` | `EcranRegles`, `EcranFormulaireRegle` (valeur validée selon le type) | UC02 |
 | `config/centres`, `config/centre/nouveau`, `config/centre/{id}` | `EcranCentres`, `EcranFormulaireCentre` | UC02 |
 

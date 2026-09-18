@@ -24,7 +24,7 @@ Application Android (Kotlin, Jetpack Compose, Room) de gestion des examens du pe
 10. Pas de fonctionnalité hors périmètre sans accord du binôme.
 
 ## Pile et conventions (résumé)
-- AGP 9.3.2 (Kotlin intégré, pas de plugin `kotlin.android`, pas de `kotlinOptions`), plugin Compose + KSP alignés sur la version Kotlin embarquée, Java 17, minSdk 24, compileSdk 37.
+- AGP 9.3.2 (Kotlin intégré, pas de plugin `kotlin.android`, pas de `kotlinOptions`), plugin Compose + KSP alignés sur la version Kotlin embarquée, Java 17, minSdk 26, compileSdk 37.
 - Package `mg.itu.att`. Une seule `MainActivity`, `MaterialTheme` par défaut, Navigation Compose avec routes chaînes et identifiants en argument.
 - Architecture : `Ecran*` → `XxxViewModel` (`AndroidViewModel`, `StateFlow<EtatXxx>`, `combine`/`stateIn`, `viewModelScope.launch`) → `XxxDao` (`Flow` pour lire, `suspend` pour écrire) → `AppDatabase.obtenir()`. Logique métier dans `metier/` (fonctions pures testées JUnit).
 - Identifiants en français sans accents, KDoc court en français, textes d'UI en français, tables au pluriel, statuts en `enum class`, dates en `String` ISO.
