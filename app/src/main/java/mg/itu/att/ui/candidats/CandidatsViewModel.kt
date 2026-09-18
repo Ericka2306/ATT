@@ -114,14 +114,18 @@ data class EtatDossier(
     val candidat: Candidat? = null,
     val categorie: CategoriePermis? = null,
     val pieces: List<PieceDossier> = emptyList(),
-    val motif: String = "",
     val historique: List<Historique> = emptyList(),
     /** L'auto-école ou l'ATT peut soumettre un dossier BROUILLON ou INCOMPLET. */
     val peutSoumettre: Boolean = false,
     /** Seule l'ATT décide, et seulement sur un dossier SOUMIS. */
     val peutDecider: Boolean = false,
-    val erreur: String? = null,
 )
+
+/**
+ * La saisie du motif de décision, exposée à part : elle ne doit pas passer par le flux du dossier,
+ * qui relit la base à chaque émission — sinon la frappe perd des caractères (défaut vu en C9 et C11).
+ */
+data class SaisieDossier(val motif: String = "", val erreur: String? = null)
 
 data class DossierATraiter(val dossier: Dossier, val nomCandidat: String, val codeCategorie: String, val nomAutoEcole: String)
 
@@ -413,21 +417,19 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
     // ----- Dossier -----
 
     private val idDossier = MutableStateFlow(0)
-    private val motif = MutableStateFlow("")
-    private val erreurDossier = MutableStateFlow<String?>(null)
+
+    private val _saisieDossier = MutableStateFlow(SaisieDossier())
+    /** Duo `_uiState` / `uiState` du cours : la frappe reste locale. */
+    val saisieDossier: StateFlow<SaisieDossier> = _saisieDossier
 
     fun afficherDossier(dossierId: Int) {
         if (idDossier.value != dossierId) {
             idDossier.value = dossierId
-            motif.value = ""
-            erreurDossier.value = null
+            _saisieDossier.value = SaisieDossier()
         }
     }
 
-    fun changerMotif(texte: String) {
-        motif.value = texte
-        erreurDossier.value = null
-    }
+    fun changerMotif(texte: String) = _saisieDossier.update { it.copy(motif = texte, erreur = null) }
 
     val dossier: StateFlow<EtatDossier> =
         idDossier.flatMapLatest { id ->
@@ -435,15 +437,13 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
                 db.dossierDao().parIdEnDirect(id),
                 db.pieceDossierDao().parDossier(id),
                 db.historiqueDao().pourObjet(EntitesHistorique.DOSSIER, id),
-                combine(motif, erreurDossier, session) { m, e, s -> Triple(m, e, s) },
-            ) { dossier, pieces, historique, (m, e, s) ->
+                session,
+            ) { dossier, pieces, historique, s ->
                 // Le candidat et la catégorie sont lus une fois par changement (map suspend, comme un DAO ponctuel).
                 EtatDossier(
                     dossier = dossier,
                     pieces = pieces,
                     historique = historique,
-                    motif = m,
-                    erreur = e,
                     peutSoumettre = dossier != null && (dossier.statut == StatutDossier.BROUILLON || dossier.statut == StatutDossier.INCOMPLET) && s != null && ReglesConsultation.peutGererCandidat(s.role),
                     peutDecider = dossier?.statut == StatutDossier.SOUMIS && estAtt(s),
                 )
@@ -469,7 +469,7 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
             val categorie = db.categoriePermisDao().parId(d.categorieId) ?: return@launch
             val erreur = ReglesDossier.verifierEligibilite(candidat.dateNaissance, categorie, dateDuJour())
             if (erreur != null) {
-                erreurDossier.value = erreur
+                _saisieDossier.update { it.copy(erreur = erreur) }
                 return@launch
             }
             val soumis = d.copy(statut = StatutDossier.SOUMIS, dateSoumission = dateDuJour(), motif = null)
@@ -484,9 +484,9 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
     fun decider(dossierId: Int, decision: StatutDossier) {
         val utilisateur = session.value ?: return
         if (!estAtt(utilisateur)) return
-        val texteMotif = motif.value.trim()
+        val texteMotif = _saisieDossier.value.motif.trim()
         if (decision != StatutDossier.VALIDE && texteMotif.isBlank()) {
-            erreurDossier.value = "Indiquez le motif (pièce manquante, non-éligibilité…)."
+            _saisieDossier.update { it.copy(erreur = "Indiquez le motif (pièce manquante, non-éligibilité…).") }
             return
         }
         viewModelScope.launch {
@@ -502,7 +502,7 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
                 db.dossierDao().modifier(decide)
                 db.tracer(EntitesHistorique.DOSSIER, dossierId, action, utilisateur.id, ancienneValeur = d.resume(), nouvelleValeur = decide.resume(), motif = texteMotif.ifBlank { null })
             }
-            motif.value = ""
+            _saisieDossier.value = SaisieDossier()
         }
     }
 

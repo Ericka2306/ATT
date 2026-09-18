@@ -40,6 +40,7 @@ fun EcranDetailSession(
 ) {
     viewModel.afficherDetail(sessionId)
     val etat by viewModel.detail.collectAsState()
+    val saisie by viewModel.saisieSession.collectAsState()
     val l = etat.ligne
 
     EcranStandard(titre = l?.let { "Session du ${formatDate(it.session.date)}" } ?: "Session", onRetour = onRetour) {
@@ -92,8 +93,8 @@ fun EcranDetailSession(
             if (etat.peutGerer && s.statut != StatutSession.ANNULEE && s.statut != StatutSession.TERMINEE) {
                 item {
                     TitreSection("Annuler la session")
-                    ChampTexte(etat.motif, viewModel::changerMotif, "Motif de l'annulation (obligatoire)", uneLigne = false)
-                    TexteErreur(etat.erreur)
+                    ChampTexte(saisie.motif, viewModel::changerMotif, "Motif de l'annulation (obligatoire)", uneLigne = false)
+                    TexteErreur(etat.erreur ?: saisie.erreur)
                     OutlinedButton(onClick = { viewModel.changerStatut(s.id, StatutSession.ANNULEE) }) { Text("Confirmer l'annulation") }
                 }
             }

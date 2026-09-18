@@ -38,6 +38,7 @@ import mg.itu.att.ui.communs.ouTiret
 fun EcranDossier(viewModel: CandidatsViewModel, dossierId: Int, onRetour: () -> Unit) {
     viewModel.afficherDossier(dossierId)
     val etat by viewModel.dossier.collectAsState()
+    val saisie by viewModel.saisieDossier.collectAsState()
     val d = etat.dossier
 
     EcranStandard(titre = etat.categorie?.let { "Dossier permis ${it.code}" } ?: "Dossier", onRetour = onRetour) {
@@ -63,7 +64,7 @@ fun EcranDossier(viewModel: CandidatsViewModel, dossierId: Int, onRetour: () -> 
                 CaseACocher(piece.fournie, { viewModel.cocherPiece(piece, it) }, piece.typePiece, actif = etat.peutSoumettre)
             }
             item {
-                TexteErreur(etat.erreur)
+                TexteErreur(saisie.erreur)
                 if (etat.peutSoumettre) {
                     BoutonPrincipal(
                         texte = if (d.statut == StatutDossier.INCOMPLET) "Soumettre à nouveau à l'ATT" else "Soumettre à l'ATT",
@@ -72,7 +73,7 @@ fun EcranDossier(viewModel: CandidatsViewModel, dossierId: Int, onRetour: () -> 
                 }
                 if (etat.peutDecider) {
                     TitreSection("Décision de l'ATT")
-                    ChampTexte(etat.motif, viewModel::changerMotif, "Motif (obligatoire si incomplet ou refusé)", uneLigne = false)
+                    ChampTexte(saisie.motif, viewModel::changerMotif, "Motif (obligatoire si incomplet ou refusé)", uneLigne = false)
                     Row {
                         Button(onClick = { viewModel.decider(d.id, StatutDossier.VALIDE) }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) { Text("Valider") }
                         Spacer(Modifier.width(8.dp))

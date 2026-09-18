@@ -58,6 +58,7 @@ fun PastilleInscription(statut: StatutInscription) {
 fun EcranInscriptions(viewModel: InscriptionsViewModel, sessionId: Int, onImprimerConvocation: (Int) -> Unit, onRetour: () -> Unit) {
     viewModel.afficher(sessionId)
     val e by viewModel.etat.collectAsState()
+    val saisie by viewModel.saisie.collectAsState()
 
     EcranStandard(titre = "Inscriptions", onRetour = onRetour) {
         val se = e.session
@@ -90,7 +91,7 @@ fun EcranInscriptions(viewModel: InscriptionsViewModel, sessionId: Int, onImprim
                 }
             }
             if (e.estAtt && e.inscrits.any { it.inscription.statut != StatutInscription.ANNULE && it.inscription.statut != StatutInscription.REPORTE }) {
-                item { ChampTexte(e.motif, viewModel::changerMotif, "Motif (obligatoire pour reporter ou annuler)") }
+                item { ChampTexte(saisie.motif, viewModel::changerMotif, "Motif (obligatoire pour reporter ou annuler)") }
             }
             if (e.peutInscrire || e.peutDemander) {
                 item {
@@ -99,8 +100,8 @@ fun EcranInscriptions(viewModel: InscriptionsViewModel, sessionId: Int, onImprim
                     Spacer(Modifier.height(8.dp))
                     ChampTexte(e.recherche, viewModel::rechercher, "Rechercher un candidat")
                     SelecteurChoix("Créneau", e.creneaux.map { Option(it.id, "${it.heureDebut} – ${it.heureFinEstimee} (${it.capacite} pl.)") }, e.creneauChoisiId, viewModel::choisirCreneau, avecTous = true, libelleTous = "premier disponible")
-                    e.message?.let { Text(it, color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.bodyMedium) }
-                    TexteErreur(e.erreur)
+                    saisie.message?.let { Text(it, color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.bodyMedium) }
+                    TexteErreur(saisie.erreur)
                     if (e.candidatsEligibles.isEmpty()) Text("Aucun candidat éligible (ou déjà inscrit).", color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
                 }
                 items(e.candidatsEligibles) { c ->
