@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,7 +53,7 @@ fun EcranParcours(
             }
             items(etat.dossiers) { ligne ->
                 CarteIcone(
-                    icone = Icons.Filled.List,
+                    icone = Icons.AutoMirrored.Filled.List,
                     titre = "Permis ${ligne.codeCategorie} — dossier n° ${ligne.dossier.id}",
                     description = ligne.libelleCategorie + (ligne.dossier.motif?.let { " · $it" } ?: ""),
                     onClick = { onOuvrirDossier(ligne.dossier.id) },

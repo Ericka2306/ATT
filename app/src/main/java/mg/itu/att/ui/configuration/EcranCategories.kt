@@ -4,8 +4,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,10 +24,11 @@ fun EcranCategories(viewModel: ConfigurationViewModel, onNouvelle: () -> Unit, o
     val categories by viewModel.categories.collectAsState()
 
     EcranStandard(titre = "Catégories de permis", onRetour = onRetour, iconeAction = Icons.Filled.Add, descriptionAction = "Nouvelle catégorie", onAction = onNouvelle) {
+        if (categories.isEmpty()) Text("Aucune catégorie. Le « + » en ouvre une.", style = MaterialTheme.typography.bodyLarge)
         LazyColumn {
             items(categories) { c ->
                 CarteIcone(
-                    icone = Icons.Filled.List,
+                    icone = Icons.AutoMirrored.Filled.List,
                     titre = "${c.code} — ${c.libelle}" + if (c.actif) "" else " (inactive)",
                     description = "Âge minimum ${c.ageMinimum ?: "—"}" + (c.categoriePrealableCode?.let { " · préalable : $it" } ?: ""),
                     onClick = { onOuvrir(c.id) },

@@ -34,7 +34,8 @@ fun EcranListeCandidats(
         descriptionAction = "Nouveau candidat",
         onAction = onNouveau,
     ) {
-        ChampTexte(etat.recherche, viewModel::rechercher, "Rechercher un nom")
+        val texteCherche by viewModel.texteRecherche.collectAsState()
+        ChampTexte(texteCherche, viewModel::rechercher, "Rechercher un nom")
         if (!etat.autoEcoleVerrouillee) {
             SelecteurChoix("Auto-école", etat.autoEcoles.map { Option(it.id, it.nom) }, etat.autoEcoleFiltreId, viewModel::filtrerParAutoEcole, avecTous = true, libelleTous = "Toutes")
         }

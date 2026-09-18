@@ -64,7 +64,14 @@ data class EtatInscriptions(
  * ci-dessus (qui recalcule listes et jointures à chaque émission) fait perdre des caractères — défaut
  * constaté en C9, C11 puis D1.
  */
-data class SaisieInscription(val motif: String = "", val message: String? = null, val erreur: String? = null)
+data class SaisieInscription(
+    val motif: String = "",
+    val message: String? = null,
+    /** Erreur de la partie « inscrire un candidat ». */
+    val erreur: String? = null,
+    /** Erreur d'une action sur un inscrit (report, annulation) : affichée sous le champ du motif. */
+    val erreurAction: String? = null,
+)
 
 // ---------- LE VIEWMODEL ----------
 
@@ -80,6 +87,12 @@ class InscriptionsViewModel(application: Application) : AndroidViewModel(applica
     private val session = MutableStateFlow<SessionUtilisateur?>(null)
     private val idSession = MutableStateFlow(0)
     private val recherche = MutableStateFlow("")
+
+    /**
+     * Le texte cherché, lu directement par le champ : le passer par le flux ci-dessous, qui refiltre
+     * la liste des candidats à chaque émission, ferait sauter des caractères à la frappe.
+     */
+    val texteRecherche: StateFlow<String> = recherche
     private val creneauChoisi = MutableStateFlow<Int?>(null)
     private val _saisie = MutableStateFlow(SaisieInscription())
     /** Duo `_uiState` / `uiState` du cours : la frappe reste locale. */
@@ -98,7 +111,7 @@ class InscriptionsViewModel(application: Application) : AndroidViewModel(applica
 
     fun rechercher(texte: String) { recherche.value = texte; _saisie.update { it.copy(erreur = null) } }
     fun choisirCreneau(id: Int?) { creneauChoisi.value = id; _saisie.update { it.copy(erreur = null) } }
-    fun changerMotif(texte: String) = _saisie.update { it.copy(motif = texte, erreur = null) }
+    fun changerMotif(texte: String) = _saisie.update { it.copy(motif = texte, erreurAction = null) }
 
     private fun estAtt(s: SessionUtilisateur?) = s?.role == Role.ADMIN_ATT || s?.role == Role.SUPER_ADMIN
 
@@ -136,6 +149,7 @@ class InscriptionsViewModel(application: Application) : AndroidViewModel(applica
                     candidatsEligibles = eligibles,
                     recherche = texte, creneauChoisiId = creneauId,
                     peutInscrire = estAtt(s), peutDemander = s?.role == Role.AUTO_ECOLE && regleAutoEcole, estAtt = estAtt(s),
+                    nomsVisibles = s?.role != Role.EXAMINATEUR,
                 )
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EtatInscriptions())
@@ -203,7 +217,7 @@ class InscriptionsViewModel(application: Application) : AndroidViewModel(applica
         val utilisateur = session.value ?: return
         if (!estAtt(utilisateur)) return
         val texteMotif = _saisie.value.motif.trim()
-        if (motifObligatoire && texteMotif.isBlank()) return run { _saisie.update { it.copy(erreur = "Indiquez le motif.") } }
+        if (motifObligatoire && texteMotif.isBlank()) return run { _saisie.update { it.copy(erreurAction = "Indiquez le motif.") } }
         viewModelScope.launch {
             db.withTransaction {
                 val actuelle = db.inscriptionDao().parId(inscriptionId) ?: return@withTransaction

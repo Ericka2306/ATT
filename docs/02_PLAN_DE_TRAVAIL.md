@@ -7,12 +7,12 @@
 
 | | |
 |---|---|
-| **Dernière étape terminée** | D1 (tests et cas particuliers : les 10 contraintes du cadrage §11) — 18/09/2026, en attente de relecture (branche `etape-D1-scenarios`) ; C13 fusionnée (PR #18) |
+| **Dernière étape terminée** | D2 (qualité : relecture croisée, 12 corrections, schéma figé, guide du code, démonstration rejouée) — 18/09/2026, en attente de relecture (branche `etape-D2-qualite`) ; D1 fusionnée (PR #19) |
 | **Étape en cours** | aucune |
-| **Prochaine étape** | D2 (qualité, relecture croisée, schéma Room figé, LISEZMOI) — **les deux devs ensemble** |
-| **Qui fait quoi** | depuis le 17/09/2026, le dev 1 a livré jusqu'à C10 ; le dev 2 reprend C11, C12, C13 et D1, une pull request par étape du plan (comme les précédentes) |
-| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape D1 » |
-| **Dernier commit poussé** | `etape-C13-impression` — « Ajoute l'impression des convocations, listes et relevés (étape C13) », PR #18 fusionnée |
+| **Prochaine étape** | D3 (soutenance : démonstration scriptée, répétée deux fois sans erreur) — le déroulé est écrit dans `LISEZMOI.md` |
+| **Qui fait quoi** | le dev 1 a livré jusqu'à C10 ; le dev 2 a repris C11, C12, C13, D1 et D2, une pull request par étape du plan |
+| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape D2 » |
+| **Dernier commit poussé** | `etape-D1-scenarios` — « Ajoute les tests des contraintes du cadrage et corrige la saisie des motifs (étape D1) », PR #19 fusionnée |
 
 Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une question à valider
 
@@ -59,7 +59,7 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 | Étape | Contenu | Critère de fin | Statut |
 |---|---|---|---|
 | D1 Tests et cas particuliers | JUnit sur `metier/` ; scénarios manuels des contraintes §11 (dossier refusé, non éligible, session complète, absence/retard/report/annulation, erreur de notation corrigée, échec + nouvelle tentative, examinateur indisponible, conflit de créneaux, candidat sans smartphone, procédure de secours = listes imprimées) | tableau de scénarios coché dans `docs/COMPTES_RENDUS.md` | 🟢 18/09/2026 (dev 2 ; 10 contraintes cochées, 119 tests verts, 3 défauts de saisie corrigés) |
-| D2 Qualité | relecture croisée du binôme, suppression des logs, schéma Room figé (`version` finale), `LISEZMOI.md` (ouverture, déroulé de démo, comptes de test), captures | chaque membre explique chaque fichier sans IA | ⚪ |
+| D2 Qualité | relecture croisée du binôme, suppression des logs, schéma Room figé (`version` finale), `LISEZMOI.md` (ouverture, déroulé de démo, comptes de test), captures | chaque membre explique chaque fichier sans IA | 🟢 18/09/2026 (dev 2 ; 12 défauts corrigés, schéma v3 figé et exporté, `docs/06_GUIDE_DU_CODE.md`, démonstration complète rejouée) |
 | D3 Soutenance | démo scriptée : parcours complet auto-école → dossier → validation → session → inscription → appel → tentative → évaluation → résultat → impression | démo répétée deux fois sans erreur | ⚪ |
 
 ---

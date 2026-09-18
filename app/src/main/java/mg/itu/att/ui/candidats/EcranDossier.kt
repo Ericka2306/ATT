@@ -74,9 +74,12 @@ fun EcranDossier(viewModel: CandidatsViewModel, dossierId: Int, onRetour: () -> 
                 if (etat.peutDecider) {
                     TitreSection("Décision de l'ATT")
                     ChampTexte(saisie.motif, viewModel::changerMotif, "Motif (obligatoire si incomplet ou refusé)", uneLigne = false)
+                    // Deux lignes : les trois boutons côte à côte débordent d'un écran étroit
+                    // (défaut déjà rencontré sur la fiche d'une session).
                     Row {
                         Button(onClick = { viewModel.decider(d.id, StatutDossier.VALIDE) }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) { Text("Valider") }
-                        Spacer(Modifier.width(8.dp))
+                    }
+                    Row {
                         OutlinedButton(onClick = { viewModel.decider(d.id, StatutDossier.INCOMPLET) }) { Text("Incomplet") }
                         Spacer(Modifier.width(8.dp))
                         OutlinedButton(onClick = { viewModel.decider(d.id, StatutDossier.REFUSE) }, colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text("Refuser") }

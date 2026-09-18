@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import mg.itu.att.data.StatutTentative
 import mg.itu.att.metier.formatDate
 import mg.itu.att.ui.communs.BoutonPrincipal
 import mg.itu.att.ui.communs.CarteFiche
@@ -85,9 +86,11 @@ fun EcranEvaluationConduite(viewModel: EvaluationConduiteViewModel, tentativeId:
                     }
                     BoutonPrincipal("Terminer l'épreuve", { viewModel.terminer(onTerminee) })
                     Text("Une fois terminée, l'épreuve ne se modifie plus : le résultat sera calculé puis validé par l'ATT.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
-                } else {
+                } else if (tentative.statut != StatutTentative.EN_COURS) {
                     Text("Épreuve close le ${formatDate(tentative.dateHeure)} : lecture seule.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
+                // Passage encore en cours mais non saisissable : la cause est déjà affichée plus haut
+                // (épreuve non configurée, rôle sans droit de saisie). Ne pas dire « close ».
                 Spacer(Modifier.height(24.dp))
             }
         }
