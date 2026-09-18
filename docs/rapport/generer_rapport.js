@@ -18,6 +18,7 @@ const {
 const BLEU = "0F4C81";
 const BLEU_FONCE = "0B2E4F";
 const GRIS = "5E6B7C";
+const NOIR = "000000"; // tout le texte du document est en noir (demande du binôme)
 const GRIS_CLAIR = "EAEFF5";
 const AMBRE_CLAIR = "FFF1D6";
 const POLICE = "Calibri";
@@ -32,9 +33,9 @@ const DOSSIER_CAPTURES = path.join(__dirname, "captures");
 const texte = (t, opts = {}) => new TextRun({ text: t, font: POLICE, size: 22, ...opts });
 const para = (t, opts = {}) => new Paragraph({ children: [typeof t === "string" ? texte(t) : t].flat(), spacing: { after: 120, line: 300 }, ...opts });
 const paras = (...ts) => ts.map((t) => para(t));
-const titre1 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_1, children: [texte(t, { bold: true, size: 32, color: BLEU })], spacing: { before: 360, after: 200 }, pageBreakBefore: true });
-const titre2 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_2, children: [texte(t, { bold: true, size: 26, color: BLEU_FONCE })], spacing: { before: 280, after: 140 } });
-const titre3 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_3, children: [texte(t, { bold: true, size: 23, color: BLEU_FONCE })], spacing: { before: 200, after: 100 } });
+const titre1 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_1, children: [texte(t, { bold: true, size: 32, color: NOIR })], spacing: { before: 360, after: 200 }, pageBreakBefore: true });
+const titre2 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_2, children: [texte(t, { bold: true, size: 26, color: NOIR })], spacing: { before: 280, after: 140 } });
+const titre3 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_3, children: [texte(t, { bold: true, size: 23, color: NOIR })], spacing: { before: 200, after: 100 } });
 const puce = (t) => new Paragraph({ children: [typeof t === "string" ? texte(t) : t].flat(), numbering: { reference: "puces", level: 0 }, spacing: { after: 60, line: 300 } });
 const puces = (...ts) => ts.map(puce);
 const numero = (t) => new Paragraph({ children: [typeof t === "string" ? texte(t) : t].flat(), numbering: { reference: "numeros", level: 0 }, spacing: { after: 60, line: 300 } });
@@ -49,13 +50,13 @@ const bloc = (lignes) => lignes.map(code);
 
 /** Un encadré jaune : texte à compléter pendant le rejeu. Facile à retrouver dans Word (surlignage). */
 const aCompleter = (t) => new Paragraph({
-  children: [new TextRun({ text: "À compléter — " + t, font: POLICE, size: 20, italics: true, color: "7A4B00", highlight: "yellow" })],
+  children: [new TextRun({ text: "À compléter — " + t, font: POLICE, size: 20, italics: true, color: NOIR, highlight: "yellow" })],
   spacing: { after: 120 },
 });
 
 /** Consigne de rédaction pour la section (grise, en italique) : à supprimer une fois la section écrite. */
 const consigne = (t) => new Paragraph({
-  children: [new TextRun({ text: t, font: POLICE, size: 19, italics: true, color: GRIS })],
+  children: [new TextRun({ text: t, font: POLICE, size: 19, italics: true, color: NOIR })],
   spacing: { after: 120 }, indent: { left: 200 },
   border: { left: { style: BorderStyle.SINGLE, size: 12, color: "B7C3D1", space: 8 } },
 });
@@ -85,11 +86,11 @@ const figure = (nomFichier, legende, largeurCm = 7) => {
         width: { size: 4000, type: WidthType.DXA }, verticalAlign: VerticalAlign.CENTER,
         shading: { type: ShadingType.CLEAR, fill: AMBRE_CLAIR, color: "auto" },
         margins: { top: 1200, bottom: 1200, left: 200, right: 200 },
-        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [texte("Capture à insérer : " + nomFichier, { italics: true, color: "7A4B00" })] })],
+        children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [texte("Capture à insérer : " + nomFichier, { italics: true, color: NOIR })] })],
       })] })],
     }));
   }
-  contenu.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 80, after: 240 }, children: [texte(`Figure ${numFigure} — ${legende}`, { italics: true, size: 19, color: GRIS })] }));
+  contenu.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 80, after: 240 }, children: [texte(`Figure ${numFigure} — ${legende}`, { italics: true, size: 19, color: NOIR })] }));
   return contenu;
 };
 
@@ -99,9 +100,9 @@ const tableau = (entetes, lignes, largeurs) => {
   const dxa = largeurs.map((l) => Math.round(total * l / 100));
   const cellule = (t, i, entete = false) => new TableCell({
     width: { size: dxa[i], type: WidthType.DXA },
-    shading: entete ? { type: ShadingType.CLEAR, fill: BLEU, color: "auto" } : undefined,
+    shading: entete ? { type: ShadingType.CLEAR, fill: GRIS_CLAIR, color: "auto" } : undefined,
     margins: { top: 80, bottom: 80, left: 100, right: 100 },
-    children: [new Paragraph({ children: [texte(String(t), { bold: entete, color: entete ? "FFFFFF" : undefined, size: 20 })], spacing: { after: 0, line: 270 } })],
+    children: [new Paragraph({ children: [texte(String(t), { bold: entete, color: NOIR, size: 20 })], spacing: { after: 0, line: 270 } })],
   });
   return new Table({
     width: { size: total, type: WidthType.DXA }, columnWidths: dxa,
@@ -149,19 +150,54 @@ function nombreTests() {
 
 // ---------- PAGE DE GARDE ----------
 
+/** Un logo de la page de garde, lu dans logos/ (jpg ou png) et affiché à la hauteur demandée. */
+function logo(nomFichier, hauteurCm) {
+  const chemin = path.join(__dirname, "logos", nomFichier);
+  if (!fs.existsSync(chemin)) return new Paragraph({ children: [] });
+  const donnees = fs.readFileSync(chemin);
+  const png = nomFichier.endsWith(".png");
+  // Dimensions : en-tête PNG (octets 16 à 24) ou segment SOF0 du JPEG.
+  let largeur, hauteur;
+  if (png) { largeur = donnees.readUInt32BE(16); hauteur = donnees.readUInt32BE(20); }
+  else {
+    let i = 2;
+    while (i < donnees.length) {
+      const marqueur = donnees[i + 1];
+      const taille = donnees.readUInt16BE(i + 2);
+      if (marqueur >= 0xc0 && marqueur <= 0xc3) { hauteur = donnees.readUInt16BE(i + 5); largeur = donnees.readUInt16BE(i + 7); break; }
+      i += 2 + taille;
+    }
+  }
+  const h = Math.round(hauteurCm * 37.8);
+  return new Paragraph({
+    alignment: AlignmentType.CENTER,
+    children: [new ImageRun({ type: png ? "png" : "jpg", data: donnees, transformation: { width: Math.round(h * largeur / hauteur), height: h } })],
+  });
+}
+
 function pageDeGarde() {
   const ligne = (t, opts, before = 0, after = 120) => new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before, after }, children: [texte(t, opts)] });
+  const cellule = (enfant) => new TableCell({
+    width: { size: 4600, type: WidthType.DXA }, verticalAlign: VerticalAlign.CENTER,
+    borders: { top: { style: BorderStyle.NONE, size: 0 }, bottom: { style: BorderStyle.NONE, size: 0 }, left: { style: BorderStyle.NONE, size: 0 }, right: { style: BorderStyle.NONE, size: 0 } },
+    children: [enfant],
+  });
   return [
-    ligne(ETABLISSEMENT, { size: 24, color: GRIS }, 600),
-    ligne(MODULE, { size: 22, color: GRIS }, 0, 2400),
-    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 }, border: { bottom: { style: BorderStyle.SINGLE, size: 18, color: BLEU, space: 12 } }, children: [texte("ATT", { bold: true, size: 96, color: BLEU })] }),
-    ligne("Digitalisation des examens du permis de conduire", { bold: true, size: 40, color: BLEU_FONCE }, 200, 100),
-    ligne("Agence des Transports Terrestres — Madagascar", { size: 26, color: GRIS }, 0, 900),
-    ligne("Rapport technique", { bold: true, size: 32, color: BLEU }, 0, 100),
-    ligne("Application Android — Kotlin, Jetpack Compose, Room", { size: 22, color: GRIS }, 0, 2400),
-    ligne("Réalisé par", { size: 22, color: GRIS }, 0, 80),
-    ...AUTEURS.map((a) => ligne(a, { bold: true, size: 28, color: BLEU_FONCE }, 0, 60)),
-    ligne(ANNEE, { size: 22, color: GRIS }, 900, 0),
+    // Les deux logos côte à côte : l'école à gauche, l'ATT à droite (tableau sans bordure).
+    new Table({
+      width: { size: 9200, type: WidthType.DXA }, columnWidths: [4600, 4600],
+      rows: [new TableRow({ children: [cellule(logo("logo_itu_icone.png", 2.4)), cellule(logo("logo_att.jpg", 3.2))] })],
+    }),
+    ligne(ETABLISSEMENT, { size: 24, color: NOIR }, 400),
+    ligne(MODULE, { size: 22, color: NOIR }, 0, 2400),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 }, border: { bottom: { style: BorderStyle.SINGLE, size: 18, color: NOIR, space: 12 } }, children: [texte("ATT", { bold: true, size: 96, color: NOIR })] }),
+    ligne("Digitalisation des examens du permis de conduire", { bold: true, size: 40, color: NOIR }, 200, 100),
+    ligne("Agence des Transports Terrestres — Madagascar", { size: 26, color: NOIR }, 0, 900),
+    ligne("Rapport technique", { bold: true, size: 32, color: NOIR }, 0, 100),
+    ligne("Application Android — Kotlin, Jetpack Compose, Room", { size: 22, color: NOIR }, 0, 2400),
+    ligne("Réalisé par", { size: 22, color: NOIR }, 0, 80),
+    ...AUTEURS.map((a) => ligne(a, { bold: true, size: 28, color: NOIR }, 0, 60)),
+    ligne(ANNEE, { size: 22, color: NOIR }, 900, 0),
   ];
 }
 
@@ -807,10 +843,12 @@ const document = new Document({
   styles: {
     default: { document: { run: { font: POLICE, size: 22 } } },
     paragraphStyles: [
-      { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true, run: { font: POLICE, size: 32, bold: true, color: BLEU }, paragraph: { spacing: { before: 360, after: 200 }, outlineLevel: 0 } },
-      { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true, run: { font: POLICE, size: 26, bold: true, color: BLEU_FONCE }, paragraph: { spacing: { before: 280, after: 140 }, outlineLevel: 1 } },
-      { id: "Heading3", name: "Heading 3", basedOn: "Normal", next: "Normal", quickFormat: true, run: { font: POLICE, size: 23, bold: true, color: BLEU_FONCE }, paragraph: { spacing: { before: 200, after: 100 }, outlineLevel: 2 } },
+      { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true, run: { font: POLICE, size: 32, bold: true, color: NOIR }, paragraph: { spacing: { before: 360, after: 200 }, outlineLevel: 0 } },
+      { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true, run: { font: POLICE, size: 26, bold: true, color: NOIR }, paragraph: { spacing: { before: 280, after: 140 }, outlineLevel: 1 } },
+      { id: "Heading3", name: "Heading 3", basedOn: "Normal", next: "Normal", quickFormat: true, run: { font: POLICE, size: 23, bold: true, color: NOIR }, paragraph: { spacing: { before: 200, after: 100 }, outlineLevel: 2 } },
     ],
+    // Les entrées du sommaire sont des liens : sans cette ligne, Word les affiche en bleu.
+    characterStyles: [{ id: "Hyperlink", name: "Hyperlink", run: { color: NOIR, underline: {} } }],
   },
   numbering: {
     config: [
@@ -822,17 +860,17 @@ const document = new Document({
     {
       properties: { page: { margin: { top: 1440, bottom: 1440, left: 1440, right: 1440 } }, titlePage: true },
       headers: {
-        default: new Header({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "B7C3D1", space: 4 } }, children: [texte("ATT — Digitalisation des examens du permis de conduire · Rapport technique", { size: 17, color: GRIS })] })] }),
+        default: new Header({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "B7C3D1", space: 4 } }, children: [texte("ATT — Digitalisation des examens du permis de conduire · Rapport technique", { size: 17, color: NOIR })] })] }),
         first: new Header({ children: [new Paragraph({ children: [] })] }),
       },
       footers: {
-        default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [texte("Page ", { size: 17, color: GRIS }), new TextRun({ children: [PageNumber.CURRENT], font: POLICE, size: 17, color: GRIS }), texte(" / ", { size: 17, color: GRIS }), new TextRun({ children: [PageNumber.TOTAL_PAGES], font: POLICE, size: 17, color: GRIS })] })] }),
+        default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [texte("Page ", { size: 17, color: NOIR }), new TextRun({ children: [PageNumber.CURRENT], font: POLICE, size: 17, color: NOIR }), texte(" / ", { size: 17, color: NOIR }), new TextRun({ children: [PageNumber.TOTAL_PAGES], font: POLICE, size: 17, color: NOIR })] })] }),
         first: new Footer({ children: [new Paragraph({ children: [] })] }),
       },
       children: [
         ...pageDeGarde(),
         saut(),
-        new Paragraph({ children: [texte("Sommaire", { bold: true, size: 32, color: BLEU })], spacing: { after: 240 } }),
+        new Paragraph({ children: [texte("Sommaire", { bold: true, size: 32, color: NOIR })], spacing: { after: 240 } }),
         new TableOfContents("Sommaire", { hyperlink: true, headingStyleRange: "1-2" }),
         ...introduction(),
         ...problematique(),
