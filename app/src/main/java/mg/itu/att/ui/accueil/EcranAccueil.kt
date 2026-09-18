@@ -30,6 +30,7 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
@@ -183,7 +184,7 @@ fun couleursPour(route: String): Pair<Color, Color> = when (route) {
     Routes.SESSIONS, Routes.EVALUATION -> PastelViolet to EncreViolet
     Routes.RESULTATS -> PastelVert to VertMadagascar
     Routes.CONFIGURATION, Routes.COMPTES, Routes.EXAMINATEURS -> PastelAmbre to Ambre
-    Routes.HISTORIQUE -> PastelTurquoise to EncreTurquoise
+    Routes.HISTORIQUE, Routes.SYNCHRONISATION -> PastelTurquoise to EncreTurquoise
     Routes.PARCOURS, Routes.MOT_DE_PASSE -> PastelRose to EncreRose
     else -> PastelBleu to BleuATT
 }
@@ -201,6 +202,7 @@ fun iconePour(route: String): ImageVector = when (route) {
     Routes.EVALUATION -> Icons.Filled.Build
     Routes.RESULTATS -> Icons.Filled.Done
     Routes.HISTORIQUE -> Icons.Filled.Info
+    Routes.SYNCHRONISATION -> Icons.Filled.Refresh
     Routes.PARCOURS -> Icons.Filled.AccountCircle
     else -> Icons.Filled.Star
 }

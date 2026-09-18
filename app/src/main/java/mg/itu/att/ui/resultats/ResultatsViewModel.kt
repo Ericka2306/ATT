@@ -23,6 +23,7 @@ import mg.itu.att.data.Historique
 import mg.itu.att.data.Resultat
 import mg.itu.att.data.Role
 import mg.itu.att.data.StatutResultat
+import mg.itu.att.data.Synchronisation
 import mg.itu.att.data.Tentative
 import mg.itu.att.data.calculerPourTentative
 import mg.itu.att.data.enregistrerResultat
@@ -218,6 +219,9 @@ class ResultatsViewModel(application: Application) : AndroidViewModel(applicatio
                 db.tracer(EntitesHistorique.RESULTAT, r.id, ActionsHistorique.VALIDATION, utilisateur.id, ancienneValeur = r.resume(), nouvelleValeur = valide.resume())
             }
             _saisie.update { it.copy(message = "Résultat validé : il est désormais visible par l'auto-école et le candidat.") }
+            // Offline-first (cours S7) : la base d'abord, le réseau ensuite. L'échec de l'envoi est sans gravité :
+            // le résultat reste dans la file d'attente et sera remonté par « Synchroniser » ou à la prochaine validation.
+            Synchronisation.synchroniserResultats(db)
         }
     }
 

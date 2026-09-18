@@ -145,6 +145,18 @@ interface ResultatDao {
     )
     suspend fun dernierReussi(candidatId: Int, typeEpreuveId: Int): Resultat?
 
+    /** La file d'attente de synchronisation = une requête (cours S7) : les résultats validés pas encore remontés. */
+    @Query("SELECT * FROM resultats WHERE statut = 'VALIDE_ATT' AND synchronisee = 0 ORDER BY id ASC")
+    suspend fun enAttenteDeSynchronisation(): List<Resultat>
+
+    /** Le compteur « n en attente » affiché à l'écran, tenu à jour par Room. */
+    @Query("SELECT COUNT(*) FROM resultats WHERE statut = 'VALIDE_ATT' AND synchronisee = 0")
+    fun nombreEnAttenteDeSynchronisation(): Flow<Int>
+
+    /** Ne touche qu'au drapeau d'envoi : la note et le statut d'un résultat ne se réécrivent jamais (R6). */
+    @Query("UPDATE resultats SET synchronisee = 1 WHERE id = :id")
+    suspend fun marquerSynchronise(id: Int)
+
     /** On ajoute une ligne à chaque calcul ou correction : un résultat n'est jamais réécrit (R6). */
     @Insert
     suspend fun inserer(resultat: Resultat): Long

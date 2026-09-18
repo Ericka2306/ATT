@@ -1,0 +1,2360 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 4,
+    "identityHash": "af2219ad194f2886287ebe03152394da",
+    "entities": [
+      {
+        "tableName": "regions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `code` TEXT NOT NULL, `nom` TEXT NOT NULL, `actif` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actif",
+            "columnName": "actif",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_regions_code",
+            "unique": true,
+            "columnNames": [
+              "code"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_regions_code` ON `${TABLE_NAME}` (`code`)"
+          }
+        ]
+      },
+      {
+        "tableName": "categories_permis",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `code` TEXT NOT NULL, `libelle` TEXT NOT NULL, `ageMinimum` INTEGER, `categoriePrealableCode` TEXT, `actif` INTEGER NOT NULL, `aConfirmer` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "libelle",
+            "columnName": "libelle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ageMinimum",
+            "columnName": "ageMinimum",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "categoriePrealableCode",
+            "columnName": "categoriePrealableCode",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "actif",
+            "columnName": "actif",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aConfirmer",
+            "columnName": "aConfirmer",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_categories_permis_code",
+            "unique": true,
+            "columnNames": [
+              "code"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_categories_permis_code` ON `${TABLE_NAME}` (`code`)"
+          }
+        ]
+      },
+      {
+        "tableName": "types_epreuve",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `categorieId` INTEGER NOT NULL, `code` TEXT NOT NULL, `libelle` TEXT NOT NULL, `ordre` INTEGER NOT NULL, `obligatoire` INTEGER NOT NULL, `dureeMinutes` INTEGER, `actif` INTEGER NOT NULL, `aConfirmer` INTEGER NOT NULL, FOREIGN KEY(`categorieId`) REFERENCES `categories_permis`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categorieId",
+            "columnName": "categorieId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "libelle",
+            "columnName": "libelle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ordre",
+            "columnName": "ordre",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "obligatoire",
+            "columnName": "obligatoire",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dureeMinutes",
+            "columnName": "dureeMinutes",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "actif",
+            "columnName": "actif",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aConfirmer",
+            "columnName": "aConfirmer",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_types_epreuve_categorieId",
+            "unique": false,
+            "columnNames": [
+              "categorieId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_types_epreuve_categorieId` ON `${TABLE_NAME}` (`categorieId`)"
+          },
+          {
+            "name": "index_types_epreuve_categorieId_code",
+            "unique": true,
+            "columnNames": [
+              "categorieId",
+              "code"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_types_epreuve_categorieId_code` ON `${TABLE_NAME}` (`categorieId`, `code`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "categories_permis",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "categorieId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "baremes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `typeEpreuveId` INTEGER NOT NULL, `version` INTEGER NOT NULL, `noteMax` REAL NOT NULL, `seuilReussite` REAL NOT NULL, `dateDebutValidite` TEXT NOT NULL, `dateFinValidite` TEXT, `aConfirmer` INTEGER NOT NULL, FOREIGN KEY(`typeEpreuveId`) REFERENCES `types_epreuve`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "typeEpreuveId",
+            "columnName": "typeEpreuveId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noteMax",
+            "columnName": "noteMax",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seuilReussite",
+            "columnName": "seuilReussite",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateDebutValidite",
+            "columnName": "dateDebutValidite",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateFinValidite",
+            "columnName": "dateFinValidite",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "aConfirmer",
+            "columnName": "aConfirmer",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_baremes_typeEpreuveId",
+            "unique": false,
+            "columnNames": [
+              "typeEpreuveId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_baremes_typeEpreuveId` ON `${TABLE_NAME}` (`typeEpreuveId`)"
+          },
+          {
+            "name": "index_baremes_typeEpreuveId_version",
+            "unique": true,
+            "columnNames": [
+              "typeEpreuveId",
+              "version"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_baremes_typeEpreuveId_version` ON `${TABLE_NAME}` (`typeEpreuveId`, `version`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "types_epreuve",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "typeEpreuveId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "regles_config",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `cle` TEXT NOT NULL, `valeur` TEXT NOT NULL, `typeValeur` TEXT NOT NULL, `categorieId` INTEGER, `description` TEXT NOT NULL, `aConfirmer` INTEGER NOT NULL, FOREIGN KEY(`categorieId`) REFERENCES `categories_permis`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cle",
+            "columnName": "cle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "valeur",
+            "columnName": "valeur",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "typeValeur",
+            "columnName": "typeValeur",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categorieId",
+            "columnName": "categorieId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aConfirmer",
+            "columnName": "aConfirmer",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_regles_config_cle_categorieId",
+            "unique": true,
+            "columnNames": [
+              "cle",
+              "categorieId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_regles_config_cle_categorieId` ON `${TABLE_NAME}` (`cle`, `categorieId`)"
+          },
+          {
+            "name": "index_regles_config_categorieId",
+            "unique": false,
+            "columnNames": [
+              "categorieId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_regles_config_categorieId` ON `${TABLE_NAME}` (`categorieId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "categories_permis",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "categorieId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "questions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `typeEpreuveId` INTEGER NOT NULL, `enonce` TEXT NOT NULL, `points` REAL NOT NULL, `reponseAttendue` TEXT, `ordre` INTEGER NOT NULL, `actif` INTEGER NOT NULL, `aConfirmer` INTEGER NOT NULL, FOREIGN KEY(`typeEpreuveId`) REFERENCES `types_epreuve`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "typeEpreuveId",
+            "columnName": "typeEpreuveId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enonce",
+            "columnName": "enonce",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "points",
+            "columnName": "points",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reponseAttendue",
+            "columnName": "reponseAttendue",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "ordre",
+            "columnName": "ordre",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actif",
+            "columnName": "actif",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aConfirmer",
+            "columnName": "aConfirmer",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_questions_typeEpreuveId",
+            "unique": false,
+            "columnNames": [
+              "typeEpreuveId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_questions_typeEpreuveId` ON `${TABLE_NAME}` (`typeEpreuveId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "types_epreuve",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "typeEpreuveId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "criteres_pratiques",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `typeEpreuveId` INTEGER NOT NULL, `libelle` TEXT NOT NULL, `points` REAL NOT NULL, `eliminatoire` INTEGER NOT NULL, `actif` INTEGER NOT NULL, `aConfirmer` INTEGER NOT NULL, FOREIGN KEY(`typeEpreuveId`) REFERENCES `types_epreuve`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "typeEpreuveId",
+            "columnName": "typeEpreuveId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "libelle",
+            "columnName": "libelle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "points",
+            "columnName": "points",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eliminatoire",
+            "columnName": "eliminatoire",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actif",
+            "columnName": "actif",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aConfirmer",
+            "columnName": "aConfirmer",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_criteres_pratiques_typeEpreuveId",
+            "unique": false,
+            "columnNames": [
+              "typeEpreuveId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_criteres_pratiques_typeEpreuveId` ON `${TABLE_NAME}` (`typeEpreuveId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "types_epreuve",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "typeEpreuveId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "centres",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `regionId` INTEGER NOT NULL, `nom` TEXT NOT NULL, `adresse` TEXT NOT NULL, `capaciteParDefaut` INTEGER, `actif` INTEGER NOT NULL, FOREIGN KEY(`regionId`) REFERENCES `regions`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "regionId",
+            "columnName": "regionId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "adresse",
+            "columnName": "adresse",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "capaciteParDefaut",
+            "columnName": "capaciteParDefaut",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "actif",
+            "columnName": "actif",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_centres_regionId",
+            "unique": false,
+            "columnNames": [
+              "regionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_centres_regionId` ON `${TABLE_NAME}` (`regionId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "regions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "regionId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "utilisateurs",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `identifiant` TEXT NOT NULL, `motDePasseHash` TEXT NOT NULL, `nom` TEXT NOT NULL, `role` TEXT NOT NULL, `regionId` INTEGER, `autoEcoleId` INTEGER, `examinateurId` INTEGER, `candidatId` INTEGER, `actif` INTEGER NOT NULL, FOREIGN KEY(`regionId`) REFERENCES `regions`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`autoEcoleId`) REFERENCES `auto_ecoles`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`examinateurId`) REFERENCES `examinateurs`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`candidatId`) REFERENCES `candidats`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "identifiant",
+            "columnName": "identifiant",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "motDePasseHash",
+            "columnName": "motDePasseHash",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "role",
+            "columnName": "role",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "regionId",
+            "columnName": "regionId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "autoEcoleId",
+            "columnName": "autoEcoleId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "examinateurId",
+            "columnName": "examinateurId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "candidatId",
+            "columnName": "candidatId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "actif",
+            "columnName": "actif",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_utilisateurs_identifiant",
+            "unique": true,
+            "columnNames": [
+              "identifiant"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_utilisateurs_identifiant` ON `${TABLE_NAME}` (`identifiant`)"
+          },
+          {
+            "name": "index_utilisateurs_regionId",
+            "unique": false,
+            "columnNames": [
+              "regionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_utilisateurs_regionId` ON `${TABLE_NAME}` (`regionId`)"
+          },
+          {
+            "name": "index_utilisateurs_autoEcoleId",
+            "unique": false,
+            "columnNames": [
+              "autoEcoleId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_utilisateurs_autoEcoleId` ON `${TABLE_NAME}` (`autoEcoleId`)"
+          },
+          {
+            "name": "index_utilisateurs_examinateurId",
+            "unique": false,
+            "columnNames": [
+              "examinateurId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_utilisateurs_examinateurId` ON `${TABLE_NAME}` (`examinateurId`)"
+          },
+          {
+            "name": "index_utilisateurs_candidatId",
+            "unique": false,
+            "columnNames": [
+              "candidatId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_utilisateurs_candidatId` ON `${TABLE_NAME}` (`candidatId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "regions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "regionId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "auto_ecoles",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "autoEcoleId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "examinateurs",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "examinateurId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "candidats",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "candidatId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "auto_ecoles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `regionId` INTEGER NOT NULL, `nom` TEXT NOT NULL, `numeroAgrement` TEXT, `adresse` TEXT NOT NULL, `telephone` TEXT, `actif` INTEGER NOT NULL, FOREIGN KEY(`regionId`) REFERENCES `regions`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "regionId",
+            "columnName": "regionId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "numeroAgrement",
+            "columnName": "numeroAgrement",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "adresse",
+            "columnName": "adresse",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "telephone",
+            "columnName": "telephone",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "actif",
+            "columnName": "actif",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_auto_ecoles_regionId",
+            "unique": false,
+            "columnNames": [
+              "regionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_auto_ecoles_regionId` ON `${TABLE_NAME}` (`regionId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "regions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "regionId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "candidats",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `autoEcoleId` INTEGER NOT NULL, `nom` TEXT NOT NULL, `prenom` TEXT NOT NULL, `dateNaissance` TEXT NOT NULL, `cin` TEXT, `telephone` TEXT, `adresse` TEXT, `actif` INTEGER NOT NULL, FOREIGN KEY(`autoEcoleId`) REFERENCES `auto_ecoles`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "autoEcoleId",
+            "columnName": "autoEcoleId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "prenom",
+            "columnName": "prenom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateNaissance",
+            "columnName": "dateNaissance",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cin",
+            "columnName": "cin",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "telephone",
+            "columnName": "telephone",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "adresse",
+            "columnName": "adresse",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "actif",
+            "columnName": "actif",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_candidats_autoEcoleId",
+            "unique": false,
+            "columnNames": [
+              "autoEcoleId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_candidats_autoEcoleId` ON `${TABLE_NAME}` (`autoEcoleId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "auto_ecoles",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "autoEcoleId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "examinateurs",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nom` TEXT NOT NULL, `matricule` TEXT, `regionId` INTEGER, `actif` INTEGER NOT NULL, FOREIGN KEY(`regionId`) REFERENCES `regions`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "matricule",
+            "columnName": "matricule",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "regionId",
+            "columnName": "regionId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "actif",
+            "columnName": "actif",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_examinateurs_regionId",
+            "unique": false,
+            "columnNames": [
+              "regionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_examinateurs_regionId` ON `${TABLE_NAME}` (`regionId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "regions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "regionId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "dossiers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `candidatId` INTEGER NOT NULL, `categorieId` INTEGER NOT NULL, `statut` TEXT NOT NULL, `motif` TEXT, `dateSoumission` TEXT, `dateDecision` TEXT, `decideParId` INTEGER, FOREIGN KEY(`candidatId`) REFERENCES `candidats`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`categorieId`) REFERENCES `categories_permis`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`decideParId`) REFERENCES `utilisateurs`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "candidatId",
+            "columnName": "candidatId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categorieId",
+            "columnName": "categorieId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statut",
+            "columnName": "statut",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "motif",
+            "columnName": "motif",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dateSoumission",
+            "columnName": "dateSoumission",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dateDecision",
+            "columnName": "dateDecision",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "decideParId",
+            "columnName": "decideParId",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_dossiers_candidatId",
+            "unique": false,
+            "columnNames": [
+              "candidatId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_dossiers_candidatId` ON `${TABLE_NAME}` (`candidatId`)"
+          },
+          {
+            "name": "index_dossiers_categorieId",
+            "unique": false,
+            "columnNames": [
+              "categorieId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_dossiers_categorieId` ON `${TABLE_NAME}` (`categorieId`)"
+          },
+          {
+            "name": "index_dossiers_decideParId",
+            "unique": false,
+            "columnNames": [
+              "decideParId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_dossiers_decideParId` ON `${TABLE_NAME}` (`decideParId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "candidats",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "candidatId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "categories_permis",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "categorieId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "utilisateurs",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "decideParId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "pieces_dossier",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `dossierId` INTEGER NOT NULL, `typePiece` TEXT NOT NULL, `fournie` INTEGER NOT NULL, `remarque` TEXT, FOREIGN KEY(`dossierId`) REFERENCES `dossiers`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dossierId",
+            "columnName": "dossierId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "typePiece",
+            "columnName": "typePiece",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fournie",
+            "columnName": "fournie",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "remarque",
+            "columnName": "remarque",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_pieces_dossier_dossierId",
+            "unique": false,
+            "columnNames": [
+              "dossierId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pieces_dossier_dossierId` ON `${TABLE_NAME}` (`dossierId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "dossiers",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "dossierId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "sessions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `categorieId` INTEGER NOT NULL, `typeEpreuveId` INTEGER NOT NULL, `centreId` INTEGER NOT NULL, `date` TEXT NOT NULL, `heureConvocation` TEXT NOT NULL, `capacite` INTEGER NOT NULL, `dureeCreneauMin` INTEGER NOT NULL, `margeMin` INTEGER NOT NULL, `statut` TEXT NOT NULL, `creeParId` INTEGER NOT NULL, FOREIGN KEY(`categorieId`) REFERENCES `categories_permis`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`typeEpreuveId`) REFERENCES `types_epreuve`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`centreId`) REFERENCES `centres`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`creeParId`) REFERENCES `utilisateurs`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categorieId",
+            "columnName": "categorieId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "typeEpreuveId",
+            "columnName": "typeEpreuveId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "centreId",
+            "columnName": "centreId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "heureConvocation",
+            "columnName": "heureConvocation",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "capacite",
+            "columnName": "capacite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dureeCreneauMin",
+            "columnName": "dureeCreneauMin",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "margeMin",
+            "columnName": "margeMin",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statut",
+            "columnName": "statut",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "creeParId",
+            "columnName": "creeParId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_sessions_categorieId",
+            "unique": false,
+            "columnNames": [
+              "categorieId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_sessions_categorieId` ON `${TABLE_NAME}` (`categorieId`)"
+          },
+          {
+            "name": "index_sessions_typeEpreuveId",
+            "unique": false,
+            "columnNames": [
+              "typeEpreuveId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_sessions_typeEpreuveId` ON `${TABLE_NAME}` (`typeEpreuveId`)"
+          },
+          {
+            "name": "index_sessions_centreId",
+            "unique": false,
+            "columnNames": [
+              "centreId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_sessions_centreId` ON `${TABLE_NAME}` (`centreId`)"
+          },
+          {
+            "name": "index_sessions_creeParId",
+            "unique": false,
+            "columnNames": [
+              "creeParId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_sessions_creeParId` ON `${TABLE_NAME}` (`creeParId`)"
+          },
+          {
+            "name": "index_sessions_date",
+            "unique": false,
+            "columnNames": [
+              "date"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_sessions_date` ON `${TABLE_NAME}` (`date`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "categories_permis",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "categorieId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "types_epreuve",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "typeEpreuveId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "centres",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "centreId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "utilisateurs",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "creeParId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "creneaux",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sessionId` INTEGER NOT NULL, `ordre` INTEGER NOT NULL, `heureDebut` TEXT NOT NULL, `heureFinEstimee` TEXT NOT NULL, `capacite` INTEGER NOT NULL, FOREIGN KEY(`sessionId`) REFERENCES `sessions`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sessionId",
+            "columnName": "sessionId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ordre",
+            "columnName": "ordre",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "heureDebut",
+            "columnName": "heureDebut",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "heureFinEstimee",
+            "columnName": "heureFinEstimee",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "capacite",
+            "columnName": "capacite",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_creneaux_sessionId",
+            "unique": false,
+            "columnNames": [
+              "sessionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_creneaux_sessionId` ON `${TABLE_NAME}` (`sessionId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "sessions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "sessionId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "inscriptions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `candidatId` INTEGER NOT NULL, `dossierId` INTEGER NOT NULL, `sessionId` INTEGER NOT NULL, `creneauId` INTEGER, `statut` TEXT NOT NULL, `dateInscription` TEXT NOT NULL, `heurePassageEstimee` TEXT, `numeroAnonymat` TEXT NOT NULL, `motif` TEXT, FOREIGN KEY(`candidatId`) REFERENCES `candidats`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`dossierId`) REFERENCES `dossiers`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`sessionId`) REFERENCES `sessions`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`creneauId`) REFERENCES `creneaux`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "candidatId",
+            "columnName": "candidatId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dossierId",
+            "columnName": "dossierId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sessionId",
+            "columnName": "sessionId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "creneauId",
+            "columnName": "creneauId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "statut",
+            "columnName": "statut",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateInscription",
+            "columnName": "dateInscription",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "heurePassageEstimee",
+            "columnName": "heurePassageEstimee",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "numeroAnonymat",
+            "columnName": "numeroAnonymat",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "motif",
+            "columnName": "motif",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_inscriptions_candidatId",
+            "unique": false,
+            "columnNames": [
+              "candidatId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_inscriptions_candidatId` ON `${TABLE_NAME}` (`candidatId`)"
+          },
+          {
+            "name": "index_inscriptions_dossierId",
+            "unique": false,
+            "columnNames": [
+              "dossierId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_inscriptions_dossierId` ON `${TABLE_NAME}` (`dossierId`)"
+          },
+          {
+            "name": "index_inscriptions_sessionId",
+            "unique": false,
+            "columnNames": [
+              "sessionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_inscriptions_sessionId` ON `${TABLE_NAME}` (`sessionId`)"
+          },
+          {
+            "name": "index_inscriptions_creneauId",
+            "unique": false,
+            "columnNames": [
+              "creneauId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_inscriptions_creneauId` ON `${TABLE_NAME}` (`creneauId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "candidats",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "candidatId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "dossiers",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "dossierId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "sessions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "sessionId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "creneaux",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "creneauId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "presences",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `inscriptionId` INTEGER NOT NULL, `statut` TEXT NOT NULL, `heureAppel` TEXT, `heureArrivee` TEXT, `remarque` TEXT, FOREIGN KEY(`inscriptionId`) REFERENCES `inscriptions`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "inscriptionId",
+            "columnName": "inscriptionId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statut",
+            "columnName": "statut",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "heureAppel",
+            "columnName": "heureAppel",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "heureArrivee",
+            "columnName": "heureArrivee",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "remarque",
+            "columnName": "remarque",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_presences_inscriptionId",
+            "unique": true,
+            "columnNames": [
+              "inscriptionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_presences_inscriptionId` ON `${TABLE_NAME}` (`inscriptionId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "inscriptions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "inscriptionId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "tentatives",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `candidatId` INTEGER NOT NULL, `inscriptionId` INTEGER NOT NULL, `typeEpreuveId` INTEGER NOT NULL, `numero` INTEGER NOT NULL, `examinateurId` INTEGER, `statut` TEXT NOT NULL, `dateHeure` TEXT NOT NULL, FOREIGN KEY(`candidatId`) REFERENCES `candidats`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`inscriptionId`) REFERENCES `inscriptions`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`typeEpreuveId`) REFERENCES `types_epreuve`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`examinateurId`) REFERENCES `examinateurs`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "candidatId",
+            "columnName": "candidatId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "inscriptionId",
+            "columnName": "inscriptionId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "typeEpreuveId",
+            "columnName": "typeEpreuveId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "numero",
+            "columnName": "numero",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "examinateurId",
+            "columnName": "examinateurId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "statut",
+            "columnName": "statut",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateHeure",
+            "columnName": "dateHeure",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_tentatives_candidatId_typeEpreuveId_numero",
+            "unique": true,
+            "columnNames": [
+              "candidatId",
+              "typeEpreuveId",
+              "numero"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_tentatives_candidatId_typeEpreuveId_numero` ON `${TABLE_NAME}` (`candidatId`, `typeEpreuveId`, `numero`)"
+          },
+          {
+            "name": "index_tentatives_inscriptionId",
+            "unique": false,
+            "columnNames": [
+              "inscriptionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tentatives_inscriptionId` ON `${TABLE_NAME}` (`inscriptionId`)"
+          },
+          {
+            "name": "index_tentatives_typeEpreuveId",
+            "unique": false,
+            "columnNames": [
+              "typeEpreuveId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tentatives_typeEpreuveId` ON `${TABLE_NAME}` (`typeEpreuveId`)"
+          },
+          {
+            "name": "index_tentatives_examinateurId",
+            "unique": false,
+            "columnNames": [
+              "examinateurId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tentatives_examinateurId` ON `${TABLE_NAME}` (`examinateurId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "candidats",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "candidatId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "inscriptions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "inscriptionId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "types_epreuve",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "typeEpreuveId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "examinateurs",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "examinateurId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "evaluations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tentativeId` INTEGER NOT NULL, `baremeId` INTEGER NOT NULL, `dateSaisie` TEXT NOT NULL, `observations` TEXT, FOREIGN KEY(`tentativeId`) REFERENCES `tentatives`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`baremeId`) REFERENCES `baremes`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tentativeId",
+            "columnName": "tentativeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baremeId",
+            "columnName": "baremeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateSaisie",
+            "columnName": "dateSaisie",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "observations",
+            "columnName": "observations",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_evaluations_tentativeId",
+            "unique": true,
+            "columnNames": [
+              "tentativeId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_evaluations_tentativeId` ON `${TABLE_NAME}` (`tentativeId`)"
+          },
+          {
+            "name": "index_evaluations_baremeId",
+            "unique": false,
+            "columnNames": [
+              "baremeId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_evaluations_baremeId` ON `${TABLE_NAME}` (`baremeId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "tentatives",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "tentativeId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "baremes",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "baremeId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "reponses_candidat",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `evaluationId` INTEGER NOT NULL, `questionId` INTEGER NOT NULL, `reponseDonnee` TEXT, `pointsAttribues` REAL, FOREIGN KEY(`evaluationId`) REFERENCES `evaluations`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`questionId`) REFERENCES `questions`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "evaluationId",
+            "columnName": "evaluationId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "questionId",
+            "columnName": "questionId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reponseDonnee",
+            "columnName": "reponseDonnee",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "pointsAttribues",
+            "columnName": "pointsAttribues",
+            "affinity": "REAL"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_reponses_candidat_evaluationId_questionId",
+            "unique": true,
+            "columnNames": [
+              "evaluationId",
+              "questionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_reponses_candidat_evaluationId_questionId` ON `${TABLE_NAME}` (`evaluationId`, `questionId`)"
+          },
+          {
+            "name": "index_reponses_candidat_questionId",
+            "unique": false,
+            "columnNames": [
+              "questionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_reponses_candidat_questionId` ON `${TABLE_NAME}` (`questionId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "evaluations",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "evaluationId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "questions",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "questionId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "evaluations_critere",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `evaluationId` INTEGER NOT NULL, `critereId` INTEGER NOT NULL, `note` REAL, `fauteEliminatoire` INTEGER NOT NULL, `observation` TEXT, FOREIGN KEY(`evaluationId`) REFERENCES `evaluations`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`critereId`) REFERENCES `criteres_pratiques`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "evaluationId",
+            "columnName": "evaluationId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "critereId",
+            "columnName": "critereId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "fauteEliminatoire",
+            "columnName": "fauteEliminatoire",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "observation",
+            "columnName": "observation",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_evaluations_critere_evaluationId_critereId",
+            "unique": true,
+            "columnNames": [
+              "evaluationId",
+              "critereId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_evaluations_critere_evaluationId_critereId` ON `${TABLE_NAME}` (`evaluationId`, `critereId`)"
+          },
+          {
+            "name": "index_evaluations_critere_critereId",
+            "unique": false,
+            "columnNames": [
+              "critereId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_evaluations_critere_critereId` ON `${TABLE_NAME}` (`critereId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "evaluations",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "evaluationId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "criteres_pratiques",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "critereId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "resultats",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tentativeId` INTEGER NOT NULL, `baremeId` INTEGER NOT NULL, `noteObtenue` REAL NOT NULL, `noteMax` REAL NOT NULL, `seuil` REAL NOT NULL, `reussi` INTEGER NOT NULL, `statut` TEXT NOT NULL, `valideParId` INTEGER, `dateCalcul` TEXT NOT NULL, `dateValidation` TEXT, `remplaceResultatId` INTEGER, `motifCorrection` TEXT, `synchronisee` INTEGER NOT NULL, FOREIGN KEY(`tentativeId`) REFERENCES `tentatives`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`baremeId`) REFERENCES `baremes`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`valideParId`) REFERENCES `utilisateurs`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`remplaceResultatId`) REFERENCES `resultats`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tentativeId",
+            "columnName": "tentativeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baremeId",
+            "columnName": "baremeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noteObtenue",
+            "columnName": "noteObtenue",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noteMax",
+            "columnName": "noteMax",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seuil",
+            "columnName": "seuil",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reussi",
+            "columnName": "reussi",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statut",
+            "columnName": "statut",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "valideParId",
+            "columnName": "valideParId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "dateCalcul",
+            "columnName": "dateCalcul",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateValidation",
+            "columnName": "dateValidation",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "remplaceResultatId",
+            "columnName": "remplaceResultatId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "motifCorrection",
+            "columnName": "motifCorrection",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "synchronisee",
+            "columnName": "synchronisee",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_resultats_tentativeId",
+            "unique": false,
+            "columnNames": [
+              "tentativeId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_resultats_tentativeId` ON `${TABLE_NAME}` (`tentativeId`)"
+          },
+          {
+            "name": "index_resultats_baremeId",
+            "unique": false,
+            "columnNames": [
+              "baremeId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_resultats_baremeId` ON `${TABLE_NAME}` (`baremeId`)"
+          },
+          {
+            "name": "index_resultats_valideParId",
+            "unique": false,
+            "columnNames": [
+              "valideParId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_resultats_valideParId` ON `${TABLE_NAME}` (`valideParId`)"
+          },
+          {
+            "name": "index_resultats_remplaceResultatId",
+            "unique": false,
+            "columnNames": [
+              "remplaceResultatId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_resultats_remplaceResultatId` ON `${TABLE_NAME}` (`remplaceResultatId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "tentatives",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "tentativeId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "baremes",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "baremeId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "utilisateurs",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "valideParId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "resultats",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "remplaceResultatId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "historique",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `entite` TEXT NOT NULL, `entiteId` INTEGER NOT NULL, `action` TEXT NOT NULL, `ancienneValeur` TEXT, `nouvelleValeur` TEXT, `utilisateurId` INTEGER NOT NULL, `dateHeure` TEXT NOT NULL, `motif` TEXT, FOREIGN KEY(`utilisateurId`) REFERENCES `utilisateurs`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "entite",
+            "columnName": "entite",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "entiteId",
+            "columnName": "entiteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "action",
+            "columnName": "action",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ancienneValeur",
+            "columnName": "ancienneValeur",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "nouvelleValeur",
+            "columnName": "nouvelleValeur",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "utilisateurId",
+            "columnName": "utilisateurId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateHeure",
+            "columnName": "dateHeure",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "motif",
+            "columnName": "motif",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_historique_entite_entiteId",
+            "unique": false,
+            "columnNames": [
+              "entite",
+              "entiteId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_historique_entite_entiteId` ON `${TABLE_NAME}` (`entite`, `entiteId`)"
+          },
+          {
+            "name": "index_historique_utilisateurId",
+            "unique": false,
+            "columnNames": [
+              "utilisateurId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_historique_utilisateurId` ON `${TABLE_NAME}` (`utilisateurId`)"
+          },
+          {
+            "name": "index_historique_dateHeure",
+            "unique": false,
+            "columnNames": [
+              "dateHeure"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_historique_dateHeure` ON `${TABLE_NAME}` (`dateHeure`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "utilisateurs",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "utilisateurId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'af2219ad194f2886287ebe03152394da')"
+    ]
+  }
+}

@@ -64,6 +64,8 @@ import mg.itu.att.ui.resultats.EcranResultats
 import mg.itu.att.ui.resultats.ResultatsViewModel
 import mg.itu.att.ui.inscriptions.InscriptionsViewModel
 import mg.itu.att.ui.sessions.EcranDetailSession
+import mg.itu.att.ui.synchronisation.EcranSynchronisation
+import mg.itu.att.ui.synchronisation.SynchronisationViewModel
 import mg.itu.att.ui.sessions.EcranFormulaireSession
 import mg.itu.att.ui.sessions.EcranListeSessions
 import mg.itu.att.ui.sessions.SessionsViewModel
@@ -127,6 +129,12 @@ fun AppNavigation() {
         graphHistorique(navController) { session }
 
         graphResultats(navController) { session }
+        composable(Routes.SYNCHRONISATION) {
+            val s = session ?: return@composable
+            val vm: SynchronisationViewModel = viewModel()
+            vm.definirSession(s)
+            EcranSynchronisation(vm, onRetour = { navController.popBackStack() })
+        }
         graphImpression(navController) { session }
 
         // ---------- FONCTIONNALITÉS À VENIR ----------

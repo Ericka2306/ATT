@@ -37,6 +37,7 @@ import mg.itu.att.metier.ReglesTheorie
 import mg.itu.att.metier.maintenantIso
 import mg.itu.att.metier.pointsValides
 import mg.itu.att.ui.communs.ViewModelAvecSession
+import mg.itu.att.ui.communs.formatPoints
 import mg.itu.att.ui.connexion.SessionUtilisateur
 import kotlin.random.Random
 

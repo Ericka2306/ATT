@@ -251,6 +251,18 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
+    /** Lève le drapeau « à confirmer » d'une version de barème sans toucher à ses valeurs (une version ne se modifie jamais). */
+    fun confirmerBareme(bareme: Bareme) {
+        val auteur = auteurConfiguration() ?: return
+        viewModelScope.launch {
+            db.withTransaction {
+                val confirme = bareme.copy(aConfirmer = false)
+                db.baremeDao().modifier(confirme)
+                db.tracer(EntitesHistorique.BAREME, bareme.id, ActionsHistorique.VALIDATION, auteur, ancienneValeur = bareme.resume(), nouvelleValeur = confirme.resume() + ", confirmé par l'ATT")
+            }
+        }
+    }
+
     private val _formulaireQuestion = MutableStateFlow(EtatFormulaireQuestion())
     val formulaireQuestion: StateFlow<EtatFormulaireQuestion> = _formulaireQuestion
     fun modifierQuestion(t: (EtatFormulaireQuestion) -> EtatFormulaireQuestion) = _formulaireQuestion.update { t(it).copy(erreur = null) }

@@ -329,6 +329,7 @@ Contraintes : une seule inscription **active** (DEMANDE, INSCRIT, CONFIRME) par 
 | dateCalcul | String | |
 | remplaceResultatId | Int? | FK → Resultat : une correction crée une nouvelle ligne qui pointe vers l'ancienne |
 | motifCorrection | String? | |
+| synchronisee | Boolean | offline-first (cours S7) : false = validé localement, pas encore remonté au serveur central ; la file d'attente est `WHERE statut = 'VALIDE_ATT' AND synchronisee = 0` (schéma v4, 18/09/2026) |
 
 Le résultat courant d'une tentative = le plus récent non annulé. Les anciens restent lisibles.
 

@@ -2,6 +2,7 @@ package mg.itu.att.ui.configuration
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +17,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -25,6 +27,7 @@ import mg.itu.att.ui.communs.CarteFiche
 import mg.itu.att.ui.communs.CaseACocher
 import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.formatPoints
 import mg.itu.att.ui.communs.EncartInfo
 import mg.itu.att.ui.communs.LigneInfo
 import mg.itu.att.ui.communs.Option
@@ -50,16 +53,23 @@ fun EcranEpreuve(
                 CarteFiche {
                     LigneInfo("Catégorie", etat.categorie?.let { "${it.code} — ${it.libelle}" } ?: "?")
                     LigneInfo("Code", e.code)
-                    LigneInfo("Barème courant", courant?.let { "note max ${it.noteMax}, seuil ${it.seuilReussite} (v${it.version})" } ?: "aucun")
-                    if (courant?.aConfirmer == true) Row { PastilleAConfirmer() }
+                    LigneInfo("Barème courant", courant?.let { "note max ${formatPoints(it.noteMax)}, seuil ${formatPoints(it.seuilReussite)} (v${it.version})" + if (it.aConfirmer) " · à confirmer" else "" } ?: "aucun")
+                    e.dureeMinutes?.let { LigneInfo("Durée", "$it min") }
+                    // La pastille concerne l'épreuve elle-même (modifiable par le crayon) ; celle du barème est sur sa ligne.
+                    if (e.aConfirmer) Row { PastilleAConfirmer() }
                 }
                 TitreSection("Versions du barème")
             }
             items(etat.baremes) { b ->
-                Text(
-                    "v${b.version} : note max ${b.noteMax}, seuil ${b.seuilReussite} — du ${formatDate(b.dateDebutValidite)}" + (b.dateFinValidite?.let { " au ${formatDate(it)}" } ?: " (courant)"),
-                    style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(vertical = 2.dp),
-                )
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        "v${b.version} : note max ${formatPoints(b.noteMax)}, seuil ${formatPoints(b.seuilReussite)} — du ${formatDate(b.dateDebutValidite)}" +
+                            (b.dateFinValidite?.let { " au ${formatDate(it)}" } ?: " (courant)") + if (b.aConfirmer) " · à confirmer" else "",
+                        style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f).padding(vertical = 2.dp),
+                    )
+                    // Confirmer une version ne change pas ses valeurs : on lève seulement le drapeau, tracé dans l'historique.
+                    if (b.aConfirmer && b.dateFinValidite == null) TextButton(onClick = { viewModel.confirmerBareme(b) }) { Text("Confirmer") }
+                }
             }
             item {
                 Spacer(Modifier.height(8.dp))
@@ -70,7 +80,7 @@ fun EcranEpreuve(
             items(etat.questions) { q ->
                 Row {
                     Text(
-                        "${q.ordre}. ${q.enonce} (${q.points} pt)" + (q.reponseAttendue?.let { " — attendu : $it" } ?: "") + if (q.actif) "" else " — inactive",
+                        "${q.ordre}. ${q.enonce} (${formatPoints(q.points)} pt)" + (q.reponseAttendue?.let { " — attendu : $it" } ?: "") + if (q.actif) "" else " — inactive",
                         style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f).padding(vertical = 4.dp),
                         color = if (q.actif) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -85,7 +95,7 @@ fun EcranEpreuve(
             items(etat.criteres) { c ->
                 Row {
                     Text(
-                        "${c.libelle} (${c.points} pt${if (c.eliminatoire) ", éliminatoire" else ""})" + if (c.actif) "" else " — inactif",
+                        "${c.libelle} (${formatPoints(c.points)} pt${if (c.eliminatoire) ", éliminatoire" else ""})" + if (c.actif) "" else " — inactif",
                         style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f).padding(vertical = 4.dp),
                     )
                     TextButton(onClick = { viewModel.basculerCritere(c) }) { Text(if (c.actif) "Désactiver" else "Réactiver") }

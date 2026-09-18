@@ -15,3 +15,6 @@ fun Role.libelle(): String = when (this) {
 
 /** Un texte facultatif affiché avec un tiret quand il est vide (le null va jusqu'à l'UI, cours S5). */
 fun String?.ouTiret(): String = if (this.isNullOrBlank()) "—" else this
+
+/** "12.0" → "12", "12.5" → "12,5" : les points et notes s'affichent sans décimale inutile. */
+fun formatPoints(points: Double): String = if (points == points.toLong().toDouble()) points.toLong().toString() else points.toString().replace('.', ',')
