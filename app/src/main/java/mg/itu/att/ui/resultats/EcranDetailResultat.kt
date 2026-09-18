@@ -30,7 +30,13 @@ import mg.itu.att.ui.communs.TitreSection
  * (nouvelle ligne, l'ancienne reste lisible) et, en cas d'échec, les épreuves à repasser.
  */
 @Composable
-fun EcranDetailResultat(viewModel: ResultatsViewModel, resultatId: Int, onCorrige: (Int) -> Unit, onRetour: () -> Unit) {
+fun EcranDetailResultat(
+    viewModel: ResultatsViewModel,
+    resultatId: Int,
+    onImprimer: () -> Unit,
+    onCorrige: (Int) -> Unit,
+    onRetour: () -> Unit,
+) {
     viewModel.afficher(resultatId)
     val etat by viewModel.detail.collectAsState()
     val saisie by viewModel.saisie.collectAsState()
@@ -57,6 +63,8 @@ fun EcranDetailResultat(viewModel: ResultatsViewModel, resultatId: Int, onCorrig
                     LigneInfo("Calculé le", formatDate(r.dateCalcul))
                     r.dateValidation?.let { LigneInfo("Validé le", formatDate(it)) }
                     r.motifCorrection?.let { LigneInfo("Motif de correction", it) }
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(onClick = onImprimer) { Text("Imprimer le relevé") }
                 }
 
                 // Le détail du calcul : d'où vient la note affichée (barème, points, faute éliminatoire).

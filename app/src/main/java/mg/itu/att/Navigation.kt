@@ -55,6 +55,9 @@ import mg.itu.att.ui.appel.AppelViewModel
 import mg.itu.att.ui.appel.EcranAppel
 import mg.itu.att.ui.inscriptions.EcranInscriptions
 import mg.itu.att.ui.inscriptions.EcranMesInscriptions
+import mg.itu.att.ui.impression.EcranImpression
+import mg.itu.att.ui.impression.ImpressionViewModel
+import mg.itu.att.ui.impression.TypeDocument
 import mg.itu.att.ui.inscriptions.MesInscriptionsViewModel
 import mg.itu.att.ui.resultats.EcranDetailResultat
 import mg.itu.att.ui.resultats.EcranResultats
@@ -124,12 +127,49 @@ fun AppNavigation() {
         graphHistorique(navController) { session }
 
         graphResultats(navController) { session }
+        graphImpression(navController) { session }
 
         // ---------- FONCTIONNALITÉS À VENIR ----------
         composable(Routes.A_VENIR) { entree ->
             EcranAVenir(entree.arguments?.getString("libelle") ?: "À venir", onRetour = { navController.popBackStack() })
         }
     }
+}
+
+// ---------- IMPRESSION (UC13, étape C13) ----------
+
+object RoutesImpression {
+    const val CONVOCATION = "impression/convocation/{inscriptionId}"
+    const val APPEL = "impression/appel/{sessionId}"
+    const val ADMIS = "impression/admis/{sessionId}"
+    const val RELEVE = "impression/releve/{resultatId}"
+    fun convocation(id: Int) = "impression/convocation/$id"
+    fun appel(id: Int) = "impression/appel/$id"
+    fun admis(id: Int) = "impression/admis/$id"
+    fun releve(id: Int) = "impression/releve/$id"
+}
+
+/**
+ * Les quatre documents imprimables : un seul écran d'aperçu, le type et l'identifiant viennent de la route.
+ * Le ViewModel vérifie les droits avant de construire la page (une auto-école n'imprime que ses candidats).
+ */
+private fun NavGraphBuilder.graphImpression(nav: NavHostController, session: () -> SessionUtilisateur?) {
+    val retour: () -> Unit = { nav.popBackStack() }
+
+    fun NavGraphBuilder.document(route: String, argument: String, type: TypeDocument) {
+        composable(route) { entree ->
+            val s = session() ?: return@composable
+            val vm: ImpressionViewModel = viewModel()
+            vm.definirSession(s)
+            val id = entree.idArgument(argument) ?: return@composable
+            EcranImpression(vm, type, id, onRetour = retour)
+        }
+    }
+
+    document(RoutesImpression.CONVOCATION, "inscriptionId", TypeDocument.CONVOCATION)
+    document(RoutesImpression.APPEL, "sessionId", TypeDocument.LISTE_APPEL)
+    document(RoutesImpression.ADMIS, "sessionId", TypeDocument.LISTE_ADMIS)
+    document(RoutesImpression.RELEVE, "resultatId", TypeDocument.RELEVE)
 }
 
 // ---------- RÉSULTATS (UC10, UC11, UC12, étape C11) ----------
@@ -156,6 +196,7 @@ private fun NavGraphBuilder.graphResultats(nav: NavHostController, session: () -
         val id = entree.idArgument("resultatId") ?: return@composable
         EcranDetailResultat(
             vm, id,
+            onImprimer = { nav.navigate(RoutesImpression.releve(id)) },
             // Une correction crée un nouveau résultat : on l'ouvre à la place de l'ancien.
             onCorrige = { nouveau -> nav.navigate(RoutesResultats.detail(nouveau)) { popUpTo(RoutesResultats.LISTE) } },
             onRetour = retour,
@@ -273,14 +314,22 @@ private fun NavGraphBuilder.graphSessions(nav: NavHostController, session: () ->
     composable(RoutesSessions.DETAIL) { entree ->
         val v = vm() ?: return@composable
         val id = entree.idArgument("sessionId") ?: return@composable
-        EcranDetailSession(v, id, onInscrire = { nav.navigate(RoutesSessions.inscrire(id)) }, onAppel = { nav.navigate(RoutesSessions.appel(id)) }, onTentatives = { nav.navigate(RoutesSessions.tentatives(id)) }, onRetour = retour)
+        EcranDetailSession(
+            v, id,
+            onInscrire = { nav.navigate(RoutesSessions.inscrire(id)) },
+            onAppel = { nav.navigate(RoutesSessions.appel(id)) },
+            onTentatives = { nav.navigate(RoutesSessions.tentatives(id)) },
+            onImprimerAppel = { nav.navigate(RoutesImpression.appel(id)) },
+            onImprimerAdmis = { nav.navigate(RoutesImpression.admis(id)) },
+            onRetour = retour,
+        )
     }
     composable(RoutesSessions.INSCRIRE) { entree ->
         val s = session() ?: return@composable
         val id = entree.idArgument("sessionId") ?: return@composable
         val v: InscriptionsViewModel = viewModel()
         v.definirSession(s)
-        EcranInscriptions(v, id, onRetour = retour)
+        EcranInscriptions(v, id, onImprimerConvocation = { nav.navigate(RoutesImpression.convocation(it)) }, onRetour = retour)
     }
     composable(RoutesSessions.APPEL) { entree ->
         val s = session() ?: return@composable
@@ -536,7 +585,12 @@ private fun NavGraphBuilder.graphCandidats(nav: NavHostController, session: () -
         val s = session() ?: return@composable
         val vm: MesInscriptionsViewModel = viewModel()
         vm.definirSession(s)
-        EcranMesInscriptions(vm, onOuvrirCandidat = { nav.navigate(RoutesCandidats.LISTE); nav.navigate(RoutesCandidats.detail(it)) }, onRetour = retour)
+        EcranMesInscriptions(
+            vm,
+            onOuvrirCandidat = { nav.navigate(RoutesCandidats.LISTE); nav.navigate(RoutesCandidats.detail(it)) },
+            onImprimerConvocation = { nav.navigate(RoutesImpression.convocation(it)) },
+            onRetour = retour,
+        )
     }
     composable(RoutesCandidats.MODIFIER) { entree ->
         val vm = viewModelDuSousParcours<CandidatsViewModel>(nav, RoutesCandidats.LISTE, session()) ?: return@composable

@@ -55,7 +55,7 @@ fun PastilleInscription(statut: StatutInscription) {
  * puis la recherche d'un candidat éligible à inscrire. L'auto-école ne voit que ses candidats.
  */
 @Composable
-fun EcranInscriptions(viewModel: InscriptionsViewModel, sessionId: Int, onRetour: () -> Unit) {
+fun EcranInscriptions(viewModel: InscriptionsViewModel, sessionId: Int, onImprimerConvocation: (Int) -> Unit, onRetour: () -> Unit) {
     viewModel.afficher(sessionId)
     val e by viewModel.etat.collectAsState()
 
@@ -83,6 +83,7 @@ fun EcranInscriptions(viewModel: InscriptionsViewModel, sessionId: Int, onRetour
                                 if (i.statut == StatutInscription.DEMANDE) TextButton(onClick = { viewModel.confirmer(i.id) }) { Text("Confirmer") }
                                 TextButton(onClick = { viewModel.reporter(i.id) }) { Text("Reporter") }
                                 TextButton(onClick = { viewModel.annuler(i.id) }) { Text("Annuler") }
+                                TextButton(onClick = { onImprimerConvocation(i.id) }) { Text("Convocation") }
                             }
                         }
                     }

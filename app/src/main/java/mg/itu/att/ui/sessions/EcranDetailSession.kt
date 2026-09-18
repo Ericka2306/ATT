@@ -28,7 +28,16 @@ import mg.itu.att.ui.communs.TitreSection
 
 /** Fiche d'une session (UC06) : informations, créneaux et leur remplissage, changement de statut, historique. */
 @Composable
-fun EcranDetailSession(viewModel: SessionsViewModel, sessionId: Int, onInscrire: () -> Unit, onAppel: () -> Unit, onTentatives: () -> Unit, onRetour: () -> Unit) {
+fun EcranDetailSession(
+    viewModel: SessionsViewModel,
+    sessionId: Int,
+    onInscrire: () -> Unit,
+    onAppel: () -> Unit,
+    onTentatives: () -> Unit,
+    onImprimerAppel: () -> Unit,
+    onImprimerAdmis: () -> Unit,
+    onRetour: () -> Unit,
+) {
     viewModel.afficherDetail(sessionId)
     val etat by viewModel.detail.collectAsState()
     val l = etat.ligne
@@ -48,6 +57,7 @@ fun EcranDetailSession(viewModel: SessionsViewModel, sessionId: Int, onInscrire:
                     LigneInfo("Créneaux", "${etat.creneaux.size} × ${s.dureeCreneauMin} min, marge ${s.margeMin} min")
                 }
                 Spacer(Modifier.height(12.dp))
+                // Une seule Row déborderait de l'écran : on répartit les actions sur plusieurs lignes.
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     // Les inscriptions sont consultables par tous les rôles autorisés ; les actions de statut restent à l'ATT.
                     if (s.statut != StatutSession.PLANIFIEE) OutlinedButton(onClick = onInscrire) { Text("Inscriptions") }
@@ -55,7 +65,14 @@ fun EcranDetailSession(viewModel: SessionsViewModel, sessionId: Int, onInscrire:
                         OutlinedButton(onClick = onAppel) { Text("Appel") }
                         OutlinedButton(onClick = onTentatives) { Text("Passages") }
                     }
-                    if (etat.peutGerer) {
+                }
+                if (etat.peutGerer) {
+                    // Documents imprimables de la session (UC13) : la liste d'appel avant, les admis après.
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(onClick = onImprimerAppel) { Text("Liste d'appel") }
+                        OutlinedButton(onClick = onImprimerAdmis) { Text("Liste des admis") }
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         when (s.statut) {
                             StatutSession.PLANIFIEE -> Button(onClick = { viewModel.changerStatut(s.id, StatutSession.OUVERTE) }) { Text("Ouvrir aux inscriptions") }
                             StatutSession.OUVERTE, StatutSession.COMPLETE -> Button(onClick = { viewModel.changerStatut(s.id, StatutSession.EN_COURS) }) { Text("Démarrer") }
