@@ -154,7 +154,7 @@ function nombreTests() {
   const dossier = path.join(RACINE_PROJET, "app", "build", "test-results", "testDebugUnitTest");
   if (!fs.existsSync(dossier)) return "plus de cent";
   let total = 0;
-  for (const f of fs.readdirSync(dossier)) if (f.endsWith(".xml")) { const m = fs.readFileSync(path.join(dossier, f), "utf8").match(/tests="(\d+)"/); if (m) total += Number(m[1]); }
+  for (const f of fs.readdirSync(dossier)) if (f.endsWith(".xml") && !f.includes("Example")) { const m = fs.readFileSync(path.join(dossier, f), "utf8").match(/tests="(\d+)"/); if (m) total += Number(m[1]); }
   return total || "plus de cent";
 }
 
@@ -261,7 +261,7 @@ function objectifs() {
     espace(),
     titre2("3.3 Contraintes imposées"),
     ...puces(
-      "Application Android native, hors ligne, base locale : aucune dépendance à un serveur.",
+      "Application Android native, base locale : aucun serveur n'est nécessaire pour fonctionner.",
       "Technologies du cours uniquement : Kotlin, Jetpack Compose, Navigation Compose, ViewModel et StateFlow, Room, coroutines.",
       "Aucune règle administrative inventée : toute valeur inconnue est une configuration marquée « à confirmer ».",
       "Une tentative ou un résultat ne s'écrase jamais : toute correction crée une nouvelle ligne tracée.",
@@ -508,7 +508,7 @@ function qualite() {
     ...puces(...classesDeTest()),
     ...paras(
       "Trois exemples de ce qu'elles vérifient : CalculResultatTest, la note rapportée au barème, le seuil atteint ou non, la faute éliminatoire ; ReglesInscriptionTest, les refus de la section 6.9 (dossier non validé, session complète, double inscription, même jour, délai de repassage, théorie non réussie) ; ReglesTheorieTest, un sujet tiré avec une graine fixe qui totalise la note maximale sans doublon.",
-      "Ce que ces tests couvrent, et ce qu'ils ne couvrent pas : ils portent sur les règles pures de metier/ et sur le hachage des mots de passe. Les ViewModels, les DAO et les écrans ne sont pas testés automatiquement : les requêtes des DAO reposent sur la vérification du SQL à la compilation par Room, et les écrans ont été vérifiés à la main sur l'émulateur, avec un script (outils/pilote_emulateur.sh) qui enchaîne les actions par le texte des boutons et rejoue chaque scénario à l'identique ; les dix contraintes du cadrage ont chacune leur scénario dans docs/COMPTES_RENDUS.md. Les tests unitaires ne font pas partie du programme de ce module ; nous les avons introduits parce qu'ils sont le seul moyen de prouver un calcul de barème sans téléphone.",
+      "Ce que ces tests couvrent, et ce qu'ils ne couvrent pas : ils portent sur les règles pures de metier/, sur le hachage des mots de passe et sur le menu par rôle (MenuParRoleTest). Les ViewModels, les DAO et les écrans ne sont pas testés automatiquement : les requêtes des DAO reposent sur la vérification du SQL à la compilation par Room, et les écrans ont été vérifiés à la main sur l'émulateur, avec un script (outils/pilote_emulateur.sh) qui enchaîne les actions par le texte des boutons et rejoue chaque scénario à l'identique ; les dix contraintes du cadrage ont chacune leur scénario dans docs/COMPTES_RENDUS.md. Les tests unitaires ne font pas partie du programme de ce module ; nous les avons introduits parce qu'ils sont le seul moyen de prouver un calcul de barème sans téléphone.",
       "Un exemple de défaut trouvé par un test avant l'écran : le tirage du sujet, dans une première version, pouvait dépasser la note maximale quand la dernière question ne tenait plus ; le test « tirage atteint la note max sans la dépasser ni répéter » l'a montré, et la boucle a été corrigée.",
     ),
     titre2("9.2 Cas particuliers du cadrage"),
@@ -539,7 +539,7 @@ function usageIA() {
     ...paras(
       "Le module s'intitule « assistée par IA » : ce chapitre dit ce que nous avons fait avec l'IA, ce qu'elle a fait de bien et de mal, et ce que nous avons refusé.",
       "L'outil : Claude Code, un agent de développement qui lit et écrit les fichiers du projet, lance la construction et les tests, et pilote l'émulateur. Il a été utilisé au niveau « agent » décrit dans l'état de l'art du module, avec un fichier de règles à la racine du dépôt (CLAUDE.md) qui lui impose les technologies du cours, l'interdiction d'inventer une règle administrative, la traçabilité, et un cycle de fin d'étape : construction et tests verts, vérification sur émulateur, compte rendu, entrée dans le journal, puis relecture humaine avant tout commit.",
-      "La proportion : l'IA a produit la majorité du code de chaque étape à partir de nos documents de cadrage (règles, plan, modèle de données, cas d'utilisation), que nous avons écrits et validés avant la première ligne. Nous avons relu chaque fichier dans la demande de fusion (pull request) de l'étape avant fusion, et rejoué chaque scénario sur l'émulateur. Le journal du dépôt (JOURNAL-IA.md) consigne pour chaque étape ce qui a été soumis, la remarque principale de l'IA, les points d'alerte, et notre verdict.",
+      "La proportion : l'IA a produit la majorité du code de chaque étape à partir de nos documents de cadrage (règles, plan, modèle de données, cas d'utilisation), que nous avons écrits et validés avant la première ligne. Nous avons relu chaque fichier dans la demande de fusion (pull request) de l'étape avant de la fusionner, et rejoué chaque scénario sur l'émulateur. Le journal du dépôt (JOURNAL-IA.md) consigne pour chaque étape ce qui a été soumis, la remarque principale de l'IA, les points d'alerte, et notre verdict.",
     ),
     titre2("10.1 Ce que nous avons refusé ou corrigé"),
     ...puces(
@@ -605,7 +605,7 @@ function coursAppliques() {
       ["4 — Jetpack Compose", "L'interface est une fonction de l'état ; @Composable, Column, Row, Card, LazyColumn, Modifier, remember pour l'état purement local", "Tous les écrans sont des composables qui affichent un état et signalent des gestes ; les listes sont des LazyColumn ; l'ouverture d'un menu déroulant est le principal état local (remember), tout le reste vit dans les ViewModels ; un jeu de composants communs (cadre d'écran, champs, cartes, encarts) évite la répétition"],
       ["5 — Navigation", "Navigation Compose, routes en chaînes, identifiant en argument, écrans qui reçoivent des lambdas", "Un NavHost, des routes comme session/{sessionId}/appel, l'identifiant relu par toIntOrNull sans plantage ; aucun écran ne connaît le navController : l'écran signale, la navigation décide"],
       ["6 — Architecture MVVM", "UI, ViewModel, source de données ; StateFlow et flux unidirectionnel garanti par les types ; ViewModel partagé", "Architecture MVVM du cours : un ViewModel par fonctionnalité, un StateFlow d'état immuable par écran, MutableStateFlow privé ; ViewModel de connexion (la session utilisateur) partagé au-dessus de la navigation, ViewModels partagés entre la liste, la fiche et le formulaire d'un même sous-parcours"],
-      ["7 — Room et hors ligne d'abord", "Entity, DAO, Database, Flow ou suspend, SQL vérifié à la compilation, combine et stateIn, base locale source de vérité, synchronisation avec drapeau", "Vingt-quatre entités avec clés étrangères et index, requêtes Flow combinées par combine puis stateIn ; la base locale est la seule source ; les résultats validés portent un drapeau synchronisee et sont remontés au serveur central par une file d'attente, sur le modèle de la démonstration du cours (différences en 7.5)"],
+      ["7 — Room et hors ligne d'abord", "Entity, DAO, Database, Flow ou suspend, SQL vérifié à la compilation, combine et stateIn, base locale source de vérité, synchronisation avec drapeau", `${nombreEntites()} entités avec clés étrangères et index, requêtes Flow combinées par combine puis stateIn ; la base locale est la seule source ; les résultats validés portent un drapeau synchronisee et sont remontés au serveur central par une file d'attente, sur le modèle de la démonstration du cours (différences en 7.5)`],
       ["8 — Synthèse", "Une application, sept couches", "Le projet parcourt les sept couches, du langage aux données, avec une étape du plan par couche puis par fonctionnalité"],
     ], [17, 33, 50]),
     espace(),
@@ -680,6 +680,7 @@ function annexes() {
     tableau(["Figure", "Écran", "Fichier"], FIGURES.map((f) => [String(f.numero), f.legende, f.fichier]), [12, 50, 38]),
     titre1("Annexe B — Extraits de code commentés"),
     titre2("B.1 Écriture et historique dans une même transaction"),
+    ...paras("Extrait simplifié de AppelViewModel (la version réelle vérifie d'abord le statut de la session et de la présence)."),
     ...bloc([
       "db.withTransaction {",
       "    val modifiee = presence.copy(statut = StatutPresence.PRESENT)",
@@ -783,7 +784,7 @@ function annexes() {
     ], [30, 70]),
     espace(),
     titre1("Annexe E — Comptes de démonstration"),
-    ...paras("Comptes disponibles au premier lancement d'une version de développement, rappelés sur l'écran de connexion avec un bouton par rôle ; les trois derniers n'existent pas dans la version livrée, et les deux premiers y ont un mot de passe initial à changer dès la première connexion."),
+    ...paras("Comptes disponibles au premier lancement d'une version de développement, rappelés sur l'écran de connexion avec un bouton par rôle ; les trois derniers n'existent pas dans la version livrée, et les deux premiers y ont un mot de passe initial documenté, qu'il faut changer soi-même : l'application ne l'impose pas encore (13.1)."),
     tableau(["Rôle", "Identifiant", "Mot de passe initial"], [
       ["Super administrateur", "superadmin", "ChangezMoi2026"], ["Administrateur ATT", "admin", "admin2026"], ["Auto-école", "autoecole", "autoecole2026"], ["Examinateur", "examinateur", "examinateur2026"], ["Candidat", "candidat", "candidat2026"],
     ], [34, 30, 36]),
@@ -791,7 +792,7 @@ function annexes() {
     titre1("Annexe F — Questions à valider avec l'ATT"),
     ...paras("Aucune de ces règles n'a été inventée : chacune a une valeur par défaut « à confirmer », modifiable dans l'application, et une question à poser à l'ATT."),
     tableau(["Question", "Ce que nous avons retenu en attendant"], [
-      ["Q1 — Épreuve théorique : note maximale, seuil, notation", "Orale (témoignage) ; questions à points variables ; barème d'exemple 20 / 12"],
+      ["Q1 — Épreuve théorique : note maximale, seuil, notation", "Orale (témoignage) ; questions à points variables ; barème d'exemple 30 / 20 dans les données initiales, remplacé par une version 2 à 20 / 12 pendant la démonstration (figure de 6.2)"],
       ["Q1 bis — Choix des questions", "Tirage au sort par l'application, ou choix de l'examinateur (règle MODE_THEORIE)"],
       ["Q2 — Épreuve de conduite : grille", "Aucune grille préchargée ; critères, points et fautes éliminatoires configurables"],
       ["Q2 bis — Sujet ou grille qui ne totalise pas la note maximale", "Note rapportée au barème (règle de trois)"],
