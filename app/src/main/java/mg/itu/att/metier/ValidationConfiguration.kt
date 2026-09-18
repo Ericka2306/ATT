@@ -26,8 +26,8 @@ object ValidationConfiguration {
     }
 
     fun validerBareme(noteMax: String, seuil: String): String? {
-        val max = noteMax.toDoubleOrNull()
-        val s = seuil.toDoubleOrNull()
+        val max = nombreSaisi(noteMax)
+        val s = nombreSaisi(seuil)
         return when {
             max == null || max <= 0 -> "La note maximale doit être un nombre positif."
             s == null || s < 0 -> "Le seuil doit être un nombre positif ou nul."
@@ -39,22 +39,21 @@ object ValidationConfiguration {
     /** La valeur saisie doit respecter le type de la règle. */
     fun validerRegle(valeur: String, type: TypeValeur): String? = when (type) {
         TypeValeur.ENTIER -> if (valeur.trim().toIntOrNull() == null) "La valeur doit être un entier." else null
-        TypeValeur.DECIMAL -> if (valeur.trim().toDoubleOrNull() == null) "La valeur doit être un nombre." else null
+        TypeValeur.DECIMAL -> if (nombreSaisi(valeur) == null) "La valeur doit être un nombre." else null
         TypeValeur.BOOLEEN -> if (valeur.trim().lowercase() !in listOf("true", "false")) "La valeur doit être true ou false." else null
         TypeValeur.TEXTE -> if (valeur.isBlank()) "La valeur ne peut pas être vide." else null
     }
 
-    /** Une question a un énoncé, des points positifs, au moins deux réponses non vides et exactement une bonne. */
     /** Question orale : un énoncé et des points ; la réponse attendue est facultative. */
     fun validerQuestion(enonce: String, points: String): String? = when {
         enonce.isBlank() -> "L'énoncé est obligatoire."
-        (points.replace(',', '.').toDoubleOrNull() ?: 0.0) <= 0 -> "Les points doivent être un nombre positif."
+        (nombreSaisi(points) ?: 0.0) <= 0 -> "Les points doivent être un nombre positif."
         else -> null
     }
 
     fun validerCritere(libelle: String, points: String): String? = when {
         libelle.isBlank() -> "Le libellé est obligatoire."
-        (points.toDoubleOrNull() ?: -1.0) < 0 -> "Les points doivent être un nombre positif ou nul."
+        (nombreSaisi(points) ?: -1.0) < 0 -> "Les points doivent être un nombre positif ou nul."
         else -> null
     }
 

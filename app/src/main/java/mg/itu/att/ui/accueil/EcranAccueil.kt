@@ -19,7 +19,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
@@ -123,7 +123,7 @@ fun iconePour(route: String): ImageVector = when (route) {
     Routes.MOT_DE_PASSE -> Icons.Filled.Lock
     Routes.AUTO_ECOLES -> Icons.Filled.Place
     Routes.CANDIDATS -> Icons.Filled.Person
-    Routes.DOSSIERS -> Icons.Filled.List
+    Routes.DOSSIERS -> Icons.AutoMirrored.Filled.List
     Routes.SESSIONS -> Icons.Filled.DateRange
     Routes.EVALUATION -> Icons.Filled.Build
     Routes.RESULTATS -> Icons.Filled.Done

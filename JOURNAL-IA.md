@@ -269,7 +269,22 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 19 — <date> — <tâche>
+## Entrée 19 — 18/09/2026 — Étape D2, relecture croisée et qualité (dev 2)
+
+- Code soumis : tout le code des étapes C1 à C10, relu à la recherche de défauts précis (frappe perdue, règles absolues, permissions, boutons hors d'atteinte), puis les corrections qui en découlent.
+- Remarque principale de l'IA : demander une relecture **ciblée** — quatre familles de défauts nommées, avec l'obligation de suivre chaque piste jusqu'au DAO avant de l'affirmer — donne un rapport utilisable, là où « relis ce code » produit des généralités. Le rapport distingue d'ailleurs ce qui est confirmé de ce qui a été écarté après vérification, et cette seconde liste évite de rechercher deux fois la même chose.
+
+⚠️ Le défaut le plus grave n'était pas visible à l'usage : la route de l'épreuve lisait `v.epreuve.value…` au moment de composer l'écran, donc **avant** que l'épreuve ne soit chargée, et « Modifier » enregistrait une catégorie vide. Lire un `StateFlow` avec `.value` dans une lambda de navigation ne recompose rien : la valeur reste celle du départ. À retenir pour toutes les routes.
+
+⚠️ J'ai vérifié la correction des champs de recherche au lieu de la croire : le texte reste intact jusqu'à 16 caractères par seconde, mais une rafale d'`adb input text` le tronque encore. La correction améliore donc sans tout supprimer — c'est la recomposition de la liste qui coûte. Écrit tel quel dans le compte rendu plutôt que « défaut corrigé ».
+
+⚠️ L'IA n'a pas trouvé seule l'ordre de la démonstration : c'est en la rejouant qu'est apparu qu'une épreuve théorique sans question configurée ne peut pas s'ouvrir, et que l'écran affichait alors « épreuve close », ce qui est faux. Le déroulé du `LISEZMOI` met donc la configuration des questions avant tout le reste.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 2>.
+
+---
+
+## Entrée 20 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :

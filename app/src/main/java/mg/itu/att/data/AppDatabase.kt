@@ -9,9 +9,13 @@ import androidx.room.RoomDatabase
  * La base locale de l'application : la source de vérité (cours S7, offline-first).
  * Singleton obtenu par [obtenir], comme `AppDatabase.obtenir(context)` dans listedetailv3.
  *
- * Pendant le développement, `fallbackToDestructiveMigration` repart d'une base neuve
- * à chaque changement de schéma ; `version` est incrémentée à chaque modification d'entité
- * et le schéma sera figé avant la soutenance (docs/01 §7).
+ * **Schéma figé le 18/09/2026 (étape D2) : version 3, définitive.** Aucune entité ne change plus.
+ * `exportSchema = true` écrit le schéma complet dans `app/schemas/` : c'est le schéma de référence,
+ * versionné avec le code et lisible sans ouvrir la base.
+ *
+ * `fallbackToDestructiveMigration` reste en place : si le schéma changeait encore, l'application
+ * repartirait d'une base neuve plutôt que de planter. Il n'y a pas de migration à écrire puisqu'aucune
+ * donnée réelle n'est encore en service (docs/01 §7).
  */
 @Database(
     entities = [
@@ -30,8 +34,9 @@ import androidx.room.RoomDatabase
         Historique::class,
     ],
     // v2 (16/09/2026, étape C7) : l'index unique (candidatId, sessionId) des inscriptions devient un index simple.
+    // v3 (17/09/2026, étape C11) : résultats corrigés (`remplaceResultatId`, motif de correction).
     version = 3,
-    exportSchema = false,
+    exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
 

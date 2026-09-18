@@ -51,6 +51,20 @@ class ReglesConsultationTest {
     }
 
     @Test
+    fun `la configuration est reservee au Super Admin, les comptes a l ATT`() {
+        assertTrue(ReglesConsultation.peutConfigurer(Role.SUPER_ADMIN))
+        for (role in listOf(Role.ADMIN_ATT, Role.AUTO_ECOLE, Role.EXAMINATEUR, Role.CANDIDAT)) {
+            assertFalse("l'Admin ATT et les autres ne font que lire les référentiels", ReglesConsultation.peutConfigurer(role))
+        }
+        for (role in listOf(Role.SUPER_ADMIN, Role.ADMIN_ATT)) {
+            assertTrue(ReglesConsultation.peutGererComptes(role))
+        }
+        for (role in listOf(Role.AUTO_ECOLE, Role.EXAMINATEUR, Role.CANDIDAT)) {
+            assertFalse(ReglesConsultation.peutGererComptes(role))
+        }
+    }
+
+    @Test
     fun `a venir et libelle de session`() {
         assertTrue(ReglesConsultation.estAVenir("2026-09-17", "2026-09-17"))
         assertTrue(ReglesConsultation.estAVenir("2026-10-01", "2026-09-17"))

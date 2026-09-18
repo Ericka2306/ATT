@@ -20,6 +20,7 @@ import mg.itu.att.data.Role
 import mg.itu.att.data.Utilisateur
 import mg.itu.att.data.resume
 import mg.itu.att.data.tracer
+import mg.itu.att.metier.ReglesConsultation
 import mg.itu.att.metier.ValidationCompte
 import mg.itu.att.securite.MotDePasse
 import mg.itu.att.ui.communs.ViewModelAvecSession
@@ -87,6 +88,9 @@ class ComptesViewModel(application: Application) : AndroidViewModel(application)
         if (this.session.value != session) this.session.value = session
     }
 
+    /** L'auteur d'une écriture sur les examinateurs et leurs comptes, ou null si le rôle ne le permet pas (R12). */
+    private fun auteurAutorise(): SessionUtilisateur? = session.value?.takeIf { ReglesConsultation.peutGererComptes(it.role) }
+
     // ----- Examinateurs -----
 
     val examinateurs: StateFlow<EtatExaminateurs> =
@@ -128,7 +132,7 @@ class ComptesViewModel(application: Application) : AndroidViewModel(application)
     /** Crée l'examinateur ET son compte dans une seule transaction, ou modifie la fiche ; historique dans les deux cas. */
     fun enregistrerExaminateur(onSucces: () -> Unit) {
         val f = _formulaireExaminateur.value
-        val utilisateur = session.value ?: return
+        val utilisateur = auteurAutorise() ?: return
         viewModelScope.launch {
             if (f.nom.isBlank()) {
                 _formulaireExaminateur.update { it.copy(erreur = "Le nom est obligatoire.") }
@@ -166,7 +170,7 @@ class ComptesViewModel(application: Application) : AndroidViewModel(application)
 
     /** Désactive ou réactive un examinateur et son compte, avec historique. */
     fun basculerExaminateur(examinateurId: Int) {
-        val utilisateur = session.value ?: return
+        val utilisateur = auteurAutorise() ?: return
         viewModelScope.launch {
             db.withTransaction {
                 val actuel = db.examinateurDao().parId(examinateurId) ?: return@withTransaction

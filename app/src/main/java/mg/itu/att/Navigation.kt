@@ -435,10 +435,11 @@ private fun NavGraphBuilder.graphConfiguration(nav: NavHostController, session: 
     composable(RoutesConfiguration.EPREUVE) { entree ->
         val v = vm() ?: return@composable
         val id = entree.idArgument("epreuveId") ?: return@composable
-        val categorieId = v.epreuve.value.epreuve?.categorieId ?: 0
         EcranEpreuve(
             v, id,
-            onModifier = { nav.navigate(RoutesConfiguration.modifierEpreuve(id, categorieId)) },
+            // La catégorie vient de l'épreuve affichée : la lire ici dans le flux donnerait 0
+            // tant que l'épreuve n'est pas chargée.
+            onModifier = { categorieId -> nav.navigate(RoutesConfiguration.modifierEpreuve(id, categorieId)) },
             onNouveauBareme = { nav.navigate(RoutesConfiguration.bareme(id)) },
             onNouvelleQuestion = { nav.navigate(RoutesConfiguration.question(id)) },
             onNouveauCritere = { nav.navigate(RoutesConfiguration.critere(id)) },

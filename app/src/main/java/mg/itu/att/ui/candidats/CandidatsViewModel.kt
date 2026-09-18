@@ -147,12 +147,21 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
         autoEcoleFiltre.value = session.autoEcoleId
     }
 
+    /** L'auteur d'une écriture sur un candidat ou son dossier, ou null si le rôle ne le permet pas (R12). */
+    private fun gestionnaireCandidat(): SessionUtilisateur? = session.value?.takeIf { ReglesConsultation.peutGererCandidat(it.role) }
+
     private fun estAtt(s: SessionUtilisateur?) = s?.role == Role.ADMIN_ATT || s?.role == Role.SUPER_ADMIN
 
     // ----- Liste -----
 
     private val autoEcoleFiltre = MutableStateFlow<Int?>(null)
     private val recherche = MutableStateFlow("")
+
+    /**
+     * Le texte cherché, lu directement par le champ : le passer par le flux de la liste, qui refiltre
+     * tous les candidats à chaque émission, ferait sauter des caractères à la frappe.
+     */
+    val texteRecherche: StateFlow<String> = recherche
 
     /** Les candidats visibles par l'utilisateur connecté (règle §7), avant filtres d'écran. */
     private val candidatsVisibles = session.flatMapLatest { s ->
@@ -226,7 +235,7 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
     /** Crée ou modifie le candidat, avec historique, puis appelle [onSucces] avec son id. */
     fun enregistrer(onSucces: (Int) -> Unit) {
         val f = _formulaire.value
-        val utilisateur = session.value ?: return
+        val utilisateur = gestionnaireCandidat() ?: return
         viewModelScope.launch {
             val erreur = ValidationCandidat.validerFiche(f.nom, f.prenom, f.dateNaissance, f.autoEcoleId)
             val autoEcoleId = f.autoEcoleId
@@ -388,7 +397,7 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
 
     /** Ouvre un dossier BROUILLON pour la catégorie choisie, avec ses pièces attendues, puis appelle [onSucces] avec son id. */
     fun ouvrirDossier(candidatId: Int, onSucces: (Int) -> Unit) {
-        val utilisateur = session.value ?: return
+        val utilisateur = gestionnaireCandidat() ?: return
         val categorieId = categorieChoisie.value
         if (categorieId == null) {
             erreurDetail.value = "Choisissez la catégorie du permis."
@@ -457,12 +466,13 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
 
     /** Coche ou décoche une pièce fournie. */
     fun cocherPiece(piece: PieceDossier, fournie: Boolean) {
+        gestionnaireCandidat() ?: return
         viewModelScope.launch { db.pieceDossierDao().modifier(piece.copy(fournie = fournie)) }
     }
 
     /** Soumet le dossier à l'ATT après contrôle d'éligibilité (âge minimum de la catégorie, valeur configurée). */
     fun soumettre(dossierId: Int) {
-        val utilisateur = session.value ?: return
+        val utilisateur = gestionnaireCandidat() ?: return
         viewModelScope.launch {
             val d = db.dossierDao().parId(dossierId) ?: return@launch
             val candidat = db.candidatDao().parId(d.candidatId) ?: return@launch

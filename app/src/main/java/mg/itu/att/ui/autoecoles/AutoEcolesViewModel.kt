@@ -23,6 +23,7 @@ import mg.itu.att.data.Role
 import mg.itu.att.data.Utilisateur
 import mg.itu.att.data.resume
 import mg.itu.att.data.tracer
+import mg.itu.att.metier.ReglesConsultation
 import mg.itu.att.metier.ValidationAutoEcole
 import mg.itu.att.securite.MotDePasse
 import mg.itu.att.ui.communs.ViewModelAvecSession
@@ -84,6 +85,12 @@ class AutoEcolesViewModel(application: Application) : AndroidViewModel(applicati
         regionFiltre.value = session.regionId
     }
 
+    /**
+     * L'auteur d'une écriture, ou null si le rôle connecté n'a pas le droit de gérer les auto-écoles
+     * et leurs comptes (règle R12 : vérifié dans le ViewModel, pas seulement dans le menu).
+     */
+    private fun auteurAutorise(): SessionUtilisateur? = session?.takeIf { ReglesConsultation.peutGererComptes(it.role) }
+
     // ----- Liste -----
 
     private val regionFiltre = MutableStateFlow<Int?>(null)
@@ -138,7 +145,7 @@ class AutoEcolesViewModel(application: Application) : AndroidViewModel(applicati
     /** Crée ou modifie l'auto-école, avec sa ligne d'historique, puis appelle [onSucces] avec son id. */
     fun enregistrer(onSucces: (Int) -> Unit) {
         val f = _formulaire.value
-        val utilisateur = session ?: return
+        val utilisateur = auteurAutorise() ?: return
         viewModelScope.launch {
             val regionId = f.regionId
             val nomsExistants = if (regionId != null) db.autoEcoleDao().nomsDansRegion(regionId, f.id) else emptyList()
@@ -205,7 +212,7 @@ class AutoEcolesViewModel(application: Application) : AndroidViewModel(applicati
 
     /** Désactive ou réactive l'auto-école (jamais de suppression), avec historique. */
     fun basculerActif(autoEcoleId: Int) {
-        val utilisateur = session ?: return
+        val utilisateur = auteurAutorise() ?: return
         viewModelScope.launch {
             db.withTransaction {
                 val actuelle = db.autoEcoleDao().parId(autoEcoleId) ?: return@withTransaction
@@ -231,7 +238,7 @@ class AutoEcolesViewModel(application: Application) : AndroidViewModel(applicati
     /** Crée le compte AUTO_ECOLE lié, mot de passe haché, avec historique, puis appelle [onSucces]. */
     fun creerCompte(autoEcoleId: Int, onSucces: () -> Unit) {
         val c = _compte.value
-        val utilisateur = session ?: return
+        val utilisateur = auteurAutorise() ?: return
         viewModelScope.launch {
             val erreur = ValidationAutoEcole.validerCompte(c.identifiant, c.motDePasse, db.utilisateurDao().tousLesIdentifiants())
             val autoEcole = db.autoEcoleDao().parId(autoEcoleId)

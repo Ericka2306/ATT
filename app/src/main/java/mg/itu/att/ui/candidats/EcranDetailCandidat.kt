@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.MaterialTheme
@@ -70,7 +70,7 @@ fun EcranDetailCandidat(
             }
             items(etat.dossiers) { ligne ->
                 CarteIcone(
-                    icone = Icons.Filled.List,
+                    icone = Icons.AutoMirrored.Filled.List,
                     titre = "Permis ${ligne.codeCategorie} — dossier n° ${ligne.dossier.id}",
                     description = ligne.libelleCategorie + (ligne.dossier.motif?.let { " · $it" } ?: ""),
                     onClick = { onOuvrirDossier(ligne.dossier.id) },

@@ -35,13 +35,13 @@ import mg.itu.att.ui.communs.TitreSection
 @Composable
 fun EcranEpreuve(
     viewModel: ConfigurationViewModel, epreuveId: Int,
-    onModifier: () -> Unit, onNouveauBareme: () -> Unit, onNouvelleQuestion: () -> Unit, onNouveauCritere: () -> Unit, onRetour: () -> Unit,
+    onModifier: (categorieId: Int) -> Unit, onNouveauBareme: () -> Unit, onNouvelleQuestion: () -> Unit, onNouveauCritere: () -> Unit, onRetour: () -> Unit,
 ) {
     viewModel.afficherEpreuve(epreuveId)
     val etat by viewModel.epreuve.collectAsState()
     val e = etat.epreuve
 
-    EcranStandard(titre = e?.libelle ?: "Épreuve", onRetour = onRetour, iconeAction = Icons.Filled.Edit, descriptionAction = "Modifier", onAction = onModifier) {
+    EcranStandard(titre = e?.libelle ?: "Épreuve", onRetour = onRetour, iconeAction = Icons.Filled.Edit, descriptionAction = "Modifier", onAction = { e?.let { onModifier(it.categorieId) } }) {
         if (e == null) { Text("Épreuve introuvable."); return@EcranStandard }
         val courant = etat.baremes.firstOrNull { it.dateFinValidite == null }
         LazyColumn {

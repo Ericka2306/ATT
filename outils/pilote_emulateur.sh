@@ -16,6 +16,9 @@ FICHIER_UI="${TMPDIR:-/tmp}/att_ui.xml"
 
 # centre (x y) de l'élément dont le texte ou la description est $1 (exact d'abord, sinon contient)
 centre() {
+  # Le fichier est effacé avant chaque relevé : si le dump échoue (animation en cours),
+  # on doit s'en apercevoir au lieu de relire l'écran précédent.
+  $ADB shell rm -f /sdcard/ui.xml >/dev/null 2>&1
   $ADB shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1
   $ADB shell cat /sdcard/ui.xml > "$FICHIER_UI" 2>/dev/null
   python3 - "$1" "$FICHIER_UI" <<'EOF'
@@ -40,19 +43,25 @@ print("INTROUVABLE", file=sys.stderr); sys.exit(1)
 EOF
 }
 
+# Les gestes de défilement partent de la marge gauche (x = 60) : un glissement qui commence dans un
+# champ de texte est capté par le champ (sélection), et l'écran ne défile pas.
+descendre() { $ADB shell input swipe 60 1800 60 700 400; sleep 1.0; }
+monter()    { $ADB shell input swipe 60 700 60 1800 400; sleep 1.0; }
+
 # remonte en haut de l'écran
-haut() { $ADB shell input swipe 360 300 360 1100 300; sleep 0.8; $ADB shell input swipe 360 300 360 1100 300; sleep 0.8; }
+haut() { monter; monter; }
+
+# ferme le clavier (y compris le panneau de saisie vocale, qui recouvre le bas de l'écran)
+fermer_clavier() { $ADB shell input keyevent KEYCODE_BACK; sleep 1.2; }
 
 tap() {
   local c essai
   for essai in 1 2 3 4 5 6; do
     c=$(centre "$1" 2>/dev/null) && break
     if [ "$essai" -le 3 ]; then
-      # défilement vers le bas, depuis le haut : la zone basse peut être couverte par le clavier
-      $ADB shell input swipe 360 650 360 250 400; sleep 1.2
+      descendre
     else
-      # puis vers le haut
-      $ADB shell input swipe 360 300 360 900 400; sleep 1.2
+      monter
     fi
   done
   [ -z "$c" ] && { echo "!! introuvable : $1"; return 1; }
