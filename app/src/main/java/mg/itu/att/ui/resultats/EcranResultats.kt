@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -53,7 +53,7 @@ fun EcranResultats(viewModel: ResultatsViewModel, onOuvrir: (Int) -> Unit, onRet
             items(etat.lignes) { l ->
                 val r = l.resultat
                 CarteIcone(
-                    icone = Icons.Filled.List,
+                    icone = Icons.AutoMirrored.Filled.List,
                     titre = "${l.nomCandidat} — permis ${l.codeCategorie}, ${l.libelleEpreuve}",
                     description = "passage n° ${l.tentative?.numero ?: "?"} · ${r.noteLisible()} · ${formatDate(r.dateCalcul)}" +
                         (if (etat.peutValider) "\n${l.nomAutoEcole} · ${r.statut.libelle()}" else "\n${r.statut.libelle()}"),

@@ -26,6 +26,7 @@ fun EcranRegles(viewModel: ConfigurationViewModel, onOuvrir: (Int) -> Unit, onRe
     val regles by viewModel.regles.collectAsState()
     EcranStandard(titre = "Règles configurables", onRetour = onRetour) {
         EncartInfo("Le code lit ces valeurs au moment du calcul ; rien n'est codé en dur.")
+        if (regles.isEmpty()) Text("Aucune règle enregistrée.", style = MaterialTheme.typography.bodyLarge)
         LazyColumn {
             items(regles) { l ->
                 val r = l.regle

@@ -3,7 +3,7 @@ package mg.itu.att.ui.candidats
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,7 +26,7 @@ fun EcranDossiersATraiter(viewModel: CandidatsViewModel, onOuvrir: (Int) -> Unit
         LazyColumn {
             items(lignes) { l ->
                 CarteIcone(
-                    icone = Icons.Filled.List,
+                    icone = Icons.AutoMirrored.Filled.List,
                     titre = "${l.nomCandidat} — permis ${l.codeCategorie}",
                     description = "${l.nomAutoEcole} · soumis le ${l.dossier.dateSoumission?.let { formatDate(it) } ?: "?"}",
                     onClick = { onOuvrir(l.dossier.id) },

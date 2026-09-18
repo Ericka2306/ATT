@@ -28,6 +28,7 @@ fun EcranComptes(viewModel: ComptesViewModel, onNouvelAdmin: () -> Unit, onRetou
 
     EcranStandard(titre = "Comptes", onRetour = onRetour, iconeAction = Icons.Filled.Add, descriptionAction = "Nouvel administrateur ATT", onAction = onNouvelAdmin) {
         Text("${etat.comptes.size} compte(s). Les comptes auto-école et examinateur se créent depuis leurs fiches.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (etat.comptes.isEmpty()) Text("Aucun compte.", style = MaterialTheme.typography.bodyLarge)
         LazyColumn {
             items(etat.comptes) { ligne ->
                 val u = ligne.utilisateur
@@ -35,7 +36,7 @@ fun EcranComptes(viewModel: ComptesViewModel, onNouvelAdmin: () -> Unit, onRetou
                     icone = Icons.Filled.AccountCircle,
                     titre = u.identifiant + if (u.actif) "" else " (désactivé)",
                     description = "${u.nom} · ${u.role.libelle()} · ${ligne.nomRegion ?: "national"}",
-                    onClick = {},
+                    onClick = null,
                     couleurPastille = if (u.actif) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
                     couleurIcone = if (u.actif) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                     complement = if (u.id == etat.idCourant) null else {

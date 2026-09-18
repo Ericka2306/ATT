@@ -7,12 +7,12 @@
 
 | | |
 |---|---|
-| **Dernière étape terminée** | D1 (tests et cas particuliers : les 10 contraintes du cadrage §11) — 18/09/2026, en attente de relecture (branche `etape-D1-scenarios`) ; C13 fusionnée (PR #18) |
-| **Étape en cours** | D2a (design de l'interface) — dev 1 + Claude, branche `etape-D2a-design` depuis `main` (18/09/2026) ; le dev 2 continue D2/D3 côté qualité |
-| **Prochaine étape** | D2 (qualité, relecture croisée, schéma Room figé, LISEZMOI) — **les deux devs ensemble** |
-| **Qui fait quoi** | depuis le 17/09/2026, le dev 1 a livré jusqu'à C10 ; le dev 2 reprend C11, C12, C13 et D1, une pull request par étape du plan (comme les précédentes) |
-| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape D1 » |
-| **Dernier commit poussé** | `etape-C13-impression` — « Ajoute l'impression des convocations, listes et relevés (étape C13) », PR #18 fusionnée |
+| **Dernière étape terminée** | D2 (qualité : relecture croisée, 12 corrections, schéma figé, guide du code, démonstration rejouée) — 18/09/2026, en attente de relecture (branche `etape-D2-qualite`) ; D1 fusionnée (PR #19) |
+| **Étape en cours** | D2a (design de l'interface) — dev 1 + Claude, branche `etape-D2a-design` (18/09/2026) ; D2b (pièces jointes du dossier) à prendre par le dev 2 |
+| **Prochaine étape** | D2b pour le dev 2, puis D3 (soutenance : démonstration scriptée, répétée deux fois sans erreur) — le déroulé est écrit dans `LISEZMOI.md` |
+| **Qui fait quoi** | le dev 1 a livré jusqu'à C10 ; le dev 2 a repris C11, C12, C13, D1 et D2, une pull request par étape du plan |
+| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape D2 » |
+| **Dernier commit poussé** | `etape-D1-scenarios` — « Ajoute les tests des contraintes du cadrage et corrige la saisie des motifs (étape D1) », PR #19 fusionnée |
 
 Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une question à valider
 
@@ -61,7 +61,7 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 | D1 Tests et cas particuliers | JUnit sur `metier/` ; scénarios manuels des contraintes §11 (dossier refusé, non éligible, session complète, absence/retard/report/annulation, erreur de notation corrigée, échec + nouvelle tentative, examinateur indisponible, conflit de créneaux, candidat sans smartphone, procédure de secours = listes imprimées) | tableau de scénarios coché dans `docs/COMPTES_RENDUS.md` | 🟢 18/09/2026 (dev 2 ; 10 contraintes cochées, 119 tests verts, 3 défauts de saisie corrigés) |
 | D2a Design de l'interface | refonte visuelle pour mobile : thème (formes, typographie), composants communs (barre claire, champs, sélecteurs, cartes, pastilles, états vides), accueil en grille, connexion ; puis retouches écran par écran | l'application « donne envie » : captures avant/après validées par le dev 1 | 🟡 depuis le 18/09/2026 (dev 1 + Claude, branche `etape-D2a-design`) |
 | D2b Dossiers : pièces jointes numériques (dev 2) | l'auto-école soumet déjà le dossier dans l'application (C3) ; **à ajouter** : pour chaque pièce, l'auto-école peut **joindre un fichier** (photo ou PDF pris dans le téléphone : appareil photo, galerie ou fichiers) ; le fichier est copié dans le stockage privé de l'application (pas de serveur), son chemin dans `PieceDossier.fichier` (schéma v4) ; l'Admin ATT l'ouvre depuis l'écran du dossier pour vérifier sans attendre le papier. Joindre est **facultatif** : sans fichier, la vérification se fait sur le dossier papier apporté par l'auto-école, donc plus lentement. À faire aussi : le candidat ne voit pas un dossier encore en brouillon dans son parcours. Notions hors cours à documenter avant usage : sélecteur de fichier (`ActivityResultContracts`), copie dans `filesDir`, affichage d'une image depuis un fichier | scénario : `autoecole` joint une photo à deux pièces et soumet → `admin` ouvre les fichiers et valide ; dossier sans fichier toujours accepté ; test JUnit sur la règle « fichier facultatif » | ⚪ demandé par le dev 1 le 18/09/2026 |
-| D2 Qualité | relecture croisée du binôme, suppression des logs, schéma Room figé (`version` finale), `LISEZMOI.md` (ouverture, déroulé de démo, comptes de test), captures | chaque membre explique chaque fichier sans IA | ⚪ |
+| D2 Qualité | relecture croisée du binôme, suppression des logs, schéma Room figé (`version` finale), `LISEZMOI.md` (ouverture, déroulé de démo, comptes de test), captures | chaque membre explique chaque fichier sans IA | 🟢 18/09/2026 (dev 2 ; 12 défauts corrigés, schéma v3 figé et exporté, `docs/06_GUIDE_DU_CODE.md`, démonstration complète rejouée) |
 | D3 Soutenance | démo scriptée : parcours complet auto-école → dossier → validation → session → inscription → appel → tentative → évaluation → résultat → impression | démo répétée deux fois sans erreur | ⚪ |
 
 ---

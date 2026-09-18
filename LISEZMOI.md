@@ -16,6 +16,7 @@ Uniquement l'ATT : de la constitution du dossier par l'auto-école jusqu'au rés
 | [docs/02_PLAN_DE_TRAVAIL.md](docs/02_PLAN_DE_TRAVAIL.md) | Étapes, livrables, avancement |
 | [docs/03_MODELE_DE_DONNEES.md](docs/03_MODELE_DE_DONNEES.md) | Entités et invariants |
 | [docs/04_QUESTIONS_A_VALIDER.md](docs/04_QUESTIONS_A_VALIDER.md) | Règles administratives inconnues, sources, valeurs par défaut |
+| [docs/06_GUIDE_DU_CODE.md](docs/06_GUIDE_DU_CODE.md) | Carte du code : à quoi sert chaque fichier, dans quel ordre le lire |
 | [docs/HORS_COURS.md](docs/HORS_COURS.md) | Notions non vues en cours, expliquées avant usage |
 | [docs/COMPTES_RENDUS.md](docs/COMPTES_RENDUS.md) | Compte rendu de chaque étape |
 | [JOURNAL-IA.md](JOURNAL-IA.md) | Journal de l'usage de l'IA (protocole du module) |
@@ -43,6 +44,52 @@ Insérés au premier lancement d'une version de développement seulement (`Build
 | Candidat (RAKOTO Hery, de l'auto-école de démonstration) | `candidat` | `candidat2026` |
 
 Les deux premiers existent aussi en version livrée (à changer dès la première connexion) ; les trois autres n'existent qu'en développement. Pour repartir de zéro : `adb shell pm clear mg.itu.att` ou désinstaller l'application.
+
+Comptes créés pendant la démonstration ci-dessous : `lalana` / `lalana2026` (auto-école) et `naina` / `naina2026` (examinateur).
+
+## Déroulé de démonstration
+
+Parcours complet, d'une base vide jusqu'au relevé imprimé. Compter une vingtaine de minutes. **L'ordre compte** : une épreuve théorique sans question configurée ne peut pas s'ouvrir.
+
+**1. Configuration — `superadmin`**
+1. Configuration → Centres d'examen → « + » : *Centre ATT Soarano*, région Analamanga, adresse.
+2. Configuration → Catégories et épreuves → *B* → *Épreuve théorique* → « Ajouter une question » **trois fois** (par exemple 10, 10 et 10,5 points). Sans au moins une question active, l'examinateur ne pourra pas ouvrir l'épreuve.
+3. Au passage : Configuration → Règles montre que délais, capacités et tolérances sont en base, marqués « à confirmer ».
+
+**2. Acteurs — `admin`**
+4. Auto-écoles → « + » : *Auto-ecole Lalana*, Analamanga → sur sa fiche, « Créer un compte » (`lalana` / `lalana2026`).
+5. Examinateurs → « + » : *RANDRIA Naina* avec son compte (`naina` / `naina2026`).
+
+**3. Candidat et dossier — `lalana`**
+6. Mes candidats → « + » : *RAKOTO Jean*, né le 2004-05-17.
+7. Sur sa fiche : catégorie *B* → « Ouvrir un dossier » → cocher les quatre pièces → « Soumettre à l'ATT ».
+
+**4. Décision et session — `admin`**
+8. Dossiers à traiter → le dossier → « Valider ». (Essayer « Refuser » sans motif : l'application le refuse.)
+9. Sessions → « + » : catégorie B, épreuve théorique, **date du jour**, 08:00. L'aperçu des créneaux se recalcule à chaque frappe.
+10. Sur la fiche de session : « Ouvrir aux inscriptions » → « Inscriptions » → « Inscrire » le candidat. Il reçoit un numéro d'appel (001) et un créneau.
+11. « Convocation » imprime sa convocation.
+
+**5. Jour de l'examen — `admin`**
+12. Fiche de session → « Démarrer » → « Appel » → « Présent ». Au-delà de la tolérance, l'application propose « Accepter le retard » ou « Refuser ».
+13. « Liste d'appel » imprime la feuille de secours à cocher.
+
+**6. Épreuve — `naina`**
+14. Sessions du jour → la session → « Ouvrir le passage n° 1 ». L'examinateur ne voit **que le numéro 001**, jamais le nom.
+15. Saisir les points de chaque question, puis « Terminer l'épreuve ». Le résultat est calculé aussitôt.
+
+**7. Résultat et documents — `admin`**
+16. Résultats à valider → le résultat : le calcul est détaillé (« 18 / 20,5 × 30 = 26,34 »), puis « Valider le résultat ».
+17. « Imprimer le relevé ». Sur la fiche de session, « Liste des admis ».
+18. Pour montrer la traçabilité : « Corriger (recalculer) » avec un motif crée une **nouvelle** ligne ; l'ancienne reste lisible, marquée « Remplacé ».
+19. Historique : les modifications du parcours, avec leur auteur, filtrables par période, objet et utilisateur.
+
+**8. Consultation — `lalana`**
+20. Mes inscriptions et Résultats : l'auto-école ne voit que ses candidats, et le résultat seulement une fois validé.
+
+Deux pièges pendant la démonstration :
+- Le clavier peut recouvrir le bouton de validation d'un formulaire : le fermer avant d'appuyer.
+- L'heure de l'appareil sert d'heure de convocation : un candidat pointé l'après-midi pour une session de 08:00 est « en retard », ce qui est normal.
 
 ## Glossaire (mots de l'écran ↔ mots du cadrage et du code)
 
@@ -73,4 +120,6 @@ tap "Auto-écoles"
 
 ## État d'avancement
 
-Voir la colonne « Statut » de [docs/02_PLAN_DE_TRAVAIL.md](docs/02_PLAN_DE_TRAVAIL.md). Phases A (cadrage) et B (socle technique) terminées ; phase C (fonctionnalités) en cours, jusqu'à l'évaluation théorique (C9).
+Voir la colonne « Statut » de [docs/02_PLAN_DE_TRAVAIL.md](docs/02_PLAN_DE_TRAVAIL.md). Phases A (cadrage), B (socle technique) et C (fonctionnalités, jusqu'à l'impression) terminées ; phase D en cours : tests et cas particuliers faits, qualité et soutenance en préparation.
+
+Le schéma de la base est figé (version 3) et exporté dans `app/schemas/`. 121 tests unitaires sur les fonctions de `metier/`.

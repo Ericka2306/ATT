@@ -1,7 +1,7 @@
 package mg.itu.att.ui.configuration
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.MaterialTheme
@@ -18,7 +18,7 @@ import mg.itu.att.ui.communs.PastilleStatut
 fun EcranConfiguration(onCategories: () -> Unit, onRegles: () -> Unit, onCentres: () -> Unit, onRetour: () -> Unit) {
     EcranStandard(titre = "Configuration", onRetour = onRetour) {
         EncartInfo("Les valeurs marquées « à confirmer » sont des exemples : aucune n'est une règle officielle de l'ATT tant qu'elle n'a pas été validée.", TonEncart.AVERTISSEMENT)
-        CarteIcone(Icons.Filled.List, "Catégories et épreuves", "Catégories de permis, épreuves, barèmes, questions, critères", onCategories)
+        CarteIcone(Icons.AutoMirrored.Filled.List, "Catégories et épreuves", "Catégories de permis, épreuves, barèmes, questions, critères", onCategories)
         CarteIcone(Icons.Filled.Settings, "Règles", "Nombre de passages, délais, retards, capacités, pièces du dossier…", onRegles)
         CarteIcone(Icons.Filled.Place, "Centres d'examen", "Centres par région, capacité par défaut", onCentres)
     }

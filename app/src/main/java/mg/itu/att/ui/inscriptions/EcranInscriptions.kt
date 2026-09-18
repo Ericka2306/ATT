@@ -63,6 +63,7 @@ fun EcranInscriptions(viewModel: InscriptionsViewModel, sessionId: Int, onImprim
     viewModel.afficher(sessionId)
     val e by viewModel.etat.collectAsState()
     val saisie by viewModel.saisie.collectAsState()
+    val texteCherche by viewModel.texteRecherche.collectAsState()
 
     EcranStandard(titre = "Inscriptions", onRetour = onRetour) {
         val se = e.session
@@ -79,7 +80,7 @@ fun EcranInscriptions(viewModel: InscriptionsViewModel, sessionId: Int, onImprim
                 Card(Modifier.fillMaxWidth().padding(vertical = 4.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                     Column(Modifier.padding(12.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                            Text("n° ${i.numeroAnonymat} — ${l.nomCandidat}", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                            Text("n° ${i.numeroAnonymat}" + if (e.nomsVisibles) " — ${l.nomCandidat}" else "", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                             PastilleInscription(i.statut)
                         }
                         Text("${l.nomAutoEcole} · créneau ${l.creneau?.heureDebut ?: "—"}" + (i.motif?.let { " · $it" } ?: ""), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -95,13 +96,16 @@ fun EcranInscriptions(viewModel: InscriptionsViewModel, sessionId: Int, onImprim
                 }
             }
             if (e.estAtt && e.inscrits.any { it.inscription.statut != StatutInscription.ANNULE && it.inscription.statut != StatutInscription.REPORTE }) {
-                item { ChampTexte(saisie.motif, viewModel::changerMotif, "Motif", aide = "obligatoire pour reporter ou annuler") }
+                item {
+                    ChampTexte(saisie.motif, viewModel::changerMotif, "Motif", aide = "obligatoire pour reporter ou annuler")
+                    TexteErreur(saisie.erreurAction)
+                }
             }
             if (e.peutInscrire || e.peutDemander) {
                 item {
                     TitreSection(if (e.peutInscrire) "Inscrire un candidat" else "Demander une inscription")
                     EncartInfo("Seuls les candidats ayant un dossier validé pour cette catégorie sont proposés.")
-                    ChampTexte(e.recherche, viewModel::rechercher, "Rechercher un candidat", icone = Icons.Filled.Search)
+                    ChampTexte(texteCherche, viewModel::rechercher, "Rechercher un candidat", icone = Icons.Filled.Search)
                     SelecteurChoix("Créneau", e.creneaux.map { Option(it.id, "${it.heureDebut} – ${it.heureFinEstimee} (${it.capacite} pl.)") }, e.creneauChoisiId, viewModel::choisirCreneau, avecTous = true, libelleTous = "premier disponible")
                     saisie.message?.let { Text(it, color = MaterialTheme.colorScheme.secondary, style = MaterialTheme.typography.bodyMedium) }
                     TexteErreur(saisie.erreur)

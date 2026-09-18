@@ -39,5 +39,7 @@ fun PastilleReussite(reussi: Boolean) {
 /** « 16 / 20 (seuil 12) » — les nombres entiers s'affichent sans décimale inutile. */
 fun Resultat.noteLisible(): String = "${formatNote(noteObtenue)} / ${formatNote(noteMax)} (seuil ${formatNote(seuil)})"
 
-/** 16.0 → « 16 » ; 13.33 → « 13.33 ». */
-fun formatNote(valeur: Double): String = if (valeur % 1.0 == 0.0) valeur.toInt().toString() else valeur.toString()
+/** 16.0 → « 16 » ; 13.33 → « 13,33 ». */
+fun formatNote(valeur: Double): String =
+    // Virgule décimale, comme les points de la feuille d'examen (`formatPoints`) : « 26,34 », pas « 26.34 ».
+    if (valeur % 1.0 == 0.0) valeur.toInt().toString() else valeur.toString().replace('.', ',')

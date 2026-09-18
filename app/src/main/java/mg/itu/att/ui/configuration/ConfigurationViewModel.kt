@@ -26,6 +26,8 @@ import mg.itu.att.data.Region
 import mg.itu.att.data.TypeEpreuve
 import mg.itu.att.data.resume
 import mg.itu.att.data.tracer
+import mg.itu.att.metier.ReglesConsultation
+import mg.itu.att.metier.nombreSaisi
 import mg.itu.att.metier.ValidationConfiguration
 import mg.itu.att.metier.dateDuJour
 import mg.itu.att.ui.communs.ViewModelAvecSession
@@ -93,7 +95,11 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
         this.session = session
     }
 
-    private fun idUtilisateur(): Int? = session?.id
+    /**
+     * L'auteur d'une écriture de configuration, ou null si le rôle connecté n'a pas le droit d'écrire ici
+     * (règle R12 : la permission est vérifiée dans le ViewModel, pas seulement dans le menu).
+     */
+    private fun auteurConfiguration(): Int? = session?.takeIf { ReglesConsultation.peutConfigurer(it.role) }?.id
 
     // ----- Catégories -----
 
@@ -120,7 +126,7 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
 
     fun enregistrerCategorie(onSucces: (Int) -> Unit) {
         val f = _formulaireCategorie.value
-        val auteur = idUtilisateur() ?: return
+        val auteur = auteurConfiguration() ?: return
         viewModelScope.launch {
             val existantes = categories.value.filter { it.id != f.id }.map { it.code }
             val erreur = ValidationConfiguration.validerCategorie(f.code, f.libelle, f.ageMinimum, existantes)
@@ -165,7 +171,8 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
             val e = epreuveId?.let { db.typeEpreuveDao().parId(it) }
             val prochainOrdre = (detailCategorie.value.epreuves.maxOfOrNull { it.ordre } ?: 0) + 1
             _formulaireEpreuve.value = EtatFormulaireEpreuve(
-                id = e?.id ?: 0, categorieId = categorieId, code = e?.code ?: "", libelle = e?.libelle ?: "",
+                // Une épreuve existante garde sa catégorie ; l'argument ne sert qu'à la création.
+                id = e?.id ?: 0, categorieId = e?.categorieId ?: categorieId, code = e?.code ?: "", libelle = e?.libelle ?: "",
                 ordre = (e?.ordre ?: prochainOrdre).toString(), duree = e?.dureeMinutes?.toString() ?: "",
                 obligatoire = e?.obligatoire ?: true, aConfirmer = e?.aConfirmer ?: true, actif = e?.actif ?: true,
             )
@@ -176,7 +183,7 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
 
     fun enregistrerEpreuve(onSucces: () -> Unit) {
         val f = _formulaireEpreuve.value
-        val auteur = idUtilisateur() ?: return
+        val auteur = auteurConfiguration() ?: return
         viewModelScope.launch {
             val existantes = detailCategorie.value.epreuves.filter { it.id != f.id }.map { it.code }
             val erreur = ValidationConfiguration.validerEpreuve(f.code, f.libelle, f.ordre, f.duree, existantes)
@@ -223,7 +230,7 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
     /** Nouvelle version du barème : l'ancienne version courante est fermée à la date du jour, jamais modifiée. */
     fun creerVersionBareme(epreuveId: Int, onSucces: () -> Unit) {
         val f = _formulaireBareme.value
-        val auteur = idUtilisateur() ?: return
+        val auteur = auteurConfiguration() ?: return
         viewModelScope.launch {
             val erreur = ValidationConfiguration.validerBareme(f.noteMax, f.seuil)
             if (erreur != null) return@launch _formulaireBareme.update { it.copy(erreur = erreur) }
@@ -231,8 +238,10 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
                 val courant = db.baremeDao().courant(epreuveId)
                 if (courant != null) db.baremeDao().modifier(courant.copy(dateFinValidite = dateDuJour()))
                 val nouveau = Bareme(
-                    typeEpreuveId = epreuveId, version = (courant?.version ?: 0) + 1, noteMax = f.noteMax.toDouble(),
-                    seuilReussite = f.seuil.toDouble(), dateDebutValidite = dateDuJour(), aConfirmer = f.aConfirmer,
+                    typeEpreuveId = epreuveId, version = (courant?.version ?: 0) + 1,
+                    noteMax = nombreSaisi(f.noteMax) ?: return@withTransaction,
+                    seuilReussite = nombreSaisi(f.seuil) ?: return@withTransaction,
+                    dateDebutValidite = dateDuJour(), aConfirmer = f.aConfirmer,
                 )
                 val id = db.baremeDao().inserer(nouveau).toInt()
                 db.tracer(EntitesHistorique.BAREME, id, ActionsHistorique.CREATION, auteur, ancienneValeur = courant?.resume(), nouvelleValeur = nouveau.resume())
@@ -248,13 +257,13 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
 
     fun creerQuestion(epreuveId: Int, onSucces: () -> Unit) {
         val f = _formulaireQuestion.value
-        val auteur = idUtilisateur() ?: return
+        val auteur = auteurConfiguration() ?: return
         viewModelScope.launch {
             val erreur = ValidationConfiguration.validerQuestion(f.enonce, f.points)
             if (erreur != null) return@launch _formulaireQuestion.update { it.copy(erreur = erreur) }
             db.withTransaction {
                 val question = Question(
-                    typeEpreuveId = epreuveId, enonce = f.enonce.trim(), points = f.points.replace(',', '.').toDouble(),
+                    typeEpreuveId = epreuveId, enonce = f.enonce.trim(), points = nombreSaisi(f.points) ?: return@withTransaction,
                     reponseAttendue = f.reponseAttendue.trim().ifBlank { null }, ordre = epreuve.value.questions.size + 1, aConfirmer = f.aConfirmer,
                 )
                 val id = db.questionDao().inserer(question).toInt()
@@ -267,7 +276,7 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
 
     /** Une question ne se supprime pas (d'anciennes évaluations la référencent) : on la désactive. */
     fun basculerQuestion(question: Question) {
-        val auteur = idUtilisateur() ?: return
+        val auteur = auteurConfiguration() ?: return
         viewModelScope.launch {
             db.withTransaction {
                 val modifiee = question.copy(actif = !question.actif)
@@ -283,12 +292,12 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
 
     fun creerCritere(epreuveId: Int, onSucces: () -> Unit) {
         val f = _formulaireCritere.value
-        val auteur = idUtilisateur() ?: return
+        val auteur = auteurConfiguration() ?: return
         viewModelScope.launch {
             val erreur = ValidationConfiguration.validerCritere(f.libelle, f.points)
             if (erreur != null) return@launch _formulaireCritere.update { it.copy(erreur = erreur) }
             db.withTransaction {
-                val critere = CriterePratique(typeEpreuveId = epreuveId, libelle = f.libelle.trim(), points = f.points.toDouble(), eliminatoire = f.eliminatoire, aConfirmer = f.aConfirmer)
+                val critere = CriterePratique(typeEpreuveId = epreuveId, libelle = f.libelle.trim(), points = nombreSaisi(f.points) ?: return@withTransaction, eliminatoire = f.eliminatoire, aConfirmer = f.aConfirmer)
                 val id = db.criterePratiqueDao().inserer(critere).toInt()
                 db.tracer(EntitesHistorique.CRITERE, id, ActionsHistorique.CREATION, auteur, nouvelleValeur = critere.resume())
             }
@@ -298,7 +307,7 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
     }
 
     fun basculerCritere(critere: CriterePratique) {
-        val auteur = idUtilisateur() ?: return
+        val auteur = auteurConfiguration() ?: return
         viewModelScope.launch {
             db.withTransaction {
                 val modifie = critere.copy(actif = !critere.actif)
@@ -333,7 +342,7 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
     fun enregistrerRegle(onSucces: () -> Unit) {
         val f = _formulaireRegle.value
         val ancienne = f.regle ?: return
-        val auteur = idUtilisateur() ?: return
+        val auteur = auteurConfiguration() ?: return
         viewModelScope.launch {
             val erreur = ValidationConfiguration.validerRegle(f.valeur, ancienne.typeValeur)
             if (erreur != null) return@launch _formulaireRegle.update { it.copy(erreur = erreur) }
@@ -374,7 +383,7 @@ class ConfigurationViewModel(application: Application) : AndroidViewModel(applic
 
     fun enregistrerCentre(onSucces: () -> Unit) {
         val f = _formulaireCentre.value
-        val auteur = idUtilisateur() ?: return
+        val auteur = auteurConfiguration() ?: return
         viewModelScope.launch {
             val erreur = ValidationConfiguration.validerCentre(f.nom, f.regionId, f.adresse, f.capacite)
             val regionId = f.regionId

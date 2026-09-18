@@ -30,6 +30,12 @@ object ReglesConsultation {
     }
 
     /** L'ATT et l'auto-école gèrent la fiche et les dossiers ; le candidat ne fait que lire (docs/01 §6). */
+    /** Configurer les référentiels, barèmes, règles et centres : Super Admin seul (matrice docs/01 §6). */
+    fun peutConfigurer(role: Role): Boolean = role == Role.SUPER_ADMIN
+
+    /** Créer ou désactiver un compte, une auto-école, un examinateur : l'ATT (matrice docs/01 §6). */
+    fun peutGererComptes(role: Role): Boolean = role == Role.SUPER_ADMIN || role == Role.ADMIN_ATT
+
     fun peutGererCandidat(role: Role): Boolean =
         role == Role.SUPER_ADMIN || role == Role.ADMIN_ATT || role == Role.AUTO_ECOLE
 

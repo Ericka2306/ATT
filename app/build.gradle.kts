@@ -43,6 +43,12 @@ android {
     }
 }
 
+// Room écrit le schéma de la base dans app/schemas/ : le schéma figé de l'étape D2,
+// versionné avec le code (voir AppDatabase.kt).
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 // Remplace l'ancien bloc kotlinOptions { jvmTarget = "17" } des projets du cours (AGP 8).
 kotlin {
     compilerOptions {

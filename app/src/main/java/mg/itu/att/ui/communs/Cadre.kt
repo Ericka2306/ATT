@@ -236,20 +236,13 @@ fun CarteIcone(
     icone: ImageVector,
     titre: String,
     description: String,
-    onClick: () -> Unit,
+    /** null : la carte affiche seulement des informations et ne réagit pas au toucher (pas de chevron). */
+    onClick: (() -> Unit)?,
     couleurPastille: Color = MaterialTheme.colorScheme.primaryContainer,
     couleurIcone: Color = MaterialTheme.colorScheme.primary,
     complement: (@Composable () -> Unit)? = null,
 ) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = bordCarte(),
-    ) {
+    val contenu: @Composable ColumnScope.() -> Unit = {
         Row(Modifier.padding(horizontal = 16.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
                 Modifier
@@ -271,9 +264,22 @@ fun CarteIcone(
                     complement()
                 }
             }
-            Spacer(Modifier.width(6.dp))
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = MaterialTheme.colorScheme.outline)
+            if (onClick != null) {
+                Spacer(Modifier.width(6.dp))
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = MaterialTheme.colorScheme.outline)
+            }
         }
+    }
+    val modifieur = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 6.dp)
+    val couleurs = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    val relief = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    // Sans action, une Card simple : une Card cliquable réagirait au toucher sans rien ouvrir.
+    if (onClick == null) {
+        Card(modifieur, colors = couleurs, elevation = relief, border = bordCarte(), content = contenu)
+    } else {
+        Card(onClick = onClick, modifier = modifieur, colors = couleurs, elevation = relief, border = bordCarte(), content = contenu)
     }
 }
 

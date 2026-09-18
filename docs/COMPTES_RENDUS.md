@@ -633,3 +633,68 @@ Réassignée au dev 1 le 16/09 (le dev 2 n'avait pas commencé) ; le dev 2 repre
 - `app/src/main/java/mg/itu/att/ui/inscriptions/InscriptionsViewModel.kt`, `EcranInscriptions.kt` — motif, message et erreur sortis du flux.
 - `app/src/main/java/mg/itu/att/ui/sessions/SessionsViewModel.kt`, `EcranDetailSession.kt` — motif d'annulation sorti du flux.
 - `docs/02_PLAN_DE_TRAVAIL.md`, `docs/captures/D1_*.png` — 6 captures de l'émulateur.
+
+---
+
+## Étape D2 — Qualité — 18/09/2026
+
+> Relecture croisée du code, correction de ce qu'elle a trouvé, schéma de base figé, `LISEZMOI` complété (comptes et déroulé de démonstration), et une démonstration complète rejouée d'une base vide jusqu'au relevé imprimé.
+
+### Relecture croisée
+
+Le code des étapes C1 à C10 a été relu ligne à ligne, avec quatre questions : le défaut de frappe déjà rencontré trois fois est-il ailleurs ; les règles absolues sont-elles tenues ; un rôle voit-il ce qui ne le regarde pas ; un bouton est-il hors d'atteinte. Ce qui en est ressorti est corrigé ci-dessous. Ce qui n'y était pas mérite d'être dit : **aucune** valeur métier codée en dur, **aucun** `@Delete` sur une tentative ou un résultat, **aucun** `!!`, `runBlocking`, `LiveData` ni `MutableStateFlow` public, et chaque écriture sensible passe par `withTransaction { … tracer(…) }`.
+
+### Corrigé
+
+**1. « Modifier l'épreuve » enregistrait une catégorie vide** (`Navigation.kt`, `EcranEpreuve.kt`, `ConfigurationViewModel.kt`)
+La route lisait `v.epreuve.value.epreuve?.categorieId ?: 0` au moment de composer l'écran, c'est-à-dire **avant** que l'épreuve ne soit chargée : toujours 0. `preparerEpreuve` reportait ce 0 dans le formulaire, et l'enregistrement écrivait `TypeEpreuve(categorieId = 0)` — clé étrangère invalide, donc plantage ; ou, si le flux avait gardé une épreuve précédente, l'épreuve changeait silencieusement de catégorie. La catégorie vient maintenant de l'épreuve affichée (`onModifier(it.categorieId)`), et `preparerEpreuve` garde celle de l'épreuve existante. Vérifié sur l'émulateur : l'épreuve reste rattachée au permis B (`D2_epreuve_modifiee.png`).
+
+**2. Permissions vérifiées dans les ViewModels, pas seulement dans le menu** (règle R12)
+Vingt fonctions d'écriture ne vérifiaient que « quelqu'un est connecté » : toute la configuration (`ConfigurationViewModel`, 9 fonctions), les auto-écoles et leurs comptes (3), les examinateurs (2), les candidats et leurs dossiers (4, dont `cocherPiece` qui ne vérifiait rien). Aucun rôle ne peut atteindre ces écrans par le menu aujourd'hui, donc rien n'était exploitable — mais la règle demande la vérification à l'endroit qui écrit. Deux règles pures s'y ajoutent, avec leurs tests : `ReglesConsultation.peutConfigurer` (Super Admin seul, la matrice docs/01 §6 ne donne que la lecture à l'Admin ATT) et `peutGererComptes` (ATT).
+
+**3. Champs de recherche sortis du flux qui refiltre** (`CandidatsViewModel`, `InscriptionsViewModel`, leurs écrans)
+Le texte cherché revenait par le `combine` qui refiltre toute la liste à chaque émission — la même cause que les trois défauts de frappe précédents. Il a maintenant son propre `StateFlow` (`texteRecherche`). Mesuré après correction sur l'émulateur : le texte reste intact jusqu'à **16 caractères par seconde** (60 ms entre deux touches), soit plus vite qu'une frappe humaine ; seule une rafale d'`adb input text`, qui envoie une phrase entière en un événement, tronque encore.
+
+**4. Boutons hors d'atteinte** (`EcranDossier.kt`, `EcranInscriptions.kt`)
+Les trois boutons de décision de l'ATT (« Valider », « Incomplet », « Refuser ») tenaient dans une seule `Row` d'environ 330 dp pour 328 dp utiles : « Refuser » était rogné sur un écran étroit ou avec une police agrandie. Même chose pour les quatre boutons d'une inscription. Répartis sur deux lignes, comme la fiche de session en C13 (`D2_boutons_decision.png`).
+
+**5. « Indiquez le motif. » s'affichait hors écran** (`EcranInscriptions.kt`, `InscriptionsViewModel.kt`)
+Le refus d'un report ou d'une annulation sans motif se posait dans l'erreur de la section « Inscrire un candidat », après toute la liste des inscrits : l'utilisateur ne voyait rien. L'erreur d'une action a désormais son propre champ (`erreurAction`), affiché sous le champ du motif (`D2_motif_erreur.png`).
+
+**6. Virgule décimale acceptée partout** (`metier/Points.kt`, `ValidationConfiguration.kt`, `ConfigurationViewModel.kt`)
+« 12,5 » était accepté pour les points d'une question mais refusé pour un critère, un barème ou une règle décimale, alors que les quatre champs ouvrent le même clavier. Une seule fonction `nombreSaisi(texte)` lit maintenant un nombre tapé, virgule ou point. Vérifié : une question à **10,5 points** se crée (`D2_question_virgule.png`). `formatNote` affiche aussi une virgule (« 26,34 / 30 »), comme le reste de l'application.
+
+**7. Détails** : l'anonymat de l'examinateur est appliqué à l'écran des inscriptions (`nomsVisibles` était calculé mais jamais utilisé) ; une carte informative ne réagit plus au toucher (`CarteIcone(onClick = null)`) ; trois listes ont un message quand elles sont vides ; `Icons.Filled.List` déprécié remplacé partout — le module ne produit **plus aucun avertissement** de compilation ; le message « Épreuve close : lecture seule » n'apparaît plus quand le passage est en cours mais non saisissable (la vraie cause est affichée en haut).
+
+### Schéma de la base figé
+
+`AppDatabase` passe à `exportSchema = true` et le schéma complet est écrit dans `app/schemas/mg.itu.att.data.AppDatabase/3.json`, versionné avec le code. **La version 3 est définitive** : aucune entité ne change plus. `fallbackToDestructiveMigration` reste en place comme filet, aucune donnée réelle n'étant en service.
+
+### Documents
+
+- **`docs/06_GUIDE_DU_CODE.md`** (nouveau) : le chemin d'une action du bouton à la base sur un exemple, la carte des 102 fichiers par dossier, l'emplacement de chaque cas d'utilisation, et les questions probables de la soutenance avec le fichier à montrer. C'est le document qui permet d'expliquer le code sans IA, critère de fin de cette étape.
+- **`LISEZMOI.md`** : comptes de départ, déroulé de démonstration en vingt étapes, état d'avancement à jour.
+- **`outils/pilote_emulateur.sh`** : trois défauts corrigés, trouvés en rejouant la démonstration — le relevé d'interface pouvait être périmé (fichier non effacé avant le relevé), les glissements partaient d'un champ de texte qui les captait (l'écran ne défilait pas), et le clavier n'était pas fermé avant d'appuyer sur un bouton du bas.
+
+### Tests
+
+- `assembleDebug` vert, **aucun avertissement** ; `testDebugUnitTest` : **121 tests verts** (119 + 2).
+- Démonstration complète rejouée d'une base vide : configuration, auto-école, examinateur, candidat, dossier, validation, session, inscription, appel, épreuve, calcul, validation, relevé imprimé, historique. 28 modifications tracées, toutes avec leur auteur. Captures `D2_demo_*.png`.
+
+### Décisions restantes
+
+1. **UC07b n'est atteignable par personne.** La règle `AUTO_ECOLE_PEUT_INSCRIRE` et le bouton « Demander » existent, mais aucune entrée de menu ne mène une auto-école à l'écran d'inscription. À trancher : ajouter l'entrée, ou retirer la branche.
+2. **Les deux écrans d'évaluation écrivent en base à chaque caractère** des champs « Réponse du candidat » et « Observation ». La frappe ne se perd pas (ces champs lisent leur propre flux) et `terminer()` sauvegarde de toute façon la feuille entière : écrire à la perte du focus suffirait.
+3. Un dossier **refusé** ne peut pas être resoumis (déjà noté en D1) : à confirmer avec l'ATT.
+
+### À relire
+
+- `app/src/main/java/mg/itu/att/Navigation.kt`, `ui/configuration/EcranEpreuve.kt`, `ui/configuration/ConfigurationViewModel.kt` — catégorie de l'épreuve, et permission d'écrire la configuration.
+- `app/src/main/java/mg/itu/att/metier/ReglesConsultation.kt` — deux règles de permission ; `app/src/test/java/mg/itu/att/metier/ReglesConsultationTest.kt` — leur test.
+- `app/src/main/java/mg/itu/att/metier/Points.kt`, `metier/ValidationConfiguration.kt` — `nombreSaisi`, la virgule décimale ; `app/src/test/java/mg/itu/att/metier/PointsTest.kt`.
+- `app/src/main/java/mg/itu/att/ui/autoecoles/AutoEcolesViewModel.kt`, `ui/comptes/ComptesViewModel.kt`, `ui/candidats/CandidatsViewModel.kt` — gardes de rôle.
+- `app/src/main/java/mg/itu/att/ui/inscriptions/InscriptionsViewModel.kt` + `EcranInscriptions.kt`, `ui/candidats/EcranDossier.kt`, `ui/candidats/EcranListeCandidats.kt` — recherche, erreur du motif, rangées de boutons, anonymat.
+- `app/src/main/java/mg/itu/att/ui/communs/Cadre.kt`, `ui/comptes/EcranComptes.kt`, `ui/configuration/EcranCategories.kt`, `ui/configuration/EcranRegles.kt` — carte sans action, listes vides.
+- `app/src/main/java/mg/itu/att/ui/evaluation/EcranEvaluationTheorie.kt`, `EcranEvaluationConduite.kt`, `ui/resultats/Statuts.kt` — message trompeur, virgule des notes.
+- `app/src/main/java/mg/itu/att/data/AppDatabase.kt`, `app/build.gradle.kts`, `app/schemas/` — schéma figé et exporté.
+- `docs/06_GUIDE_DU_CODE.md` (nouveau), `LISEZMOI.md`, `outils/pilote_emulateur.sh`, `docs/captures/D2_*.png`.
