@@ -677,7 +677,7 @@ function limites() {
 function annexes() {
   return [
     titre1("Annexe A — Captures d'écran"),
-    ...paras("Les captures du chapitre 6 ont été prises sur l'émulateur Android d'un petit téléphone (720 × 1280), avec les comptes de démonstration, en rejouant le parcours complet depuis une base vide. Elles sont récapitulées ici dans l'ordre du document ; les fichiers se trouvent dans le dossier docs/rapport/captures du dépôt."),
+    ...paras("Les captures du chapitre 6 ont été prises sur l'émulateur Android d'un petit téléphone (720 × 1280), avec les comptes de démonstration, en rejouant le parcours complet depuis une base vide. Elles sont récapitulées ici dans l'ordre du document."),
     tableau(["Figure", "Écran", "Fichier"], FIGURES.map((f) => [String(f.numero), f.legende, f.fichier]), [12, 50, 38]),
     titre1("Annexe B — Extraits de code commentés"),
     titre2("B.1 Écriture et historique dans une même transaction"),
