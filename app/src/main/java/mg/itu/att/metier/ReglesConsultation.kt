@@ -1,6 +1,7 @@
 package mg.itu.att.metier
 
 import mg.itu.att.data.Role
+import mg.itu.att.data.StatutDossier
 
 /**
  * Consultation par rôle (UC12, matrice docs/01 §6) : qui peut voir la fiche d'un candidat,
@@ -30,6 +31,13 @@ object ReglesConsultation {
     }
 
     /** L'ATT et l'auto-école gèrent la fiche et les dossiers ; le candidat ne fait que lire (docs/01 §6). */
+    /**
+     * Un dossier encore en brouillon est un travail en cours de l'auto-école : le candidat ne le voit
+     * qu'une fois soumis à l'ATT (D2b). Les autres rôles le voient toujours.
+     */
+    fun dossierVisible(role: Role, statut: StatutDossier): Boolean =
+        role != Role.CANDIDAT || statut != StatutDossier.BROUILLON
+
     /** Configurer les référentiels, barèmes, règles et centres : Super Admin seul (matrice docs/01 §6). */
     fun peutConfigurer(role: Role): Boolean = role == Role.SUPER_ADMIN
 

@@ -21,6 +21,8 @@ object ActionsHistorique {
     const val CORRECTION = "CORRECTION"
     const val ANNULATION = "ANNULATION"
     const val CREATION_COMPTE = "CREATION_COMPTE"
+    const val PIECE_JOINTE = "PIECE_JOINTE"
+    const val PIECE_RETIREE = "PIECE_RETIREE"
 }
 
 /** Noms d'entités utilisés dans l'historique (toujours les mêmes chaînes, pour pouvoir filtrer). */

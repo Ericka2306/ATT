@@ -30,5 +30,14 @@ inline fun <reified VM> viewModelDuSousParcours(
     return vm
 }
 
+/**
+ * Revenir à l'écran précédent, jamais au-delà de l'accueil : deux ou trois appuis rapides sur la flèche
+ * « Retour » dépilaient aussi l'accueil et laissaient un écran vide (défaut constaté en D2b).
+ * Après la connexion, l'accueil est la base de la pile : il n'a pas d'écran précédent.
+ */
+fun NavHostController.revenir() {
+    if (previousBackStackEntry != null) popBackStack()
+}
+
 /** Lit un identifiant entier dans les arguments d'une route ("{xxxId}") ; null si absent ou invalide (cours S5). */
 fun androidx.navigation.NavBackStackEntry.idArgument(nom: String): Int? = arguments?.getString(nom)?.toIntOrNull()

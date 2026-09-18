@@ -297,7 +297,22 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 21 — 18/09/2026 — Rejeu de A à Z, audit et rapport technique
+## Entrée 21 — 18/09/2026 — Étape D2b, pièces jointes du dossier (dev 2)
+
+- Code soumis : `metier/PiecesJointes.kt` et ses tests, `ui/candidats/FichiersPieces.kt`, l'écran d'ouverture d'une pièce, les ajouts au dossier.
+- Remarque principale de l'IA : séparer ce qui **décide** (types acceptés, taille, qui peut joindre, comment une pièce se vérifie) de ce qui **manipule les fichiers** (copie, lecture, appareil photo). La règle « le fichier est facultatif » devient alors un test JUnit de trois lignes, alors qu'elle serait impossible à tester si elle vivait dans le code qui copie les fichiers.
+
+⚠️ Quatre notions hors cours d'un coup (sélecteur de fichier, `FileProvider`, `withContext(Dispatchers.IO)`, `try/catch`) : le cours S2 cite `Dispatchers.IO` pour « réseau, fichiers » mais ne l'emploie pas, et la synthèse du cours déconseille de l'introduire quand Room suffit. Ici Room ne suffit pas, puisque ce sont des fichiers. Chaque notion est déclarée avant usage (HORS_COURS n° 28 à 31) et reste enfermée dans un seul fichier.
+
+⚠️ Un défaut ancien est apparu pendant les tests, par accident : des frappes envoyées sans champ actif ont « appuyé » plusieurs fois sur « Retour », et l'application est restée sur un écran vide. Reproduit ensuite volontairement : trois appuis rapides sur la flèche suffisent. Ce n'était pas lié aux pièces jointes. Toutes les flèches « Retour » sont corrigées.
+
+⚠️ La photo de l'appareil photo semblait pixellisée à l'écran. Vérifié avant de corriger quoi que ce soit : le fichier stocké fait 1440 × 1920 pixels, c'est la scène virtuelle de l'émulateur qui est en pixel art. Rien à corriger.
+
+- Mon verdict (accepte / rejette / nuance) et pourquoi : <à compléter par le dev 2>.
+
+---
+
+## Entrée 22 — 18/09/2026 — Rejeu de A à Z, audit et rapport technique
 
 - Code soumis : corrections dans `Selecteurs.kt`, `EcranEpreuve.kt`, `ConfigurationViewModel.kt`, `Tracage.kt`, `DocumentsImpression.kt`, `EcranImpression.kt`, cinq fiches (état vide de l'historique), `outils/pilote_emulateur.sh` ; rédaction de `docs/rapport/generer_rapport.js`.
 - Remarque principale de l'IA : rejouer le parcours avec un automate qui ne voit que le texte des éléments a révélé un défaut invisible à l'œil : les sélecteurs et l'interrupteur réseau n'exposaient aucun nom, donc un lecteur d'écran ne les aurait pas annoncés. L'accessibilité et la testabilité sont la même propriété.
@@ -310,7 +325,7 @@ Règle du module : « un "je rejette" bien argumenté vaut mieux qu'un "j'accept
 
 ---
 
-## Entrée 22 — <date> — <tâche>
+## Entrée 23 — <date> — <tâche>
 
 - Fonction/Code soumis :
 - Remarque principale de l'IA :

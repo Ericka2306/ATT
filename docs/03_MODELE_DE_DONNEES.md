@@ -213,8 +213,9 @@ Pas d'affectation préalable examinateur → candidat en V1 : l'examinateur est 
 | typePiece | String | liste des pièces À confirmer (configurable via TypePiece ou RegleConfig) |
 | fournie | Boolean | |
 | remarque | String? | |
+| fichier | String? | chemin, relatif au stockage privé de l'application, de la photo ou du PDF joint ; null = aucun fichier (schéma v5, D2b) |
 
-Aucun document n'est stocké (pas de scan/photo) tant que « données/documents que l'ATT peut stocker » n'est pas confirmé.
+Joindre un fichier est **facultatif** (décision du dev 1, Q7) : une pièce fournie sans fichier se vérifie sur le dossier papier. La copie est gardée dans le stockage privé de l'application, sans serveur ; sa protection au regard des données personnelles reste à confirmer avec l'ATT.
 
 ---
 

@@ -109,4 +109,5 @@ relancer() {
   sleep 5
 }
 
-connexion() { saisir "Identifiant" "$1"; saisir "Mot de passe" "$2"; tap "Se connecter" 4; }
+# le clavier, encore ouvert après la saisie, recouvre le bouton sur l'écran de connexion refondu (D2a)
+connexion() { saisir "Identifiant" "$1"; saisir "Mot de passe" "$2"; fermer_clavier; tap "Se connecter" 4; }

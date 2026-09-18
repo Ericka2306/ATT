@@ -62,10 +62,10 @@ Parcours complet, d'une base vide jusqu'au relevé imprimé. Compter une vingtai
 
 **3. Candidat et dossier — `lalana`**
 6. Mes candidats → « + » : *RAKOTO Jean*, né le 2004-05-17.
-7. Sur sa fiche : catégorie *B* → « Ouvrir un dossier » → cocher les quatre pièces → « Soumettre à l'ATT ».
+7. Sur sa fiche : catégorie *B* → « Ouvrir un dossier » → pour une ou deux pièces, « Joindre un fichier » (photo ou PDF) ou « Prendre une photo » ; cocher les autres (vérification sur papier) → « Soumettre à l'ATT ». Le candidat ne voit pas le dossier tant qu'il est en brouillon.
 
 **4. Décision et session — `admin`**
-8. Dossiers à traiter → le dossier → « Valider ». (Essayer « Refuser » sans motif : l'application le refuse.)
+8. Dossiers à traiter → le dossier → « Ouvrir » sur chaque pièce jointe pour la vérifier → « Valider ». (Essayer « Refuser » sans motif : l'application le refuse.)
 9. Sessions → « + » : catégorie B, épreuve théorique, **date du jour**, 08:00. L'aperçu des créneaux se recalcule à chaque frappe.
 10. Sur la fiche de session : « Ouvrir aux inscriptions » → « Inscriptions » → « Inscrire » le candidat. Il reçoit un numéro d'appel (001) et un créneau.
 11. « Convocation » imprime sa convocation.
