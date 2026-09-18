@@ -33,7 +33,10 @@ data class Dossier(
     val decideParId: Int? = null,
 )
 
-/** Une pièce attendue dans un dossier : on note seulement si elle est fournie (aucun scan stocké, Q7). */
+/**
+ * Une pièce attendue dans un dossier : fournie ou non, et, facultativement, un fichier joint (photo ou PDF)
+ * copié dans le stockage privé de l'application (D2b, Q7). Sans fichier, l'ATT vérifie sur le dossier papier.
+ */
 @Entity(
     tableName = "pieces_dossier",
     foreignKeys = [
@@ -48,4 +51,6 @@ data class PieceDossier(
     val typePiece: String,
     val fournie: Boolean = false,
     val remarque: String? = null,
+    /** Chemin du fichier joint, relatif au dossier privé de l'application (`filesDir`) ; null = aucun fichier. */
+    val fichier: String? = null,
 )

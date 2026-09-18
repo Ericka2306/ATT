@@ -9,9 +9,9 @@ import androidx.room.RoomDatabase
  * La base locale de l'application : la source de vérité (cours S7, offline-first).
  * Singleton obtenu par [obtenir], comme `AppDatabase.obtenir(context)` dans listedetailv3.
  *
- * **Schéma figé le 18/09/2026 (étape D2) : version 3, définitive.** Aucune entité ne change plus.
- * `exportSchema = true` écrit le schéma complet dans `app/schemas/` : c'est le schéma de référence,
- * versionné avec le code et lisible sans ouvrir la base.
+ * Schéma figé en version 3 à l'étape D2, puis rouvert deux fois pour les ajouts de la phase D :
+ * v4 (synchronisation, D2c) et v5 (pièces jointes, D2b). `exportSchema = true` écrit chaque version
+ * dans `app/schemas/` : c'est le schéma de référence, versionné avec le code et lisible sans ouvrir la base.
  *
  * `fallbackToDestructiveMigration` reste en place : si le schéma changeait encore, l'application
  * repartirait d'une base neuve plutôt que de planter. Il n'y a pas de migration à écrire puisqu'aucune
@@ -35,7 +35,9 @@ import androidx.room.RoomDatabase
     ],
     // v2 (16/09/2026, étape C7) : l'index unique (candidatId, sessionId) des inscriptions devient un index simple.
     // v3 (17/09/2026, étape C11) : résultats corrigés (`remplaceResultatId`, motif de correction).
-    version = 4,
+    // v4 (18/09/2026, étape D2c) : résultats remontés au serveur central (`Resultat.synchronisee`).
+    // v5 (18/09/2026, étape D2b) : pièce jointe facultative sur chaque pièce du dossier (`PieceDossier.fichier`).
+    version = 5,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {

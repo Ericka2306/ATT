@@ -1,6 +1,7 @@
 package mg.itu.att.ui.candidats
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
@@ -33,11 +34,13 @@ import mg.itu.att.data.Tentative
 import mg.itu.att.data.Utilisateur
 import mg.itu.att.data.resume
 import mg.itu.att.data.tracer
+import mg.itu.att.metier.PiecesJointes
 import mg.itu.att.metier.ReglesConsultation
 import mg.itu.att.metier.ReglesDossier
 import mg.itu.att.metier.ValidationCandidat
 import mg.itu.att.metier.ValidationCompte
 import mg.itu.att.metier.dateDuJour
+import mg.itu.att.metier.maintenantIso
 import mg.itu.att.securite.MotDePasse
 import mg.itu.att.ui.communs.ViewModelAvecSession
 import mg.itu.att.ui.connexion.SessionUtilisateur
@@ -119,6 +122,8 @@ data class EtatDossier(
     val peutSoumettre: Boolean = false,
     /** Seule l'ATT décide, et seulement sur un dossier SOUMIS. */
     val peutDecider: Boolean = false,
+    /** Joindre ou retirer un fichier : l'auto-école ou l'ATT, tant que le dossier se prépare (D2b). */
+    val peutJoindre: Boolean = false,
 )
 
 /**
@@ -343,6 +348,7 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
                 val visible = c != null && s != null &&
                     ReglesConsultation.peutVoirCandidat(s.role, s.regionId, s.autoEcoleId, s.candidatId, c.id, c.autoEcoleId, regionAutoEcole)
                 if (!visible) EtatDetailCandidat() else etat.copy(
+                    dossiers = etat.dossiers.filter { ReglesConsultation.dossierVisible(s.role, it.dossier.statut) },
                     inscriptions = inscriptions, passages = passages, comptes = comptes,
                     peutGerer = ReglesConsultation.peutGererCandidat(s.role),
                     peutCreerCompte = ReglesConsultation.peutCreerCompteCandidat(s.role) && comptes.isEmpty(),
@@ -448,6 +454,8 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
                 db.historiqueDao().pourObjet(EntitesHistorique.DOSSIER, id),
                 session,
             ) { dossier, pieces, historique, s ->
+                // Un brouillon n'existe pas encore pour le candidat : « introuvable », comme un id invalide.
+                if (dossier != null && s != null && !ReglesConsultation.dossierVisible(s.role, dossier.statut)) return@combine EtatDossier()
                 // Le candidat et la catégorie sont lus une fois par changement (map suspend, comme un DAO ponctuel).
                 EtatDossier(
                     dossier = dossier,
@@ -455,6 +463,7 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
                     historique = historique,
                     peutSoumettre = dossier != null && (dossier.statut == StatutDossier.BROUILLON || dossier.statut == StatutDossier.INCOMPLET) && s != null && ReglesConsultation.peutGererCandidat(s.role),
                     peutDecider = dossier?.statut == StatutDossier.SOUMIS && estAtt(s),
+                    peutJoindre = dossier != null && s != null && PiecesJointes.peutJoindre(s.role, dossier.statut),
                 )
             }.map { etat ->
                 etat.copy(
@@ -468,6 +477,99 @@ class CandidatsViewModel(application: Application) : AndroidViewModel(applicatio
     fun cocherPiece(piece: PieceDossier, fournie: Boolean) {
         gestionnaireCandidat() ?: return
         viewModelScope.launch { db.pieceDossierDao().modifier(piece.copy(fournie = fournie)) }
+    }
+
+    // ----- Pièces jointes (D2b) -----
+
+    /**
+     * La pièce pour laquelle un fichier ou une photo est en cours de choix, et l'adresse où l'appareil photo écrit.
+     * Gardées ici et non dans l'écran : la réponse du téléphone arrive plus tard, parfois après une rotation.
+     */
+    private var pieceEnAttente: Int? = null
+    private var photoEnAttente: Uri? = null
+
+    /** Avant d'ouvrir le sélecteur de fichier : retenir la pièce concernée. */
+    fun preparerFichier(pieceId: Int) {
+        pieceEnAttente = pieceId
+        photoEnAttente = null
+    }
+
+    /** Avant d'ouvrir l'appareil photo : retenir la pièce et rendre l'adresse où la photo sera écrite. */
+    fun preparerPhoto(pieceId: Int): Uri {
+        pieceEnAttente = pieceId
+        return nouvelleAdressePhoto(getApplication()).also { photoEnAttente = it }
+    }
+
+    /** Réponse du sélecteur : null si l'utilisateur a renoncé. */
+    fun fichierChoisi(source: Uri?) {
+        val pieceId = pieceEnAttente ?: return
+        pieceEnAttente = null
+        if (source != null) joindreFichier(pieceId, source)
+    }
+
+    /** Réponse de l'appareil photo : faux si l'utilisateur a renoncé. */
+    fun photoPrise(reussie: Boolean) {
+        val pieceId = pieceEnAttente
+        val adresse = photoEnAttente
+        pieceEnAttente = null
+        photoEnAttente = null
+        if (reussie && pieceId != null && adresse != null) joindreFichier(pieceId, adresse)
+    }
+
+    /**
+     * Joint le fichier à la pièce : copie dans le stockage privé, pièce cochée « fournie », ligne d'historique
+     * sur le dossier. Un fichier déjà joint est remplacé (sa copie est effacée, l'historique garde la trace).
+     */
+    private fun joindreFichier(pieceId: Int, source: Uri) {
+        val utilisateur = gestionnaireCandidat() ?: return
+        val contexte = getApplication<Application>()
+        viewModelScope.launch {
+            val piece = db.pieceDossierDao().parId(pieceId) ?: return@launch
+            val dossier = db.dossierDao().parId(piece.dossierId) ?: return@launch
+            if (!PiecesJointes.peutJoindre(utilisateur.role, dossier.statut)) return@launch
+            val type = contexte.contentResolver.getType(source)
+            val extension = PiecesJointes.extensionPour(type)
+                ?: return@launch _saisieDossier.update { it.copy(erreur = PiecesJointes.verifierFichier(type, 1)) }
+            val chemin = PiecesJointes.cheminCopie(piece.id, maintenantIso(), extension)
+            val taille = copierDansStockage(contexte, source, chemin, PiecesJointes.TAILLE_MAX_OCTETS)
+            val erreur = if (taille == null) "Lecture du fichier impossible." else PiecesJointes.verifierFichier(type, taille)
+            if (erreur != null) {
+                supprimerDuStockage(contexte, chemin)
+                return@launch _saisieDossier.update { it.copy(erreur = erreur) }
+            }
+            val jointe = PiecesJointes.joindre(piece, chemin)
+            db.withTransaction {
+                db.pieceDossierDao().modifier(jointe)
+                db.tracer(
+                    EntitesHistorique.DOSSIER, dossier.id, ActionsHistorique.PIECE_JOINTE, utilisateur.id,
+                    ancienneValeur = PiecesJointes.resume(piece),
+                    nouvelleValeur = PiecesJointes.resume(jointe) + if (piece.fichier != null) ", remplace le fichier précédent" else "",
+                )
+            }
+            piece.fichier?.let { supprimerDuStockage(contexte, it) }
+            _saisieDossier.update { it.copy(erreur = null) }
+        }
+    }
+
+    /** Retire le fichier joint ; la pièce reste cochée, l'original papier pouvant toujours être apporté. */
+    fun retirerFichier(pieceId: Int) {
+        val utilisateur = gestionnaireCandidat() ?: return
+        val contexte = getApplication<Application>()
+        viewModelScope.launch {
+            val piece = db.pieceDossierDao().parId(pieceId) ?: return@launch
+            val chemin = piece.fichier ?: return@launch
+            val dossier = db.dossierDao().parId(piece.dossierId) ?: return@launch
+            if (!PiecesJointes.peutJoindre(utilisateur.role, dossier.statut)) return@launch
+            val retiree = PiecesJointes.retirer(piece)
+            db.withTransaction {
+                db.pieceDossierDao().modifier(retiree)
+                db.tracer(
+                    EntitesHistorique.DOSSIER, dossier.id, ActionsHistorique.PIECE_RETIREE, utilisateur.id,
+                    ancienneValeur = PiecesJointes.resume(piece), nouvelleValeur = PiecesJointes.resume(retiree),
+                )
+            }
+            supprimerDuStockage(contexte, chemin)
+        }
     }
 
     /** Soumet le dossier à l'ATT après contrôle d'éligibilité (âge minimum de la catégorie, valeur configurée). */

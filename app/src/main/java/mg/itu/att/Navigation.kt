@@ -22,12 +22,15 @@ import mg.itu.att.ui.autoecoles.EcranListeAutoEcoles
 import mg.itu.att.ui.candidats.CandidatsViewModel
 import mg.itu.att.ui.candidats.EcranDetailCandidat
 import mg.itu.att.ui.candidats.EcranDossier
+import mg.itu.att.ui.candidats.EcranPieceJointe
+import mg.itu.att.ui.candidats.PieceJointeViewModel
 import mg.itu.att.ui.candidats.EcranDossiersATraiter
 import mg.itu.att.ui.candidats.EcranFormulaireCompteCandidat
 import mg.itu.att.ui.candidats.EcranParcours
 import mg.itu.att.ui.candidats.EcranFormulaireCandidat
 import mg.itu.att.ui.candidats.EcranListeCandidats
 import mg.itu.att.ui.communs.EcranAVenir
+import mg.itu.att.ui.communs.revenir
 import mg.itu.att.ui.configuration.ConfigurationViewModel
 import mg.itu.att.ui.configuration.EcranCategories
 import mg.itu.att.ui.configuration.EcranCentres
@@ -133,13 +136,13 @@ fun AppNavigation() {
             val s = session ?: return@composable
             val vm: SynchronisationViewModel = viewModel()
             vm.definirSession(s)
-            EcranSynchronisation(vm, onRetour = { navController.popBackStack() })
+            EcranSynchronisation(vm, onRetour = { navController.revenir() })
         }
         graphImpression(navController) { session }
 
         // ---------- FONCTIONNALITÉS À VENIR ----------
         composable(Routes.A_VENIR) { entree ->
-            EcranAVenir(entree.arguments?.getString("libelle") ?: "À venir", onRetour = { navController.popBackStack() })
+            EcranAVenir(entree.arguments?.getString("libelle") ?: "À venir", onRetour = { navController.revenir() })
         }
     }
 }
@@ -162,7 +165,7 @@ object RoutesImpression {
  * Le ViewModel vérifie les droits avant de construire la page (une auto-école n'imprime que ses candidats).
  */
 private fun NavGraphBuilder.graphImpression(nav: NavHostController, session: () -> SessionUtilisateur?) {
-    val retour: () -> Unit = { nav.popBackStack() }
+    val retour: () -> Unit = { nav.revenir() }
 
     fun NavGraphBuilder.document(route: String, argument: String, type: TypeDocument) {
         composable(route) { entree ->
@@ -193,7 +196,7 @@ object RoutesResultats {
  * les évaluations saisies par l'examinateur. Un seul écran, filtré par le ViewModel selon le rôle.
  */
 private fun NavGraphBuilder.graphResultats(nav: NavHostController, session: () -> SessionUtilisateur?) {
-    val retour: () -> Unit = { nav.popBackStack() }
+    val retour: () -> Unit = { nav.revenir() }
 
     composable(RoutesResultats.LISTE) {
         val vm = viewModelDuSousParcours<ResultatsViewModel>(nav, RoutesResultats.LISTE, session()) ?: return@composable
@@ -220,7 +223,7 @@ private fun NavGraphBuilder.graphResultats(nav: NavHostController, session: () -
  * (`viewModelDuSousParcours`) : on ouvre d'abord la liste, puis la fiche, pour que la racine soit dans la pile.
  */
 private fun NavGraphBuilder.graphHistorique(nav: NavHostController, session: () -> SessionUtilisateur?) {
-    val retour: () -> Unit = { nav.popBackStack() }
+    val retour: () -> Unit = { nav.revenir() }
 
     fun peutOuvrir(entite: String) = entite in listOf(
         EntitesHistorique.CANDIDAT, EntitesHistorique.DOSSIER, EntitesHistorique.SESSION, EntitesHistorique.AUTO_ECOLE,
@@ -256,7 +259,7 @@ object RoutesAutoEcoles {
 }
 
 private fun NavGraphBuilder.graphAutoEcoles(nav: NavHostController, session: () -> SessionUtilisateur?) {
-    val retour: () -> Unit = { nav.popBackStack() }
+    val retour: () -> Unit = { nav.revenir() }
 
     composable(RoutesAutoEcoles.LISTE) {
         val vm = viewModelDuSousParcours<AutoEcolesViewModel>(nav, RoutesAutoEcoles.LISTE, session()) ?: return@composable
@@ -307,7 +310,7 @@ object RoutesEvaluation {
 }
 
 private fun NavGraphBuilder.graphSessions(nav: NavHostController, session: () -> SessionUtilisateur?) {
-    val retour: () -> Unit = { nav.popBackStack() }
+    val retour: () -> Unit = { nav.revenir() }
     @Composable
     fun vm(): SessionsViewModel? = viewModelDuSousParcours(nav, RoutesSessions.LISTE, session())
 
@@ -408,7 +411,7 @@ object RoutesConfiguration {
 }
 
 private fun NavGraphBuilder.graphConfiguration(nav: NavHostController, session: () -> SessionUtilisateur?) {
-    val retour: () -> Unit = { nav.popBackStack() }
+    val retour: () -> Unit = { nav.revenir() }
     /** Le ViewModel partagé de tout le sous-parcours, ancré sur le menu de configuration. */
     @Composable
     fun vm(): ConfigurationViewModel? = viewModelDuSousParcours(nav, RoutesConfiguration.MENU, session())
@@ -512,7 +515,7 @@ object RoutesComptes {
 }
 
 private fun NavGraphBuilder.graphComptes(nav: NavHostController, session: () -> SessionUtilisateur?) {
-    val retour: () -> Unit = { nav.popBackStack() }
+    val retour: () -> Unit = { nav.revenir() }
 
     composable(RoutesComptes.EXAMINATEURS) {
         val vm = viewModelDuSousParcours<ComptesViewModel>(nav, RoutesComptes.EXAMINATEURS, session()) ?: return@composable
@@ -551,6 +554,7 @@ object RoutesCandidats {
     const val DETAIL = "candidat/{candidatId}"
     const val MODIFIER = "candidat/{candidatId}/modifier"
     const val DOSSIER = "dossier/{dossierId}"
+    const val PIECE = "piece/{pieceId}"
     const val A_TRAITER = Routes.DOSSIERS
     const val COMPTE = "candidat/{candidatId}/compte"
     const val PARCOURS = Routes.PARCOURS
@@ -558,11 +562,12 @@ object RoutesCandidats {
     fun detail(id: Int) = "candidat/$id"
     fun modifier(id: Int) = "candidat/$id/modifier"
     fun dossier(id: Int) = "dossier/$id"
+    fun piece(id: Int) = "piece/$id"
     fun compte(id: Int) = "candidat/$id/compte"
 }
 
 private fun NavGraphBuilder.graphCandidats(nav: NavHostController, session: () -> SessionUtilisateur?) {
-    val retour: () -> Unit = { nav.popBackStack() }
+    val retour: () -> Unit = { nav.revenir() }
 
     composable(RoutesCandidats.LISTE) {
         val vm = viewModelDuSousParcours<CandidatsViewModel>(nav, RoutesCandidats.LISTE, session()) ?: return@composable
@@ -613,7 +618,14 @@ private fun NavGraphBuilder.graphCandidats(nav: NavHostController, session: () -
         val vm: CandidatsViewModel = viewModel()
         vm.definirSession(s)
         val id = entree.idArgument("dossierId") ?: return@composable
-        EcranDossier(vm, id, onRetour = retour)
+        EcranDossier(vm, id, onOuvrirPiece = { nav.navigate(RoutesCandidats.piece(it)) }, onRetour = retour)
+    }
+    composable(RoutesCandidats.PIECE) { entree ->
+        val s = session() ?: return@composable
+        val vm: PieceJointeViewModel = viewModel()
+        vm.definirSession(s)
+        val id = entree.idArgument("pieceId") ?: return@composable
+        EcranPieceJointe(vm, id, onRetour = retour)
     }
     composable(RoutesCandidats.A_TRAITER) {
         val s = session() ?: return@composable

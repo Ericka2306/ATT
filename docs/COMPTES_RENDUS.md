@@ -725,3 +725,47 @@ Le refus d'un report ou d'une annulation sans motif se posait dans l'erreur de l
 2. Le serveur reçoit le numéro d'appel, jamais le nom : cohérent avec l'anonymat.
 
 **À relire** : les fichiers ci-dessus ; entrée 20 du journal IA.
+
+---
+
+## Étape D2b — Pièces jointes numériques du dossier — 18/09/2026
+
+**Pourquoi** : témoignage du dev 1 (Q7) — à un appel, un candidat a été renvoyé sans passer l'épreuve parce qu'il manquait une pièce à son dossier, découverte seulement ce jour-là. Si l'auto-école peut joindre une photo de chaque pièce, l'ATT vérifie le dossier **avant** la convocation. Joindre reste **facultatif** : sans fichier, la vérification se fait sur le dossier papier, comme aujourd'hui.
+
+**Créé** (`app/src/main/java/mg/itu/att/`)
+- `metier/PiecesJointes.kt` — les décisions, en fonctions pures : comment une pièce se vérifie (`FICHIER_JOINT`, `SUR_PAPIER`, `MANQUANTE`), qui peut joindre et quand (auto-école ou ATT, dossier brouillon ou renvoyé incomplet), types acceptés (JPEG, PNG, PDF), taille maximale (10 Mo), nom de la copie (neuf à chaque ajout), résumé pour l'historique.
+- `ui/candidats/FichiersPieces.kt` — le côté Android : copie du fichier choisi dans le stockage privé (`filesDir/pieces/`), adresse où l'appareil photo écrit (`FileProvider`), relecture d'une photo (réduite pour la mémoire) ou des pages d'un PDF (`PdfRenderer`).
+- `ui/candidats/PieceJointeViewModel.kt`, `EcranPieceJointe.kt` — ouvrir le fichier joint à une pièce, avec les mêmes droits que le dossier (route `piece/{pieceId}`).
+- `res/xml/chemins_partages.xml` et le `<provider>` du manifeste : seul le sous-dossier `photos/` du cache est exposé, le temps que l'appareil photo y écrive.
+- `app/src/test/…/PiecesJointesTest.kt` — 6 tests, dont **« le fichier est facultatif »** (critère de fin de l'étape) et « le candidat ne voit pas un dossier en brouillon ».
+
+**Modifié**
+- `data/EntitesDossiers.kt` — `PieceDossier.fichier: String?` ; `data/AppDatabase.kt` — **schéma v5** (`app/schemas/…/5.json` exporté) ; `data/DossiersDao.kt` — `PieceDossierDao.parId` ; `data/Tracage.kt` — actions `PIECE_JOINTE`, `PIECE_RETIREE`.
+- `ui/candidats/CandidatsViewModel.kt` — joindre (fichier ou photo), remplacer, retirer, chacun tracé sur le dossier dans la même transaction ; la pièce en attente de réponse du téléphone est gardée dans le ViewModel, pas dans l'écran.
+- `ui/candidats/EcranDossier.kt` — sous chaque pièce : son mode de vérification et « Joindre un fichier », « Prendre une photo », « Ouvrir », « Remplacer », « Retirer ». Une pièce avec un fichier ne se décoche pas (retirer d'abord le fichier).
+- `metier/ReglesConsultation.kt` — `dossierVisible` : **le candidat ne voit pas un dossier encore en brouillon** (demandé avec D2b). Appliqué à sa fiche et à l'écran du dossier.
+- `ui/communs/NavigationCommune.kt`, `Navigation.kt` — `revenir()` : voir « Défaut trouvé » ci-dessous.
+- `docs/HORS_COURS.md` n° 28 à 31, déclarés avant usage : sélecteur de fichier et appareil photo, copie avec `withContext(Dispatchers.IO)` et `try/catch`, affichage d'une image ou d'un PDF, `previousBackStackEntry`.
+
+**Défaut trouvé en testant, corrigé**
+Trois appuis rapides sur la flèche « Retour » dépilaient aussi l'accueil : **écran vide**, et le retour système sortait de l'application. Reproduit depuis « Dossiers à traiter ». La cause n'est pas propre à D2b : toutes les flèches « Retour » appelaient `popBackStack()` sans condition. `revenir()` ne remonte plus au-delà de l'accueil ; revérifié avec trois puis quatre appuis rapides.
+
+**Tests**
+- `assembleDebug` vert, aucun avertissement ; `testDebugUnitTest` : **127 tests verts** (121 + 6).
+- Émulateur, base neuve (v5), comptes de démonstration :
+  1. `autoecole` ouvre un dossier B pour RAKOTO Hery et joint **les trois sortes de fichiers** : une photo choisie dans les fichiers (acte de naissance), un PDF (certificat de résidence), une photo prise avec l'appareil photo (CIN). La 4ᵉ pièce est cochée sans fichier : « vérification sur le dossier papier ».
+  2. `candidat` : « Aucun dossier déposé par votre auto-école » — le brouillon ne se voit pas.
+  3. `autoecole` soumet : les boutons d'ajout disparaissent, il ne reste que « Ouvrir ».
+  4. `admin` ouvre la photo, le PDF (dessiné page par page) et la photo de l'appareil, puis renvoie le dossier **incomplet** (« Photo de la CIN illisible »).
+  5. `autoecole` **remplace** la photo de la CIN, resoumet ; l'ancienne copie est effacée du stockage. `admin` **valide**.
+  6. `candidat` voit le dossier validé et peut ouvrir les fichiers.
+  7. Un second dossier : joindre un PDF puis le **retirer** — la pièce reste cochée, le fichier disparaît du stockage.
+  Historique du dossier : chaque ajout, remplacement et retrait avec l'ancienne et la nouvelle valeur.
+- Les fichiers de test sont des pages marquées « DOCUMENT DE TEST — aucune valeur officielle ». La photo de l'appareil est la scène virtuelle de l'émulateur.
+
+**Décisions restantes**
+1. Le schéma passe en **v5**. Il faudra le figer pour de bon avant la soutenance (le compte rendu de D2c le disait déjà pour v4).
+2. Les fichiers sont copiés sans chiffrement dans le stockage privé de l'application : aucune autre application ne peut les lire, mais la protection des données personnelles reste à confirmer avec l'ATT (Q7).
+3. Une photo prise de travers s'affiche telle quelle : l'orientation enregistrée par l'appareil photo n'est pas relue.
+
+**À relire** : les fichiers ci-dessus ; entrée 21 du journal IA.
