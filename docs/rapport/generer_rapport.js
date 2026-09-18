@@ -205,7 +205,7 @@ function problematique() {
   return [
     titre1("2. Problématique"),
     ...paras(
-      "Passer l'examen du permis à Madagascar reste aujourd'hui un parcours long et opaque, pour le candidat comme pour l'administration. L'échelle donne la mesure du problème : environ 60 000 candidats par an, un taux de réussite d'environ 53 %, 173 auto-écoles dont une centaine à Antananarivo, 22 centres d'examen et 31 examinateurs pour tout le pays (presse, juillet 2024, annexe C). Les difficultés relevées sont les suivantes.",
+      "Passer l'examen du permis à Madagascar reste aujourd'hui un parcours long et opaque, pour le candidat comme pour l'administration. L'échelle donne la mesure du problème : environ 60 000 candidats par an, un taux de réussite d'environ 53 %, 173 auto-écoles dont une centaine à Antananarivo, 22 centres d'examen et 31 examinateurs pour tout le pays (presse, juillet 2024, annexe B). Les difficultés relevées sont les suivantes.",
     ),
     titre2("2.1 Pour le candidat et l'auto-école"),
     ...puces(
@@ -311,7 +311,7 @@ function parcours() {
   return [
     titre1("6. Le parcours dans l'application, de A à Z"),
     ...paras(
-      "Ce chapitre suit un candidat de son inscription en auto-école jusqu'à son résultat, dans l'ordre réel des opérations. Chaque étape est illustrée par une capture prise sur un petit téléphone (720 × 1280) ; les comptes utilisés sont ceux de l'annexe E.",
+      "Ce chapitre suit un candidat de son inscription en auto-école jusqu'à son résultat, dans l'ordre réel des opérations. Chaque étape est illustrée par une capture prise sur un petit téléphone (720 × 1280) ; les comptes utilisés sont ceux de l'annexe D.",
       "Une précision honnête avant de commencer : ce MVP (produit minimum viable, la version qui couvre le parcours de bout en bout sans les raffinements) fonctionne sur un seul appareil. Tous les rôles se connectent à la même base locale, ce qui correspond à un poste de l'ATT dans un centre, où l'administrateur saisit aussi pour l'auto-école et pour le candidat sans smartphone. Répartir les rôles sur plusieurs téléphones exigerait le serveur central, hors périmètre, qui devrait diffuser la configuration, les dossiers et les inscriptions dans les deux sens ; la synchronisation de la section 6.19 n'en est que le premier pas.",
     ),
     ...etape(1, "Connexion et accueil par rôle",
@@ -431,7 +431,7 @@ function architecture() {
     ...paras(
       "Un exemple de bout en bout. Sur l'écran des inscriptions, l'administrateur choisit un candidat et appuie sur « Inscrire ». L'écran appelle la fonction inscrire du ViewModel avec l'identifiant du candidat. Le ViewModel rassemble ce qu'il faut (session, créneaux, inscriptions existantes, règles configurées) et appelle la fonction pure ReglesInscription.verifier, qui renvoie soit un message (« Session complète », « Le candidat est déjà inscrit »), soit rien. S'il y a un message, il est placé dans l'état et l'écran l'affiche dans un encart rouge. Sinon, le ViewModel ouvre une transaction : insertion de l'inscription avec son numéro d'appel et son créneau, puis la ligne d'historique. Room réémet alors les flux des tables concernées, la fonction combine recalcule l'état, et l'écran se redessine avec la nouvelle ligne et les places restantes : aucune relecture manuelle, aucun rafraîchissement à déclencher.",
     ),
-    ...paras("L'annexe B montre les quatre briques de ce flux : l'écriture et sa ligne d'historique dans une même transaction (B.1), une règle pure et son test (B.2), un ViewModel qui combine les flux de Room en un seul état (B.3) et le tirage du sujet avec le hasard injecté (B.4)."),
+    ...paras("L'annexe A montre les quatre briques de ce flux : l'écriture et sa ligne d'historique dans une même transaction (A.1), une règle pure et son test (A.2), un ViewModel qui combine les flux de Room en un seul état (A.3) et le tirage du sujet avec le hasard injecté (A.4)."),
     titre2("7.4 Sécurité"),
     ...puces(
       "Mots de passe jamais en clair : empreinte PBKDF2 (fonction de dérivation de clé de la bibliothèque Java, plusieurs milliers d'itérations) avec un sel aléatoire par compte ; seule l'empreinte est stockée et comparée.",
@@ -540,7 +540,7 @@ function usageIA() {
     ...paras(
       "Le module s'intitule « assistée par IA » : ce chapitre dit ce que nous avons fait avec l'IA, ce qu'elle a fait de bien et de mal, et ce que nous avons refusé.",
       "L'outil : Claude Code, un agent de développement qui lit et écrit les fichiers du projet, lance la construction et les tests, et pilote l'émulateur. Il a été utilisé au niveau « agent » décrit dans l'état de l'art du module, avec un fichier de règles à la racine du projet qui lui impose les technologies du cours, l'interdiction d'inventer une règle administrative, la traçabilité, et un cycle de fin d'étape : construction et tests verts, vérification sur émulateur, compte rendu, entrée dans le journal, puis relecture humaine avant tout commit.",
-      "La proportion : l'IA a produit la majorité du code de chaque étape à partir de nos documents de cadrage (règles, plan, modèle de données, cas d'utilisation), que nous avons écrits et validés avant la première ligne. Nous avons relu chaque fichier dans la demande de fusion (pull request) de l'étape avant de la fusionner, et rejoué chaque scénario sur l'émulateur. Le journal IA (annexe G) consigne pour chaque étape ce qui a été soumis, la remarque principale de l'IA, les points d'alerte, et notre verdict.",
+      "La proportion : l'IA a produit la majorité du code de chaque étape à partir de nos documents de cadrage (règles, plan, modèle de données, cas d'utilisation), que nous avons écrits et validés avant la première ligne. Nous avons relu chaque fichier dans la demande de fusion (pull request) de l'étape avant de la fusionner, et rejoué chaque scénario sur l'émulateur. Le journal IA (annexe F) consigne pour chaque étape ce qui a été soumis, la remarque principale de l'IA, les points d'alerte, et notre verdict.",
     ),
     titre2("10.1 Ce que nous avons refusé ou corrigé"),
     ...puces(
@@ -553,7 +553,7 @@ function usageIA() {
     titre2("10.2 Ce que l'IA fait bien, ce qu'elle fait mal"),
     ...paras(
       "Bien : produire vite du code conforme à un patron donné (le duo état et événements d'un ViewModel, un DAO, un écran), écrire les tests d'une règle pure, rédiger les comptes rendus et tenir la trace. Mal : elle ne connaît pas le terrain (le QCM), elle reproduit ses propres défauts d'un écran à l'autre, elle propose volontiers des outils hors programme (Repository, WorkManager, Retrofit) qu'il faut refuser, et elle affirme avec la même assurance ce qui est vérifié et ce qui ne l'est pas.",
-      "La question de la dernière séance, « sur quelle tâche auriez-vous appris moins si l'IA avait été autorisée ? », nous y répondons ainsi : sur l'architecture. Si l'IA avait posé seule le modèle de données et la découpe des ViewModels, nous aurions eu une application qui marche sans savoir pourquoi. C'est parce que nous avons écrit le cadrage et relu chaque étape que nous savons expliquer chaque fichier ; trois entrées du journal sont recopiées en annexe G pour en témoigner.",
+      "La question de la dernière séance, « sur quelle tâche auriez-vous appris moins si l'IA avait été autorisée ? », nous y répondons ainsi : sur l'architecture. Si l'IA avait posé seule le modèle de données et la découpe des ViewModels, nous aurions eu une application qui marche sans savoir pourquoi. C'est parce que nous avons écrit le cadrage et relu chaque étape que nous savons expliquer chaque fichier ; trois entrées du journal sont recopiées en annexe F pour en témoigner.",
     ),
   ];
 }
@@ -589,7 +589,7 @@ function deroulement() {
     espace(),
     titre2("11.3 Durée réelle et bilan"),
     ...paras(
-      "Le plan prévoyait dix semaines ; le développement s'est fait en peu de jours, à deux, précédé de la recherche documentaire de l'annexe C. Le cadrage (règles, plan, modèle de données, cas d'utilisation) a été écrit le premier jour, avant la première ligne de code, et n'a presque pas bougé ensuite : c'est ce qui a permis d'enchaîner les étapes sans revenir en arrière. Le socle technique et les premières fonctionnalités ont suivi ; puis les évaluations, les résultats, la consultation et l'impression ; enfin les tests, la relecture croisée, la refonte de l'interface et ce rapport.",
+      "Le plan prévoyait dix semaines ; le développement s'est fait en peu de jours, à deux, précédé de la recherche documentaire de l'annexe B. Le cadrage (règles, plan, modèle de données, cas d'utilisation) a été écrit le premier jour, avant la première ligne de code, et n'a presque pas bougé ensuite : c'est ce qui a permis d'enchaîner les étapes sans revenir en arrière. Le socle technique et les premières fonctionnalités ont suivi ; puis les évaluations, les résultats, la consultation et l'impression ; enfin les tests, la relecture croisée, la refonte de l'interface et ce rapport.",
       "Ce qui a pris plus de temps que prévu : comprendre le vrai déroulement de l'examen. La première version de l'épreuve théorique était un questionnaire à choix multiples, construit d'après la presse ; elle a été refaite le jour même, après le passage de l'examen par l'une de nous, sous la forme d'une feuille d'examen orale. La leçon vaut pour tout le projet : un témoignage de terrain vaut plus qu'un article, et ce que l'on ne sait pas doit rester une configuration marquée « à confirmer », pas une hypothèse gravée dans le code.",
     ),
   ];
@@ -649,7 +649,7 @@ function limites() {
     ),
     titre2("13.2 Ce qui reste à confirmer ou à construire pour coller au terrain"),
     ...puces(
-      "Les barèmes, seuils, délais et la grille de conduite sont des valeurs d'exemple en attente de validation par l'ATT (annexe F).",
+      "Les barèmes, seuils, délais et la grille de conduite sont des valeurs d'exemple en attente de validation par l'ATT (annexe E).",
       "La fin de la chaîne : clôture d'une session, procès-verbal signé par l'examinateur, liste des admis numérotée et non modifiable, bordereau vers le CIM, et une procédure de réclamation avec délai et décision tracée.",
       "Les droits d'examen : la quittance pourrait devenir une pièce du dossier exigée avant l'inscription, sans que l'application gère le paiement.",
       "Le report d'une session entière (véhicule en panne, examinateur absent, intempéries) avec transfert des inscriptions et nouvelles convocations.",
@@ -676,11 +676,8 @@ function limites() {
 
 function annexes() {
   return [
-    titre1("Annexe A — Captures d'écran"),
-    ...paras("Les captures du chapitre 6 ont été prises sur l'émulateur Android d'un petit téléphone (720 × 1280), avec les comptes de démonstration, en rejouant le parcours complet depuis une base vide. Elles sont récapitulées ici dans l'ordre du document."),
-    tableau(["Figure", "Écran", "Fichier"], FIGURES.map((f) => [String(f.numero), f.legende, f.fichier]), [12, 50, 38]),
-    titre1("Annexe B — Extraits de code commentés"),
-    titre2("B.1 Écriture et historique dans une même transaction"),
+    titre1("Annexe A — Extraits de code commentés"),
+    titre2("A.1 Écriture et historique dans une même transaction"),
     ...paras("Extrait simplifié de AppelViewModel (la version réelle vérifie d'abord le statut de la session et de la présence)."),
     ...bloc([
       "db.withTransaction {",
@@ -692,7 +689,7 @@ function annexes() {
     ]),
     espace(),
     ...paras("La modification et sa trace sont dans le même bloc : Room les écrit ensemble ou n'écrit rien. L'historique ne peut donc jamais raconter autre chose que ce qui s'est passé."),
-    titre2("B.2 Une règle pure et son test"),
+    titre2("A.2 Une règle pure et son test"),
     ...bloc([
       "// Règle d'ouverture d'une tentative (couche métier)",
       "fun peutOuvrir(statutPresence: StatutPresence?, tentativeDeCetteInscription: Tentative?,",
@@ -714,7 +711,7 @@ function annexes() {
       "}",
     ]),
     ...paras("Extrait simplifié (les messages réels citent le numéro et le statut du passage). La fonction ne connaît ni Android ni la base : elle reçoit des valeurs et renvoie un message d'erreur ou null. Le ViewModel fait les requêtes, la fonction fait le jugement, le test JUnit tourne sans téléphone."),
-    titre2("B.3 Un ViewModel branché sur Room"),
+    titre2("A.3 Un ViewModel branché sur Room"),
     ...bloc([
       "val etat: StateFlow<EtatTentatives> =",
       "    idSession.flatMapLatest { id ->",
@@ -723,7 +720,7 @@ function annexes() {
       "    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EtatTentatives())",
     ]),
     ...paras("L'écran collecte un seul état immuable, recalculé par Room à chaque changement d'une des tables : aucune lecture manuelle, aucun rafraîchissement à déclencher."),
-    titre2("B.4 Le tirage du sujet, reproductible"),
+    titre2("A.4 Le tirage du sujet, reproductible"),
     ...bloc([
       "fun tirerSujet(questionsActives: List<Question>, noteMax: Double, aleatoire: Random = Random.Default): List<Question> {",
       "    val sujet = mutableListOf<Question>(); var total = 0.0",
@@ -735,7 +732,7 @@ function annexes() {
       "}",
     ]),
     ...paras("Le hasard est un paramètre : en production, le générateur par défaut ; en test, une graine fixe, et le test vérifie que le sujet atteint la note maximale sans la dépasser ni répéter une question."),
-    titre1("Annexe C — Sources"),
+    titre1("Annexe B — Sources"),
     tableau(["Sujet", "Source", "Fiabilité"], [
       ["Pièces du dossier, frais, étapes officielles", "Portail Torolalana (gouvernement) — torolalana.gov.mg", "Officiel"],
       ["Code de la route, catégories", "Loi n° 2017-002 du 6 juillet 2017 (officiel) ; décret 2026-974 cité par la presse, texte non consulté", "Officiel / presse"],
@@ -755,7 +752,7 @@ function annexes() {
       "fr.wikipedia.org/wiki/Région_de_Madagascar (liste des 24 régions)",
       "developer.android.com, m3.material.io, kotlinlang.org (documentation technique)",
     ),
-    titre1("Annexe D — Glossaire"),
+    titre1("Annexe C — Glossaire"),
     tableau(["Terme", "Sens dans l'application"], [
       ["Passage (tentative)", "Un candidat passe une épreuve une fois ; numéroté, jamais effacé"],
       ["Inscription", "Convocation d'un candidat à une session, avec numéro d'appel et créneau"],
@@ -783,13 +780,13 @@ function annexes() {
       ["Hors ligne d'abord", "La base locale est la source de vérité ; le réseau la nourrit quand il est là"],
     ], [30, 70]),
     espace(),
-    titre1("Annexe E — Comptes de démonstration"),
+    titre1("Annexe D — Comptes de démonstration"),
     ...paras("Comptes disponibles au premier lancement d'une version de développement, rappelés sur l'écran de connexion avec un bouton par rôle ; les trois derniers n'existent pas dans la version livrée, et les deux premiers y ont un mot de passe initial documenté, qu'il faut changer soi-même : l'application ne l'impose pas encore (13.1)."),
     tableau(["Rôle", "Identifiant", "Mot de passe initial"], [
       ["Super administrateur", "superadmin", "ChangezMoi2026"], ["Administrateur ATT", "admin", "admin2026"], ["Auto-école", "autoecole", "autoecole2026"], ["Examinateur", "examinateur", "examinateur2026"], ["Candidat", "candidat", "candidat2026"],
     ], [34, 30, 36]),
     espace(),
-    titre1("Annexe F — Questions à valider avec l'ATT"),
+    titre1("Annexe E — Questions à valider avec l'ATT"),
     ...paras("Aucune de ces règles n'a été inventée : chacune a une valeur par défaut « à confirmer », modifiable dans l'application, et une question à poser à l'ATT."),
     tableau(["Question", "Ce que nous avons retenu en attendant"], [
       ["Q1 — Épreuve théorique : note maximale, seuil, notation", "Orale (témoignage) ; questions à points variables ; barème d'exemple 30 / 20 dans les données initiales, remplacé par une version 2 à 20 / 12 pendant la démonstration (figure de 6.2)"],
@@ -810,7 +807,7 @@ function annexes() {
       ["Q14 — Auto-école qui demande son agrément", "Non dans le MVP : créée par l'ATT"],
     ], [42, 58]),
     espace(),
-    titre1("Annexe G — Trois entrées du journal IA, telles quelles"),
+    titre1("Annexe F — Trois entrées du journal IA, telles quelles"),
     ...paras("Le journal IA compte une entrée par étape. Les trois entrées ci-dessous sont recopiées telles quelles, sans la ligne qui liste les fichiers concernés : la contradiction entre un index SQL et une règle métier (chapitre 10), le passage du QCM à l'épreuve orale sur un témoignage de terrain (chapitres 2 et 10), et la reprise de la démonstration du cours pour la synchronisation (chapitres 7.5 et 12)."),
     ...entreeJournal(10),
     ...entreeJournal(12),
