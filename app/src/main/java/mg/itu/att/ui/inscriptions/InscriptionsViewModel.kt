@@ -30,6 +30,7 @@ import mg.itu.att.data.regleBooleen
 import mg.itu.att.data.regleEntier
 import mg.itu.att.data.resume
 import mg.itu.att.data.tracer
+import mg.itu.att.metier.formatDate
 import mg.itu.att.metier.ReglesInscription
 import mg.itu.att.metier.dateDuJour
 import mg.itu.att.ui.communs.ViewModelAvecSession
@@ -137,7 +138,7 @@ class InscriptionsViewModel(application: Application) : AndroidViewModel(applica
                     .sortedBy { it.candidat.nom }
                 EtatInscriptions(
                     session = se,
-                    libelleSession = "Permis ${categories.find { it.id == se.categorieId }?.code ?: "?"} — ${epreuves.find { it.id == se.typeEpreuveId }?.libelle ?: "?"} · ${centres.find { it.id == se.centreId }?.nom ?: "?"} · ${se.date} ${se.heureConvocation}",
+                    libelleSession = "Permis ${categories.find { it.id == se.categorieId }?.code ?: "?"} — ${epreuves.find { it.id == se.typeEpreuveId }?.libelle ?: "?"} · ${centres.find { it.id == se.centreId }?.nom ?: "?"} · ${formatDate(se.date)} ${se.heureConvocation}",
                     creneaux = creneaux,
                     inscrits = inscriptions
                         .filter { s?.autoEcoleId == null || candidats.find { c -> c.id == it.candidatId }?.autoEcoleId == s.autoEcoleId }

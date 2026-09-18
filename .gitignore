@@ -22,3 +22,6 @@ local.properties
 *.db
 *.db-journal
 node_modules/
+
+# Fichiers de verrou de Word
+~$*

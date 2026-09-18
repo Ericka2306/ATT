@@ -769,3 +769,31 @@ Trois appuis rapides sur la flèche « Retour » dépilaient aussi l'accueil : *
 3. Une photo prise de travers s'affiche telle quelle : l'orientation enregistrée par l'appareil photo n'est pas relue.
 
 **À relire** : les fichiers ci-dessus ; entrée 21 du journal IA.
+
+---
+
+## Étape D2d — Rejeu de A à Z, audit et rapport technique — 18/09/2026
+
+**Objet** : rejouer tout le parcours depuis une base vide en traquant les petits défauts (front et back), en corrigeant au passage, et en prenant les captures du rapport technique.
+
+**Défauts trouvés et corrigés pendant le rejeu**
+1. Fiche d'une épreuve : la pastille « à confirmer » affichait le drapeau du barème, pas celui de l'épreuve ; le barème a maintenant son propre indicateur et un bouton « Confirmer » sur la version courante (`ConfigurationViewModel.confirmerBareme`, tracé).
+2. Sélecteurs (région, catégorie, épreuve…) : la zone cliquable n'exposait aucun texte ; invisibles pour un lecteur d'écran et pour l'automate de test. Correction : description « Région : Analamanga » et rôle bouton (`Selecteurs.kt`).
+3. Interrupteur réseau de l'écran de synchronisation : même défaut, même correction.
+4. En-tête de l'écran des inscriptions : date brute « 2026-09-18 » au lieu de « 18/09/2026 ».
+5. Nombres « 20.0 » dans l'écran de synchronisation, le panneau serveur et les résumés d'historique : format commun `formatPoints` / `nombreLisible`.
+6. Sections « Historique » vides sur cinq fiches : un titre suivi de rien ; désormais « Aucune modification enregistrée pour l'instant. » (`HistoriqueVide`).
+7. Aperçu d'impression illisible sur petit écran (étiquettes repliées) : page de 640 px et aperçu à l'échelle (`viewport`, `useWideViewPort`).
+8. Pilote d'émulateur : coordonnées de défilement prévues pour un grand écran, « retour » système envoyé sans clavier ouvert (quittait l'écran), captures dans le mauvais dossier. Corrigé (`descendre`, `monter`, `fermer_clavier` conditionnel, `retour`, `bas`, `DOSSIER_CAPTURES`).
+
+**Rapport technique** (`docs/rapport/`) : 43 captures prises pendant le rejeu (720 × 1280), chapitre 6 rédigé étape par étape (19 étapes), annexes A (index des figures, généré), B (quatre extraits commentés), C (sources), D (glossaire), E (comptes), F (questions Q1 à Q14), G (extraits du journal IA) ; chapitre 12 « les cours appliqués » avec les preuves séance par séance ; chapitre 10 sur l'usage de l'IA ; conclusion. Plus aucun passage « à compléter ». Le nombre de tests, la liste des classes de test, le nombre d'entités et de notions hors cours sont lus dans le projet à la génération.
+
+**Audit du rapport par trois agents juges** (18/09/2026) : un juge « jury académique », un juge « métier ATT » et un relecteur de forme ont noté le rapport (13/20 et 12/20 aux deux premières lectures) et listé leurs reproches. Corrections apportées : périmètre contradictoire en 3.2, mode mono-appareil assumé et expliqué, chapitre 10 sur l'IA réécrit avec le jugement porté, limites bloquantes pour un vrai centre en 13.1, gestion des erreurs en 7.7, chiffres faux (entités, notions hors cours, nombre de figures) désormais calculés, deux classes d'exemple d'Android Studio (`ExampleUnitTest`, `ExampleInstrumentedTest`) supprimées du dépôt, `CLAUDE.md` mis à jour (minSdk 26), accords et tournures corrigés. Neuf captures manquantes ajoutées : erreur de connexion, dossiers à traiter, liste et fiche d'une session, convocation, file des résultats, résultat corrigé, liste d'appel et liste des admis.
+
+**Tests** : `assembleDebug` vert, `testDebugUnitTest` : 126 tests verts ; base de l'émulateur recréée (schéma v5) ; parcours complet rejoué : configuration, auto-école, examinateur, candidats, dossiers, sessions théorie et conduite, appels, passages, résultats validés puis corrigés puis revalidés, synchronisation en quatre temps, parcours candidat, quatre documents imprimés, historique.
+
+**Décisions restantes**
+1. Les résumés d'historique déjà écrits gardent l'ancien format des nombres ; la base de démonstration sera recréée avant la soutenance.
+2. Le rapport se relit dans Word ; la version PDF s'exporte depuis Word au moment du rendu (mettre à jour les champs pour le sommaire).
+3. Les verdicts « à compléter par le dev 1 » des entrées 22 et 23 du journal IA restent à écrire par Ericka.
+4. Réécriture ou non des anciens commits qui mentionnent l'outil d'IA : décision d'Ericka.

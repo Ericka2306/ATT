@@ -7,11 +7,11 @@
 
 | | |
 |---|---|
-| **Dernière étape terminée** | D2b (pièces jointes numériques du dossier) — 18/09/2026, en attente de relecture (branche `etape-D2b-pieces-jointes`) ; D2c et D2a (première passe) fusionnées (PR #21, #22) |
-| **Étape en cours** | aucune de développement ; D2a (design) reste 🟡 en attente de la validation des captures avant/après |
-| **Prochaine étape** | clôture de D2a et schéma figé (v5), puis rapport technique (captures du parcours A → Z) et D3 (démonstration répétée deux fois) |
+| **Dernière étape terminée** | D2d (rejeu de A à Z, audit, rapport technique) — 18/09/2026, sur la branche `etape-D2a-design` ; D2b fusionnée (PR #23) ; D2c et D2a (première passe) fusionnées (PR #21, #22) |
+| **Étape en cours** | aucune de développement ; D2a (design) reste 🟡 : retouches au fil des relectures du dev 1 |
+| **Prochaine étape** | schéma figé (v5) et clôture de D2a, puis D3 : démonstration répétée deux fois, relecture du rapport dans Word, export PDF |
 | **Qui fait quoi** | le dev 1 a livré jusqu'à C10, puis D2a (première passe) et D2c ; le dev 2 a repris C11, C12, C13, D1, D2 et D2b, et termine le reste |
-| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape D2b » |
+| **Dernier compte rendu** | `docs/COMPTES_RENDUS.md` → « Étape D2d » |
 | **Dernier commit poussé** | `etape-D2a-design` — « Ajoute la synchronisation hors ligne d'abord, le gabarit du rapport et des retouches d'interface », PR #22 fusionnée |
 
 Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une question à valider
@@ -62,6 +62,7 @@ Légende : 🟢 fait · 🟡 en cours · ⚪ à faire · 🔒 bloqué par une qu
 | D2a Design de l'interface | refonte visuelle pour mobile : thème (formes, typographie), composants communs (barre claire, champs, sélecteurs, cartes, pastilles, états vides), accueil en grille, connexion ; puis retouches écran par écran | l'application « donne envie » : captures avant/après validées par le dev 1 | 🟡 depuis le 18/09/2026 (dev 1 + Claude, branche `etape-D2a-design`) |
 | D2b Dossiers : pièces jointes numériques (dev 2) | l'auto-école soumet déjà le dossier dans l'application (C3) ; **à ajouter** : pour chaque pièce, l'auto-école peut **joindre un fichier** (photo ou PDF pris dans le téléphone : appareil photo, galerie ou fichiers) ; le fichier est copié dans le stockage privé de l'application (pas de serveur), son chemin dans `PieceDossier.fichier` (schéma v4) ; l'Admin ATT l'ouvre depuis l'écran du dossier pour vérifier sans attendre le papier. Joindre est **facultatif** : sans fichier, la vérification se fait sur le dossier papier apporté par l'auto-école, donc plus lentement. À faire aussi : le candidat ne voit pas un dossier encore en brouillon dans son parcours. Notions hors cours à documenter avant usage : sélecteur de fichier (`ActivityResultContracts`), copie dans `filesDir`, affichage d'une image depuis un fichier | scénario : `autoecole` joint une photo à deux pièces et soumet → `admin` ouvre les fichiers et valide ; dossier sans fichier toujours accepté ; test JUnit sur la règle « fichier facultatif » | 🟢 18/09/2026 (dev 2 ; photo, PDF ou appareil photo, facultatif ; brouillon caché au candidat ; schéma v5 ; 127 tests verts) |
 | D2c Synchronisation hors ligne d'abord | appliquer la démo `demosync` du cours S7 : drapeau `synchronisee` sur les résultats validés (schéma v4), faux serveur en mémoire avec interrupteur, remontée automatique après validation, écran « Synchronisation » (file d'attente, bouton, panneau serveur), marque « envoyé / à envoyer » sur la liste des résultats | démonstration en quatre temps comme au cours : réseau on, réseau off, données acquises, resynchronisation | 🟢 18/09/2026 (dev 1 + Claude) |
+| D2d Rejeu de A à Z, audit et rapport | rejouer tout le parcours depuis une base vide, corriger chaque détail vu (8 défauts), prendre les captures du rapport et rédiger le rapport technique Word (`docs/rapport/`) | rapport complet sans passage « à compléter », captures vérifiées | 🟢 18/09/2026 (dev 1 + Claude) |
 | D2 Qualité | relecture croisée du binôme, suppression des logs, schéma Room figé (`version` finale), `LISEZMOI.md` (ouverture, déroulé de démo, comptes de test), captures | chaque membre explique chaque fichier sans IA | 🟢 18/09/2026 (dev 2 ; 12 défauts corrigés, schéma v3 figé et exporté, `docs/06_GUIDE_DU_CODE.md`, démonstration complète rejouée) |
 | D3 Soutenance | démo scriptée : parcours complet auto-école → dossier → validation → session → inscription → appel → tentative → évaluation → résultat → impression | démo répétée deux fois sans erreur | ⚪ |
 

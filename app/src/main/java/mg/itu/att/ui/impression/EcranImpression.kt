@@ -34,7 +34,15 @@ fun EcranImpression(viewModel: ImpressionViewModel, type: TypeDocument, id: Int,
     val etat by viewModel.uiState.collectAsState()
     val contexte = LocalContext.current
     // La WebView est créée une fois et réutilisée : c'est elle qui fournit l'adaptateur d'impression.
-    val vue = remember { WebView(contexte).apply { webViewClient = WebViewClient() } }
+    val vue = remember {
+        WebView(contexte).apply {
+            webViewClient = WebViewClient()
+            // Le document est une page de 640 px de large : l'aperçu la réduit pour tenir sur l'écran au lieu de
+            // replier chaque ligne (sur un petit téléphone, les étiquettes passaient à la ligne).
+            settings.useWideViewPort = true
+            settings.loadWithOverviewMode = true
+        }
+    }
 
     EcranStandard(titre = etat.titre, onRetour = onRetour) {
         TexteErreur(etat.erreur)

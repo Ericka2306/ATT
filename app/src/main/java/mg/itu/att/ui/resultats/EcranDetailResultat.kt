@@ -23,6 +23,7 @@ import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.EcranStandard
 import mg.itu.att.ui.communs.EncartInfo
 import mg.itu.att.ui.communs.TonEncart
+import mg.itu.att.ui.communs.HistoriqueVide
 import mg.itu.att.ui.communs.LigneHistorique
 import mg.itu.att.ui.communs.LigneInfo
 import mg.itu.att.ui.communs.TexteErreur
@@ -125,6 +126,7 @@ fun EcranDetailResultat(
                     }
                 }
                 TitreSection("Historique")
+                if (etat.historique.isEmpty()) HistoriqueVide()
             }
             items(etat.historique) { LigneHistorique(it) }
             item { Spacer(Modifier.height(24.dp)) }

@@ -15,6 +15,7 @@ import mg.itu.att.data.Resultat
 import mg.itu.att.data.StatutResultat
 import mg.itu.att.data.Synchronisation
 import mg.itu.att.ui.communs.ViewModelAvecSession
+import mg.itu.att.ui.communs.formatPoints
 import mg.itu.att.ui.connexion.SessionUtilisateur
 
 /** Un résultat validé tel qu'affiché sur l'écran de synchronisation : lisible sans le nom du candidat. */
@@ -63,7 +64,7 @@ class SynchronisationViewModel(application: Application) : AndroidViewModel(appl
                 resultats = resultats.filter { it.statut == StatutResultat.VALIDE_ATT }.map { r ->
                     val t = tentatives.find { it.id == r.tentativeId }
                     val i = inscriptions.find { it.id == t?.inscriptionId }
-                    LigneSynchro(r, "n° ${i?.numeroAnonymat ?: "?"} · passage n° ${t?.numero ?: "?"} · ${r.noteObtenue} / ${r.noteMax}")
+                    LigneSynchro(r, "n° ${i?.numeroAnonymat ?: "?"} · passage n° ${t?.numero ?: "?"} · ${formatPoints(r.noteObtenue)} / ${formatPoints(r.noteMax)}")
                 },
                 journalServeur = locaux.journal,
                 derniereSynchronisation = FauxServeurATT.derniereSynchronisation,

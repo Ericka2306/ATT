@@ -22,6 +22,7 @@ import mg.itu.att.ui.communs.LigneActions
 import mg.itu.att.ui.communs.CarteFiche
 import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.HistoriqueVide
 import mg.itu.att.ui.communs.LigneHistorique
 import mg.itu.att.ui.communs.LigneInfo
 import mg.itu.att.ui.communs.TexteErreur
@@ -99,7 +100,7 @@ fun EcranDetailSession(
                     OutlinedButton(onClick = { viewModel.changerStatut(s.id, StatutSession.ANNULEE) }) { Text("Confirmer l'annulation") }
                 }
             }
-            item { TitreSection("Historique") }
+            item { TitreSection("Historique"); if (etat.historique.isEmpty()) HistoriqueVide() }
             items(etat.historique) { LigneHistorique(it) }
         }
     }

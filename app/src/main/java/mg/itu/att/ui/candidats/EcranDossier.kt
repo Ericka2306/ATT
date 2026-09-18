@@ -33,6 +33,7 @@ import mg.itu.att.ui.communs.CarteFiche
 import mg.itu.att.ui.communs.CaseACocher
 import mg.itu.att.ui.communs.ChampTexte
 import mg.itu.att.ui.communs.EcranStandard
+import mg.itu.att.ui.communs.HistoriqueVide
 import mg.itu.att.ui.communs.LigneHistorique
 import mg.itu.att.ui.communs.LigneInfo
 import mg.itu.att.ui.communs.TexteErreur
@@ -110,6 +111,7 @@ fun EcranDossier(viewModel: CandidatsViewModel, dossierId: Int, onOuvrirPiece: (
                     }
                 }
                 TitreSection("Historique")
+                if (etat.historique.isEmpty()) HistoriqueVide()
             }
             items(etat.historique) { LigneHistorique(it) }
         }

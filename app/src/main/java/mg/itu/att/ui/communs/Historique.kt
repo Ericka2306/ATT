@@ -21,3 +21,9 @@ fun LigneHistorique(h: Historique) {
         }
     }
 }
+
+/** Section d'historique encore vide : une phrase plutôt qu'un titre suivi de rien. */
+@Composable
+fun HistoriqueVide() {
+    Text("Aucune modification enregistrée pour l'instant.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+}
